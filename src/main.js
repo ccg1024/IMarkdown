@@ -1,20 +1,167 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, dialog, Menu } = require('electron');
 const path = require('path');
+
+require('@electron/remote/main').initialize()
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
+// for menu
+const isMac = process.platform === 'darwin'
+let openFilePath = ''
+
+async function handleOpen() {
+  console.log('into Open file')
+  const { canceled, filePaths } = await dialog.showOpenDialog()
+
+  if (canceled) {
+    return
+  } else {
+    return filePaths[0]
+  }
+}
+
+
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1000,
+    height: 800,
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      nodeIntegration: true,  // makd sure to use `path` and `fs` in react module
+      enableRemoteModule: true,
+      contextIsolation: true
     },
   });
+
+  // show close dialog
+  mainWindow.on('close', function(e) {
+    let response = dialog.showMessageBoxSync(this, {
+      type: 'info',
+      buttons: ['Ok', 'Exit'],
+      title: 'Warning',
+      cancelId: 1,
+      defaultId: 0,
+      detail: 'The app is under development, make sure everything is saved before exiting.'
+    });
+
+    if (response == 1) e.preventDefault();
+  })
+
+  // menu template ----------------------------------------
+  const template = [
+    // { role: 'appMenu' }
+    ...(isMac ? [{
+      label: app.name,
+      submenu: [
+        { role: 'about' },
+        { type: 'separator' },
+        { role: 'services' },
+        { type: 'separator' },
+        { role: 'hide' },
+        { role: 'hideOthers' },
+        { role: 'unhide' },
+        { type: 'separator' },
+        { role: 'quit' }
+      ]
+    }] : []),
+    // { role: 'fileMenu' }
+    {
+      label: 'File',
+      submenu: [
+        {
+          label: "open file",
+          click: async () => {
+            const filePath = await handleOpen()
+            if (filePath) {
+              mainWindow.webContents.send('open-file', filePath)
+              openFilePath = filePath
+            }
+          },
+          accelerator: process.platform === 'darwin' ? 'Cmd+o' : 'Ctrl+o',
+        },
+        {
+          label: "save file",
+          click: () => {
+            if (openFilePath !== '') {
+              console.log('using save file piple')
+              mainWindow.webContents.send('save-file', openFilePath)
+            }
+          },
+          accelerator: process.platform === 'darwin' ? 'Cmd+s' : 'Ctrl+s',
+        },
+        { type: 'separator' },
+        isMac ? { role: 'close' } : { role: 'quit' }
+      ]
+    },
+    // { role: 'editMenu' }
+    {
+      label: 'Edit',
+      submenu: [
+        { role: 'undo' },
+        { role: 'redo' },
+        { type: 'separator' },
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' },
+        ...(isMac ? [
+          { role: 'pasteAndMatchStyle' },
+          { role: 'delete' },
+          { role: 'selectAll' },
+          { type: 'separator' },
+          {
+            label: 'Speech',
+            submenu: [
+              { role: 'startSpeaking' },
+              { role: 'stopSpeaking' }
+            ]
+          }
+        ] : [
+          { role: 'delete' },
+          { type: 'separator' },
+          { role: 'selectAll' }
+        ])
+      ]
+    },
+    // { role: 'viewMenu' }
+    {
+      label: 'View',
+      submenu: [
+        { role: 'reload' },
+        { role: 'forceReload' },
+        { role: 'toggleDevTools' },
+        { type: 'separator' },
+        { role: 'resetZoom' },
+        { role: 'zoomIn' },
+        { role: 'zoomOut' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' }
+      ]
+    },
+    // { role: 'windowMenu' }
+    {
+      label: 'Window',
+      submenu: [
+        { role: 'minimize' },
+        { role: 'zoom' },
+        ...(isMac ? [
+          { type: 'separator' },
+          { role: 'front' },
+          { type: 'separator' },
+          { role: 'window' }
+        ] : [
+          { role: 'close' }
+        ])
+      ]
+    }
+  ]
+  // END ---------------------------------------------
+
+  const menu = Menu.buildFromTemplate(template)
+  Menu.setApplicationMenu(menu)
 
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
@@ -32,6 +179,10 @@ app.on('ready', createWindow);
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
+
+  console.log('into close window')
+  openFilePath = ""
+
   if (process.platform !== 'darwin') {
     app.quit();
   }
