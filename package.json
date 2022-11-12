@@ -16,7 +16,7 @@
     "name": "ccg1024",
     "email": "aimerchenyuan@163.com"
   },
-  "license": "MIT",
+  "license": "GPL3",
   "devDependencies": {
     "@babel/core": "^7.20.2",
     "@babel/preset-react": "^7.18.6",
