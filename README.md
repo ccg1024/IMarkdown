@@ -22,7 +22,7 @@ GPL3.
 
 # TASK
 
-* [x] add image support.
+* [x] added absolute path image support. (relative paths are not supported at this time)
 * [ ] replace `codemirror` to `monaco-editor` which powers VS code.
 * [ ] make a custom titlebar.
 
