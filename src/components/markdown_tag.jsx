@@ -111,7 +111,7 @@ export const MarkdownText = ({ props, children }) => {
 
 export const MarkdownImage = ({ src, props, children }) => {
   return (
-    <Image src={src} {...props}>
+    <Image src={'atom:///' + src} {...props}>
       {children}
     </Image>
   )

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, dialog, Menu } = require('electron');
+const { app, BrowserWindow, dialog, Menu, protocol } = require('electron');
 const path = require('path');
 
 require('@electron/remote/main').initialize()
@@ -174,6 +174,12 @@ const createWindow = () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', createWindow);
+app.whenReady().then(() => {
+  protocol.registerFileProtocol("atom", (request, callback) => {
+    const url = request.url.substr(7)
+    callback(decodeURI(path.normalize(url)))
+  })
+})
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits

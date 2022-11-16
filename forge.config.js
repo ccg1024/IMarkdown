@@ -23,6 +23,7 @@ module.exports = {
     {
       name: '@electron-forge/plugin-webpack',
       config: {
+        devContentSecurityPolicy: "default-src 'self' 'unsafe-inline' 'unsafe-eval' data:;img-src atom:;",
         mainConfig: './webpack.main.config.js',
         renderer: {
           config: './webpack.renderer.config.js',

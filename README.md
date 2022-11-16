@@ -18,3 +18,11 @@ npm start
 # LICENCE
 
 GPL3.
+
+
+# TASK
+
+* [x] add image support.
+* [ ] replace `codemirror` to `monaco-editor` which powers VS code.
+* [ ] make a custom titlebar.
+
