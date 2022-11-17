@@ -87,3 +87,6 @@ typings/
 
 # Electron-Forge
 out/
+
+# self config for ignore file
+idea.md
