@@ -2,6 +2,10 @@
 
 }
 
+.cm-editor {
+  text-align: justify;
+}
+
 .cm-scroller::-webkit-scrollbar {
   width: 4px;
 }
