@@ -5,5 +5,6 @@ const { ipcRenderer, contextBridge } = require('electron')
 contextBridge.exposeInMainWorld('electronAPI', {
   openFile: (callback) => ipcRenderer.on('open-file', callback),
   saveFile: (callback) => ipcRenderer.on('save-file', callback),
-  require: (callback) => window.require(callback)
+  require: (callback) => window.require(callback),
+  toggleView: (callback) => ipcRenderer.on('toggle-view', callback)
 })

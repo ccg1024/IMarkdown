@@ -151,7 +151,29 @@ const createWindow = () => {
         { role: 'zoomIn' },
         { role: 'zoomOut' },
         { type: 'separator' },
-        { role: 'togglefullscreen' }
+        { role: 'togglefullscreen' },
+        { type: 'separator' },
+        {
+          label: 'Just Preview',
+          click: async () => {
+            mainWindow.webContents.send('toggle-view', 1)
+          },
+          accelerator: process.platform === 'darwin' ? 'Cmd+Shift+p' : 'Ctrl+Shift+p',
+        },
+        {
+          label: "Just Editor",
+          click: async () => {
+            mainWindow.webContents.send('toggle-view', 2)
+          },
+          accelerator: process.platform === 'darwin' ? 'Cmd+Shift+e' : 'Ctrl+Shift+e',
+        },
+        {
+          label: "Normal View",
+          click: async () => {
+            mainWindow.webContents.send('toggle-view', 0)
+          },
+          accelerator: process.platform === 'darwin' ? 'Cmd+Shift+n' : 'Ctrl+Shift+n'
+        }
       ]
     },
     // { role: 'windowMenu' }
