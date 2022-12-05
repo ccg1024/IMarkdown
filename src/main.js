@@ -26,9 +26,10 @@ async function handleOpen() {
 
 const createWindow = () => {
   // Create the browser window.
+  openFilePath = ""
   const mainWindow = new BrowserWindow({
-    width: 1000,
-    height: 800,
+    width: 1100,
+    height: 700,
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       nodeIntegration: true,  // makd sure to use `path` and `fs` in react module
@@ -87,8 +88,20 @@ const createWindow = () => {
           label: "save file",
           click: () => {
             if (openFilePath !== '') {
-              console.log('using save file piple')
-              mainWindow.webContents.send('save-file', openFilePath)
+              let response = dialog.showMessageBoxSync(null, {
+                message: 'Since the application is under developed, so, do you want to save file to',
+                type: 'info',
+                buttons: ['Yes', 'No'],
+                defaultId: 0,
+                cancelId: 1,
+                detail: `${openFilePath}`
+              })
+              if (response == 1) {
+                console.log("cancel save")
+              } else {
+                console.log('using save file piple')
+                mainWindow.webContents.send('save-file', openFilePath)
+              }
             }
           },
           accelerator: process.platform === 'darwin' ? 'Cmd+s' : 'Ctrl+s',
@@ -167,7 +180,7 @@ const createWindow = () => {
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
@@ -198,6 +211,7 @@ app.on('activate', () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
+    openFilePath = ""
     createWindow();
   }
 });
