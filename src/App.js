@@ -70,8 +70,8 @@ const App = () => {
 
   const handleScrollFirst = (scroll) => {
     const pre_doc = document.getElementById('preview-scroll')
-    let currentPercent = (scroll.target.scrollTop) / scroll.target.scrollHeight
-    pre_doc.scrollTop = pre_doc.scrollHeight * currentPercent
+    let currentPercent = (scroll.target.scrollTop) / (scroll.target.scrollHeight - scroll.target.clientHeight)
+    pre_doc.scrollTop = (pre_doc.scrollHeight - pre_doc.clientHeight) * currentPercent
   }
 
   return (
