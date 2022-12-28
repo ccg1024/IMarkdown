@@ -30,7 +30,7 @@ const Preview = ({ doc }) => {
   return (
     <ReactMarkdown
       className="preview"
-      children={doc + "\n</br></br></br>"}
+      children={doc + "\n\n</br></br></br>"}
       components={{
         blockquote: Quote,
         a: MarkdownLink,

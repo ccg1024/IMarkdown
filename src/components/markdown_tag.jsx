@@ -14,7 +14,8 @@ import {
   Th,
   Td,
   TableContainer,
-  Code
+  Code,
+  useColorModeValue
 } from '@chakra-ui/react'
 
 export const MarkdownDiv = ({ props, children }) => {
@@ -30,7 +31,7 @@ export const Quote = ({ children }) => {
   return (
     <Box
       borderRadius='5px'
-      bg='rgba(255, 255, 255, 0.12)'
+      bg={useColorModeValue('whiteAlpha.500', 'blackAlpha.500')}
       pl={2}
       pr={2}
       mt={2}
@@ -45,7 +46,7 @@ export const Quote = ({ children }) => {
 
 export const MarkdownLink = ({ href, props, children }) => {
   return (
-    <Link href={href} textAlign="justify" {...props} color='#ff63c3' textUnderlineOffset={3}>
+    <Link href={href} textAlign="justify" {...props}>
       {children}
     </Link>
   )
@@ -150,9 +151,8 @@ export const MarkdownOList = ({ props, children }) => {
 export const MarkdownCode = ({ props, children }) => {
   return (
     <Code
-      background="whiteAlpha.400"
-      color='#ff63c3'
       fontWeight='bold'
+      color={useColorModeValue('#3d7aed', '#ff63c3')}
       {...props}
     >
       {children}

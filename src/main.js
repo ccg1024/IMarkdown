@@ -30,6 +30,8 @@ const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 1100,
     height: 700,
+    vibrancy: 'under-window',
+    visualEffectState: 'active',
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       nodeIntegration: true,  // makd sure to use `path` and `fs` in react module

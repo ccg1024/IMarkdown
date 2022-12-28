@@ -90,7 +90,6 @@ const App = () => {
           id='preview-scroll'
           className='preview_parent'
           overflow='auto'
-          backgroundColor='#000000'
           height='100%'
         >
           <Preview doc={doc} />

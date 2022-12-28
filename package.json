@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "@chakra-ui/react": "^2.3.7",
+    "@chakra-ui/theme-tools": "^2.0.15",
     "@codemirror/commands": "^6.1.2",
     "@codemirror/lang-javascript": "^6.1.1",
     "@codemirror/lang-markdown": "^6.0.5",
