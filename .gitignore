@@ -90,3 +90,5 @@ out/
 
 # self config for ignore file
 idea.md
+src/components/test.jsx
+src/css/test.css
