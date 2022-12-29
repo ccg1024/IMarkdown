@@ -33,7 +33,7 @@ const Editor = ({ initialDoc, onChange, filePath }) => {
         doc: initialDoc,
         extensions: [
           keymap.of([...defaultKeymap, ...historyKeymap]),
-          lineNumbers(),
+          // lineNumbers(),
           highlightActiveLineGutter(),
           history(),
           indentOnInput(),

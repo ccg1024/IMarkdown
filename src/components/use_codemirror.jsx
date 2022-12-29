@@ -13,25 +13,26 @@ export const transparentTheme = EditorView.theme({
   '&': {
     // backgroundColor: 'transparent !important',
     height: '100%',
-    fontSize: '1.2em',
+    fontSize: '1.5em',
+    padding: '12px',
   }
 })
 
 export const my_syntaxHighlighting = HighlightStyle.define([
-  {
-    tag: tags.heading1,
-    fontSize: '1.6em',
-    fontWeight: 'bold',
-  },
-  {
-    tag: tags.heading2,
-    fontSize: '1.4em',
-    fontWeight: 'bold'
-  },
-  {
-    tag: tags.content,  // just change the normal content size, the empty line not change
-    fontSize: '1em'
-  }
+  // {
+  //   tag: tags.heading1,
+  //   fontSize: '1.6em',
+  //   fontWeight: 'bold',
+  // },
+  // {
+  //   tag: tags.heading2,
+  //   fontSize: '1.5em',
+  //   fontWeight: 'bold'
+  // },
+  // {
+  //   tag: tags.content,  // just change the normal content size, the empty line not change
+  //   fontSize: '1em'
+  // }
 ])
 
 
@@ -49,7 +50,7 @@ const useCodeMirror = ({ initialDoc, onChange }) => {
       doc: initialDoc,
       extensions: [
         keymap.of([...defaultKeymap, ...historyKeymap]),
-        lineNumbers(),
+        // lineNumbers(),
         highlightActiveLineGutter(),
         history(),
         indentOnInput(),
