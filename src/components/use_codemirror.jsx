@@ -13,7 +13,7 @@ export const transparentTheme = EditorView.theme({
   '&': {
     // backgroundColor: 'transparent !important',
     height: '100%',
-    fontSize: '1.5em',
+    fontSize: '1.2em',
     padding: '12px',
   }
 })
