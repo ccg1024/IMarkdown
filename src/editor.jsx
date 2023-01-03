@@ -1,12 +1,7 @@
 import React, { useCallback, useEffect } from 'react'
-import useCodeMirror, { transparentTheme, my_syntaxHighlighting } from './components/use_codemirror.jsx'
+import useCodeMirror, { Init_extends } from './components/use_codemirror.jsx'
 import { EditorState } from '@codemirror/state'
-import { EditorView, keymap, highlightActiveLine, lineNumbers, highlightActiveLineGutter } from '@codemirror/view'
-import { defaultKeymap, historyKeymap, history } from '@codemirror/commands'
-import { indentOnInput, bracketMatching, syntaxHighlighting } from '@codemirror/language'
-import { markdown, markdownLanguage } from '@codemirror/lang-markdown'
-import { languages } from '@codemirror/language-data'
-import { oneDark } from '@codemirror/theme-one-dark'
+import { EditorView } from '@codemirror/view'
 import { Box } from '@chakra-ui/react'
 import './css/editor.css'
 
@@ -32,27 +27,12 @@ const Editor = ({ initialDoc, onChange, filePath }) => {
       editorView.setState(EditorState.create({
         doc: initialDoc,
         extensions: [
-          keymap.of([...defaultKeymap, ...historyKeymap]),
-          // lineNumbers(),
-          highlightActiveLineGutter(),
-          history(),
-          indentOnInput(),
-          bracketMatching(),
-          highlightActiveLine(),
-          markdown({
-            base: markdownLanguage,
-            codeLanguages: languages,
-            addKeymap: true
-          }),
-          oneDark,
-          transparentTheme,
-          syntaxHighlighting(my_syntaxHighlighting),
-          EditorView.lineWrapping,
           EditorView.updateListener.of(update => {
             if (update.changes) {
               handleChange && handleChange(update.state)
             }
-          })
+          }),
+          ...Init_extends()
         ]
       }))
     }

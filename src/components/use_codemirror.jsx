@@ -35,6 +35,29 @@ export const my_syntaxHighlighting = HighlightStyle.define([
   // }
 ])
 
+export const Init_extends = () => {
+  const temp = [
+    keymap.of([...defaultKeymap, ...historyKeymap]),
+    // lineNumbers(),
+    highlightActiveLineGutter(),
+    history(),
+    indentOnInput(),
+    bracketMatching(),
+    // syntaxHighlighting(defaultHighlightStyle),
+    highlightActiveLine(),
+    markdown({
+      base: markdownLanguage,
+      codeLanguages: languages,
+      addKeymap: true
+    }),
+    oneDark,
+    transparentTheme,
+    syntaxHighlighting(my_syntaxHighlighting),
+    EditorView.lineWrapping,
+  ]
+  return temp
+}
+
 
 const useCodeMirror = ({ initialDoc, onChange }) => {
   const refContainer = useRef(null)
@@ -49,28 +72,12 @@ const useCodeMirror = ({ initialDoc, onChange }) => {
     const startState = EditorState.create({
       doc: initialDoc,
       extensions: [
-        keymap.of([...defaultKeymap, ...historyKeymap]),
-        // lineNumbers(),
-        highlightActiveLineGutter(),
-        history(),
-        indentOnInput(),
-        bracketMatching(),
-        // syntaxHighlighting(defaultHighlightStyle),
-        highlightActiveLine(),
-        markdown({
-          base: markdownLanguage,
-          codeLanguages: languages,
-          addKeymap: true
-        }),
-        oneDark,
-        transparentTheme,
-        syntaxHighlighting(my_syntaxHighlighting),
-        EditorView.lineWrapping,
         EditorView.updateListener.of(update => {
           if (update.changes) {
             onChange && onChange(update.state)
           }
-        })
+        }),
+        ...Init_extends()
       ]
     })
 
