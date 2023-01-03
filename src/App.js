@@ -3,6 +3,7 @@ import { Box } from '@chakra-ui/react'
 import Editor from './editor.jsx'
 import Preview from './preview.jsx';
 import { SimpleGrid } from '@chakra-ui/react'
+import { toggleView } from './utils/after_load.jsx'
 import './css/App.css';
 
 const fs = window.electronAPI.require('fs')
@@ -27,45 +28,7 @@ const App = () => {
         }
       })
     })
-    window.electronAPI.toggleView(async (_event, value) => {
-      if (value === 1) {  // just show preview part
-        const t0 = document.getElementById("content_root")
-        const t1 = document.getElementById("editor_Box")
-        const t2 = document.getElementById("preview-scroll")
-
-        t0.style.display = 'block'
-        t1.style.display = 'none'
-        t2.style.display = 'block'
-        t2.style.width = "70%"
-        t2.style.margin = "auto"
-
-        // document.getElementById("root").style.backgroundColor = "#000000"
-      } else if (value === 2) {  // just show editor part
-        const t0 = document.getElementById("content_root")
-        const t1 = document.getElementById("editor_Box")
-        const t2 = document.getElementById("preview-scroll")
-
-        t0.style.display = 'block'
-        t1.style.display = 'block'
-        t1.style.width = "70%"
-        t1.style.margin = "auto"
-        t2.style.display = 'none'
-
-        // document.getElementById("root").style.backgroundColor = "#282c34"
-      } else if (value === 0) {  // show normal view, left editor, right preview
-        const t0 = document.getElementById("content_root")
-        const t1 = document.getElementById("editor_Box")
-        const t2 = document.getElementById("preview-scroll")
-
-        t0.style.display = 'grid'
-        t1.style.display = 'block'
-        t1.style.width = "100%"
-        t1.style.margin = "0"
-        t2.style.display = 'block'
-        t2.style.width = "100%"
-        t2.style.margin = '0'
-      }
-    })
+    window.electronAPI.toggleView(toggleView)
   }, [])
 
   const handleScrollFirst = (scroll) => {
