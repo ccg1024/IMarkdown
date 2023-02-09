@@ -1,13 +1,39 @@
 import { useEffect, useState, useRef } from 'react'
 import { EditorState } from '@codemirror/state'
-import { EditorView, keymap, highlightActiveLine, lineNumbers, highlightActiveLineGutter, drawSelection } from '@codemirror/view'
+import {
+  EditorView,
+  keymap,
+  highlightActiveLine,
+  lineNumbers,
+  highlightActiveLineGutter,
+  drawSelection,
+  highlightSpecialChars,
+  dropCursor,
+  rectangularSelection,
+  crosshairCursor
+} from '@codemirror/view'
 import { defaultKeymap, historyKeymap, history } from '@codemirror/commands'
-import { indentOnInput, bracketMatching, HighlightStyle, syntaxHighlighting } from '@codemirror/language'
+import {
+  indentOnInput,
+  bracketMatching,
+  HighlightStyle,
+  syntaxHighlighting,
+  foldGutter,
+  foldKeymap,
+  defaultHighlightStyle
+} from '@codemirror/language'
 import { tags } from '@lezer/highlight'
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown'
 import { languages } from '@codemirror/language-data'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { vim } from "@replit/codemirror-vim"
+import { searchKeymap, highlightSelectionMatches } from '@codemirror/search'
+import {
+  autocompletion,
+  completionKeymap,
+  closeBrackets,
+  closeBracketsKeymap
+} from '@codemirror/autocomplete'
 
 
 export const transparentTheme = EditorView.theme({
@@ -37,7 +63,14 @@ export const my_syntaxHighlighting = HighlightStyle.define([
 
 export const Init_extends = () => {
   const temp = [
-    keymap.of([...defaultKeymap, ...historyKeymap]),
+    keymap.of([
+      ...defaultKeymap,
+      ...historyKeymap,
+      ...foldKeymap,
+      ...searchKeymap,
+      ...closeBracketsKeymap,
+      ...completionKeymap
+    ]),
     // lineNumbers(),
     highlightActiveLineGutter(),
     history(),
@@ -52,10 +85,18 @@ export const Init_extends = () => {
     }),
     oneDark,
     transparentTheme,
-    syntaxHighlighting(my_syntaxHighlighting),
+    syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
     EditorView.lineWrapping,
     drawSelection(),
-    vim()
+    dropCursor(),
+    vim(),
+    highlightSpecialChars(),
+    rectangularSelection(),
+    crosshairCursor(),
+    foldGutter(),
+    highlightSelectionMatches(),
+    closeBrackets(),
+    autocompletion()
   ]
   return temp
 }
