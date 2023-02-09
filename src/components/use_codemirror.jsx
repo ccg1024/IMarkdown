@@ -1,12 +1,13 @@
 import { useEffect, useState, useRef } from 'react'
 import { EditorState } from '@codemirror/state'
-import { EditorView, keymap, highlightActiveLine, lineNumbers, highlightActiveLineGutter } from '@codemirror/view'
+import { EditorView, keymap, highlightActiveLine, lineNumbers, highlightActiveLineGutter, drawSelection } from '@codemirror/view'
 import { defaultKeymap, historyKeymap, history } from '@codemirror/commands'
 import { indentOnInput, bracketMatching, HighlightStyle, syntaxHighlighting } from '@codemirror/language'
 import { tags } from '@lezer/highlight'
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown'
 import { languages } from '@codemirror/language-data'
 import { oneDark } from '@codemirror/theme-one-dark'
+import { vim } from "@replit/codemirror-vim"
 
 
 export const transparentTheme = EditorView.theme({
@@ -31,8 +32,7 @@ export const my_syntaxHighlighting = HighlightStyle.define([
   // },
   // {
   //   tag: tags.content,  // just change the normal content size, the empty line not change
-  //   fontSize: '1em'
-  // }
+  //   fontSize: '1em' }
 ])
 
 export const Init_extends = () => {
@@ -54,6 +54,8 @@ export const Init_extends = () => {
     transparentTheme,
     syntaxHighlighting(my_syntaxHighlighting),
     EditorView.lineWrapping,
+    drawSelection(),
+    vim()
   ]
   return temp
 }
