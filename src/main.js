@@ -23,6 +23,17 @@ async function handleOpen() {
   }
 }
 
+async function handleEmptyFileSave() {
+  console.log('into handle empty file save')
+  const { canceled, filePath } = await dialog.showSaveDialog()
+
+  if (canceled) {
+    return
+  } else {
+    return filePath
+  }
+}
+
 
 const createWindow = () => {
   // Create the browser window.
@@ -88,23 +99,31 @@ const createWindow = () => {
         },
         {
           label: "save file",
-          click: () => {
-            if (openFilePath !== '') {
-              let response = dialog.showMessageBoxSync(null, {
-                message: 'Since the application is under developed, so, do you want to save file to',
-                type: 'info',
-                buttons: ['Yes', 'No'],
-                defaultId: 0,
-                cancelId: 1,
-                detail: `${openFilePath}`
-              })
-              if (response == 1) {
-                console.log("cancel save")
+          click: async () => {
+            let response = dialog.showMessageBoxSync(null, {
+              message: 'Since the application is under developed, so, do you want to save file to',
+              type: 'info',
+              buttons: ['Yes', 'No'],
+              defaultId: 0,
+              cancelId: 1,
+              detail: `${openFilePath}`
+            })
+            if (response == 1) {
+              console.log("cancel save")
+
+            } else {
+              console.log('using save file piple')
+              if (openFilePath === '') {
+                openFilePath = await handleEmptyFileSave()
+                console.log("the new file path is: " + openFilePath)
+              }
+              if (typeof (openFilePath) == "undefined") {
+                openFilePath = ""
               } else {
-                console.log('using save file piple')
                 mainWindow.webContents.send('save-file', openFilePath)
               }
             }
+
           },
           accelerator: process.platform === 'darwin' ? 'Cmd+s' : 'Ctrl+s',
         },
