@@ -32,9 +32,11 @@ const App = () => {
   }, [])
 
   const handleScrollFirst = (scroll) => {
-    const pre_doc = document.getElementById('preview-scroll')
     let currentPercent = (scroll.target.scrollTop) / (scroll.target.scrollHeight - scroll.target.clientHeight)
-    pre_doc.scrollTop = (pre_doc.scrollHeight - pre_doc.clientHeight) * currentPercent
+    if (currentPercent > 0.95) {
+      const pre_doc = document.getElementById('preview-scroll')
+      pre_doc.scrollTop = (pre_doc.scrollHeight - pre_doc.clientHeight) * currentPercent
+    }
   }
 
   return (
