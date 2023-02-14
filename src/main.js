@@ -93,6 +93,7 @@ const createWindow = () => {
             if (filePath) {
               mainWindow.webContents.send('open-file', filePath)
               openFilePath = filePath
+              mainWindow.setTitle(openFilePath)
             }
           },
           accelerator: process.platform === 'darwin' ? 'Cmd+o' : 'Ctrl+o',
