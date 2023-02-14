@@ -93,7 +93,7 @@ const createWindow = () => {
             if (filePath) {
               mainWindow.webContents.send('open-file', filePath)
               openFilePath = filePath
-              mainWindow.setTitle(openFilePath)
+              mainWindow.setTitle(path.basename(openFilePath))
             }
           },
           accelerator: process.platform === 'darwin' ? 'Cmd+o' : 'Ctrl+o',
@@ -118,7 +118,7 @@ const createWindow = () => {
                 openFilePath = await handleEmptyFileSave()
                 console.log("the new file path is: " + openFilePath)
                 if (typeof (openFilePath) !== "undefined") {
-                  mainWindow.setTitle(openFilePath)
+                  mainWindow.setTitle(path.basename(openFilePath))
                 }
               }
               if (typeof (openFilePath) == "undefined") {
