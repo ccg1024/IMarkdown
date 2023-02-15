@@ -1,4 +1,4 @@
-const { app, BrowserWindow, dialog, Menu, protocol } = require('electron');
+const { app, BrowserWindow, dialog, Menu, protocol, ipcMain } = require('electron');
 const path = require('path');
 
 require('@electron/remote/main').initialize()
@@ -51,6 +51,10 @@ const createWindow = () => {
     },
   });
 
+  //
+  ipcMain.on('set-filePath', (_event, filePath) => {
+    openFilePath = filePath
+  })
   // show close dialog
   mainWindow.on('close', function(e) {
     let response = dialog.showMessageBoxSync(this, {
@@ -192,13 +196,6 @@ const createWindow = () => {
           },
           accelerator: process.platform === 'darwin' ? 'Cmd+Shift+e' : 'Ctrl+Shift+e',
         },
-        {
-          label: "Normal View",
-          click: async () => {
-            mainWindow.webContents.send('toggle-view', 0)
-          },
-          accelerator: process.platform === 'darwin' ? 'Cmd+Shift+n' : 'Ctrl+Shift+n'
-        }
       ]
     },
     // { role: 'windowMenu' }

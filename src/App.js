@@ -1,9 +1,9 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { Box } from '@chakra-ui/react'
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { Box, Flex } from '@chakra-ui/react'
 import Editor from './editor.jsx'
 import Preview from './preview.jsx';
-import { SimpleGrid } from '@chakra-ui/react'
 import { toggleView } from './utils/after_load.jsx'
+import FileDir from './components/file_dir.jsx';
 import './css/App.css';
 
 const fs = window.electronAPI.require('fs')
@@ -12,10 +12,14 @@ const App = () => {
 
   const [doc, setDoc] = useState('# In development...')
   const [filePath, setFilePath] = useState('')
+  const recentFiles = useRef([])
 
   const handleDocChange = useCallback(newDoc => {
     setDoc(newDoc)
   }, [])
+  const handlePathChange = useCallback(newPath => {
+    setFilePath(newPath)
+  })
 
   useEffect(() => {
     window.electronAPI.openFile(async (_event, value) => {
@@ -25,6 +29,9 @@ const App = () => {
         else {
           setDoc(data)
           setFilePath(value)
+          if (!recentFiles.current.includes(value)) {
+            recentFiles.current = [...recentFiles.current, value]
+          }
         }
       })
     })
@@ -41,12 +48,19 @@ const App = () => {
 
   return (
     <>
-      <SimpleGrid columns={2} height="100%" id='content_root'>
+      <Flex height="100%" width="100%" id='content_root'>
+        <FileDir
+          recentFiles={recentFiles.current}
+          currentFile={filePath}
+          handlePath={handlePathChange}
+          handleDoc={handleDocChange}
+        />
         <Box
           overflow='auto'
           height='100%'
           onScrollCapture={handleScrollFirst}
           id='editor_Box'
+          w='80%'
         >
           <Editor initialDoc={doc} onChange={handleDocChange} filePath={filePath} />
         </Box>
@@ -56,10 +70,11 @@ const App = () => {
           className='preview_parent'
           overflow='auto'
           height='100%'
+          w="80%"
         >
           <Preview doc={doc} />
         </Box>
-      </SimpleGrid>
+      </Flex>
     </>
   )
 }

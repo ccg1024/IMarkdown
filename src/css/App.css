@@ -5,7 +5,7 @@
 }
 
 .preview_parent {
-
+  display: none;
 }
 
 .preview_parent::-webkit-scrollbar {
