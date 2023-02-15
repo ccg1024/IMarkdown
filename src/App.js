@@ -71,6 +71,7 @@ const App = () => {
           overflow='auto'
           height='100%'
           w="80%"
+          pl={2}
         >
           <Preview doc={doc} />
         </Box>

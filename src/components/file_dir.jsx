@@ -6,6 +6,7 @@ import {
   Link,
   List,
   ListItem,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { BsFillFileEarmarkTextFill, BsFillRecordFill } from 'react-icons/bs'
 
@@ -34,6 +35,7 @@ const FileDir = ({ recentFiles, currentFile, handlePath, handleDoc }) => {
       backdropFilter='auto'
       p={2}
       overflow='auto'
+      backgroundColor={useColorModeValue('rgb(255, 250, 240, 0.24)', 'blackAlpha.400')}
     >
       <Flex
         alignItems="center"

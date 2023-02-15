@@ -46,19 +46,52 @@ export const transparentTheme = EditorView.theme({
 })
 
 export const my_syntaxHighlighting = HighlightStyle.define([
-  // {
-  //   tag: tags.heading1,
-  //   fontSize: '1.6em',
-  //   fontWeight: 'bold',
-  // },
-  // {
-  //   tag: tags.heading2,
-  //   fontSize: '1.5em',
-  //   fontWeight: 'bold'
-  // },
-  // {
-  //   tag: tags.content,  // just change the normal content size, the empty line not change
-  //   fontSize: '1em' }
+  {
+    tag: tags.heading1,
+    fontWeight: 'bold',
+    color: '#E90064'
+  },
+  {
+    tag: tags.heading2,
+    fontWeight: 'bold',
+    color: '#E90064'
+  },
+  {
+    tag: tags.heading3,
+    fontWeight: 'bold',
+    color: '#E90064'
+  },
+  {
+    tag: tags.heading4,
+    fontWeight: 'bold',
+    color: '#E90064'
+  },
+  {
+    tag: tags.heading5,
+    fontWeight: 'bold',
+    color: '#E90064'
+  },
+  {
+    tag: tags.heading6,
+    fontWeight: 'bold',
+    color: '#E90064'
+  },
+  {
+    tag: tags.list,
+    color: '#537FE7'
+  },
+  {
+    tag: tags.link,
+    color: '#913175'
+  },
+  {
+    tag: tags.quote,
+    color: '#7D5A50'
+  },
+  {
+    tag: tags.emphasis,
+    color: '#EA5455'
+  },
 ])
 
 export const Init_extends = () => {
@@ -76,16 +109,15 @@ export const Init_extends = () => {
     history(),
     indentOnInput(),
     bracketMatching(),
-    // syntaxHighlighting(defaultHighlightStyle),
     highlightActiveLine(),
     markdown({
       base: markdownLanguage,
       codeLanguages: languages,
       addKeymap: true
     }),
-    oneDark,
+    // oneDark,
     transparentTheme,
-    syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+    syntaxHighlighting(my_syntaxHighlighting, { fallback: true }),
     EditorView.lineWrapping,
     drawSelection(),
     dropCursor(),
