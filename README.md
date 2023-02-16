@@ -13,7 +13,9 @@ npm start
 
 # screenshote
 
-![screenshote](./screenshot.png)
+![light-editor](./img/light-editor.png)
+
+![light-preview](./img/light-preview.png)
 
 # LICENCE
 
