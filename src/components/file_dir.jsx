@@ -47,6 +47,7 @@ const FileDir = ({ recentFiles, currentFile, handlePath, handleDoc }) => {
           as="h1"
           textAlign="left"
           px={2}
+          fontWeight="bold"
         >Opened File</Text>
       </Flex>
       <List>

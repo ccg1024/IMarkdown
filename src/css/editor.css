@@ -6,6 +6,10 @@
   text-align: justify;
 }
 
+.cm-scroller {
+  font-family: 'JetBrainsMono Nerd Font Mono' !important
+}
+
 .cm-scroller::-webkit-scrollbar {
   width: 4px;
 }

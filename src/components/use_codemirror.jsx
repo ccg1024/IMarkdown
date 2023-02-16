@@ -40,7 +40,7 @@ export const transparentTheme = EditorView.theme({
   '&': {
     // backgroundColor: 'transparent !important',
     height: '100%',
-    fontSize: '1.2em',
+    fontSize: '1.0em',
     padding: '12px',
   }
 })
@@ -90,8 +90,45 @@ export const my_syntaxHighlighting = HighlightStyle.define([
   },
   {
     tag: tags.emphasis,
-    color: '#EA5455'
+    // color: '#EA5455',
+    fontStyle: 'italic'
   },
+  {
+    tag: tags.strong,
+    fontWeight: 'bold'
+  },
+  {
+    tag: tags.comment,
+    color: '#03C988'
+  },
+  {
+    tag: tags.labelName,  // javascript, java, python... etc
+    color: '#FF8787'
+  },
+  {
+    tag: tags.keyword, // all
+    color: 'red'
+  },
+  {
+    tag: tags.definitionKeyword,
+    color: '#2192FF'
+  },
+  {
+    tag: tags.controlKeyword,
+    color: 'orange'
+  },
+  {
+    tag: tags.moduleKeyword,
+    color: 'green'
+  },
+  {
+    tag: tags.string,
+    color: 'green'
+  },
+  {
+    tag: tags.typeName,
+    color: 'blue'
+  }
 ])
 
 export const Init_extends = () => {

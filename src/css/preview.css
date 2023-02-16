@@ -53,6 +53,11 @@
   margin-top: 10pt;
 }
 
+.preview ul {
+  margin-top: 10pt;
+  margin-bottom: 10pt;
+}
+
 .katex-mathml {
   display: none;
 }
