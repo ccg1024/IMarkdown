@@ -73,7 +73,7 @@ const App = () => {
           w="80%"
           pl={2}
         >
-          <Preview doc={doc} />
+          <Preview doc={doc} currentFile={filePath} />
         </Box>
       </Flex>
     </>

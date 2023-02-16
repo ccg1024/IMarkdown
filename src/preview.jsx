@@ -13,7 +13,6 @@ import {
   MarkdownTr,
   MarkdownLink,
   MarkdownText,
-  MarkdownImage,
   MarkdownOList,
   MarkdownTable,
   MarkdownTbody,
@@ -24,9 +23,13 @@ import {
 } from './components/markdown_tag.jsx'
 import 'katex/dist/katex.min.css'
 import './css/preview.css'
+import { Image } from '@chakra-ui/react'
 
 
-const Preview = ({ doc }) => {
+const Preview = ({ doc, currentFile }) => {
+
+  const path = window.electronAPI.require('path')
+
   return (
     <ReactMarkdown
       className="preview"
@@ -38,7 +41,14 @@ const Preview = ({ doc }) => {
         ol: MarkdownOList,
         li: MarkdownListItem,
         p: MarkdownText,
-        img: MarkdownImage,
+        img: ({ node, src, ...props }) => {
+          if (src.startsWith(".")) {
+            let nameLen = path.basename(currentFile).length
+            let pathPre = currentFile.substring(0, currentFile.length - nameLen)
+            src = pathPre + src
+          }
+          return <Image src={'atom:///' + src} {...props} borderRadius="md" boxShadow="lg" />
+        },
         table: MarkdownTable,
         thead: MarkdownThead,
         tbody: MarkdownTbody,
