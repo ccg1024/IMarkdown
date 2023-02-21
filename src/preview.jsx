@@ -47,7 +47,7 @@ const Preview = ({ doc, currentFile }) => {
             let pathPre = currentFile.substring(0, currentFile.length - nameLen)
             src = pathPre + src
           }
-          return <Image src={'atom:///' + src} {...props} borderRadius="md" boxShadow="lg" />
+          return <Image src={'atom:///' + src} {...props} borderRadius="md" boxShadow="lg" m="auto" />
         },
         table: MarkdownTable,
         thead: MarkdownThead,
