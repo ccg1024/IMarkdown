@@ -24,6 +24,8 @@ const Editor = ({ initialDoc, onChange, filePath }) => {
       // do nothing
     }
     if (filePath) {
+      // set preview scroll to top
+      previewScroll = 1
       console.log('got new file and reset codemirro with ' + filePath)
       editorView.setState(EditorState.create({
         doc: initialDoc,
