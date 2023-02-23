@@ -6,6 +6,7 @@ import { Box } from '@chakra-ui/react'
 import './css/editor.css'
 
 const fs = window.electronAPI.require('fs')
+export let previewScroll = 1
 
 
 const Editor = ({ initialDoc, onChange, filePath }) => {
@@ -30,6 +31,19 @@ const Editor = ({ initialDoc, onChange, filePath }) => {
           EditorView.updateListener.of(update => {
             if (update.changes) {
               handleChange && handleChange(update.state)
+            }
+          }),
+          EditorView.domEventHandlers({
+            scroll(_event, view) {
+              const self = document.getElementById("editor_Box")
+              if (!self.matches(":hover")) { return; }
+              // got corrected position
+              const scrollPos = view.elementAtHeight(view.scrollDOM.scrollTop).from
+              // console.log(view.elementAtHeight(view.scrollDOM.scrollTop).from)
+              // console.log(view.state.doc.lineAt(view.elementAtHeight(view.scrollDOM.scrollTop).from))
+              // got doc line number
+              const lineNumber = view.state.doc.lineAt(scrollPos).number
+              previewScroll = lineNumber
             }
           }),
           ...Init_extends()

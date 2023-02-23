@@ -23,7 +23,7 @@ import {
 } from './components/markdown_tag.jsx'
 import 'katex/dist/katex.min.css'
 import './css/preview.css'
-import { Image } from '@chakra-ui/react'
+import { Image, Text } from '@chakra-ui/react'
 
 
 const Preview = ({ doc, currentFile }) => {
@@ -40,7 +40,7 @@ const Preview = ({ doc, currentFile }) => {
         ul: MarkdownUList,
         ol: MarkdownOList,
         li: MarkdownListItem,
-        p: MarkdownText,
+        p: ({ node, ...props }) => { return <Text {...props} /> },
         img: ({ node, src, ...props }) => {
           if (src.startsWith(".")) {
             let nameLen = path.basename(currentFile).length
@@ -76,6 +76,7 @@ const Preview = ({ doc, currentFile }) => {
       }}
       remarkPlugins={[remarkGfm, remarkMath]}
       rehypePlugins={[rehypeKatex, rehypeRaw]}
+      sourcePos={true}
     />
   )
 }

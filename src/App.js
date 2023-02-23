@@ -58,7 +58,6 @@ const App = () => {
         <Box
           overflow='auto'
           height='100%'
-          onScrollCapture={handleScrollFirst}
           id='editor_Box'
           w='80%'
         >
