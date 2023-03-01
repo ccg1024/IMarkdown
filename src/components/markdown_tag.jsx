@@ -38,6 +38,7 @@ export const Quote = ({ children }) => {
       mb={2}
       pt='1px'
       pb='1px'
+      boxShadow="lg"
     >
       {children}
     </Box>
