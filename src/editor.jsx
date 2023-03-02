@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect } from 'react'
-import useCodeMirror, { Init_extends } from './components/use_codemirror.jsx'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { Init_extends } from './components/use_codemirror.jsx'
 import { EditorState } from '@codemirror/state'
 import { EditorView } from '@codemirror/view'
 import { Box } from '@chakra-ui/react'
@@ -14,15 +14,50 @@ const Editor = ({ initialDoc, onChange, filePath }) => {
     state => onChange(state.doc.toString()),
     [onChange]
   )
-  const [refContainer, editorView] = useCodeMirror({
-    initialDoc: initialDoc,
-    onChange: handleChange
-  })
+
+  // initial codemirror
+  const refContainer = useRef(null)
+  const [editorView, setEditorView] = useState()
 
   useEffect(() => {
-    if (editorView) {
-      // do nothing
+    if (!refContainer.current) {
+      return
     }
+
+    const startState = EditorState.create({
+      doc: initialDoc,
+      extensions: [
+        EditorView.updateListener.of(update => {
+          if (update.changes) {
+            handleChange && handleChange(update.state)
+          }
+        }),
+        EditorView.domEventHandlers({
+          scroll(_event, view) {
+            const self = document.getElementById("editor_Box")
+            if (!self.matches(":hover")) { return; }
+            // got corrected position
+            const scrollPos = view.elementAtHeight(view.scrollDOM.scrollTop).from
+            // console.log(view.elementAtHeight(view.scrollDOM.scrollTop).from)
+            // console.log(view.state.doc.lineAt(view.elementAtHeight(view.scrollDOM.scrollTop).from))
+            // got doc line number
+            const lineNumber = view.state.doc.lineAt(scrollPos).number
+            previewScroll = lineNumber
+          }
+        }),
+        ...Init_extends()
+      ]
+    })
+
+    const view = new EditorView({
+      state: startState,
+      parent: refContainer.current
+    })
+
+    setEditorView(view)
+  }, [refContainer])
+
+  useEffect(() => {
     if (filePath) {
       // set preview scroll to top
       previewScroll = 1
