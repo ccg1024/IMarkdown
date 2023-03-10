@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from "remark-gfm";
 import SyntaxHighlighter from 'react-syntax-highlighter'
@@ -12,7 +12,6 @@ import {
   MarkdownTh,
   MarkdownTr,
   MarkdownLink,
-  MarkdownText,
   MarkdownOList,
   MarkdownTable,
   MarkdownTbody,
@@ -24,11 +23,25 @@ import {
 import 'katex/dist/katex.min.css'
 import './css/preview.css'
 import { Image, Text } from '@chakra-ui/react'
+import { previewScroll } from "./editor.jsx"
 
 
 const Preview = ({ doc, currentFile }) => {
 
   const path = window.electronAPI.require('path')
+
+  // run once after render
+  useEffect(() => {
+    let tempIdx = previewScroll;
+    let target = document.querySelector("[data-sourcepos^='" + tempIdx + ":']");
+    while (target === null && tempIdx > 1) {
+      tempIdx -= 1
+      target = document.querySelector("[data-sourcepos^='" + tempIdx + ":']")
+    }
+    if (target !== null) {
+      target.scrollIntoView();
+    }
+  }, [])
 
   return (
     <ReactMarkdown

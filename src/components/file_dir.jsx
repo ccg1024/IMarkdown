@@ -9,6 +9,7 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { BsFillFileEarmarkTextFill, BsFillRecordFill } from 'react-icons/bs'
+import { toggleView } from "../utils/after_load.jsx";
 
 const FileDir = ({ recentFiles, currentFile, handlePath, handleDoc }) => {
 
@@ -20,6 +21,8 @@ const FileDir = ({ recentFiles, currentFile, handlePath, handleDoc }) => {
     fs.readFile(filePath, 'utf-8', (err, data) => {
       if (err) throw err
       else {
+        // show editor pane
+        toggleView("click from file dir", 2);
         handleDoc(data)
         handlePath(filePath)
         window.electronAPI.setFilePath(filePath)

@@ -1,24 +1,26 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Box, Flex } from '@chakra-ui/react'
 import Editor from './editor.jsx'
-import Preview from './preview.jsx';
 import { toggleView } from './utils/after_load.jsx'
 import FileDir from './components/file_dir.jsx';
 import './css/App.css';
 
 const fs = window.electronAPI.require('fs')
 
+export let doc = "# In development"
+export let currentFile = ""
+
 const App = () => {
 
-  const [doc, setDoc] = useState('# In development...')
   const [filePath, setFilePath] = useState('')
   const recentFiles = useRef([])
 
   const handleDocChange = useCallback(newDoc => {
-    setDoc(newDoc)
+    doc = newDoc
   }, [])
   const handlePathChange = useCallback(newPath => {
     setFilePath(newPath)
+    currentFile = newPath
   })
 
   useEffect(() => {
@@ -27,8 +29,10 @@ const App = () => {
       fs.readFile(value, 'utf-8', (err, data) => {
         if (err) throw err
         else {
-          setDoc(data)
+          toggleView('from open file', 2);  // change to editor pane
+          doc = data
           setFilePath(value)
+          currentFile = value
           if (!recentFiles.current.includes(value)) {
             recentFiles.current = [...recentFiles.current, value]
           }
@@ -38,13 +42,13 @@ const App = () => {
     window.electronAPI.toggleView(toggleView)
   }, [])
 
-  const handleScrollFirst = (scroll) => {
-    let currentPercent = (scroll.target.scrollTop) / (scroll.target.scrollHeight - scroll.target.clientHeight)
-    if (currentPercent > 0.95) {
-      const pre_doc = document.getElementById('preview-scroll')
-      pre_doc.scrollTop = (pre_doc.scrollHeight - pre_doc.clientHeight) * currentPercent
-    }
-  }
+  // const handleScrollFirst = (scroll) => {
+  //   let currentPercent = (scroll.target.scrollTop) / (scroll.target.scrollHeight - scroll.target.clientHeight)
+  //   if (currentPercent > 0.95) {
+  //     const pre_doc = document.getElementById('preview-scroll')
+  //     pre_doc.scrollTop = (pre_doc.scrollHeight - pre_doc.clientHeight) * currentPercent
+  //   }
+  // }
 
   return (
     <>
@@ -72,7 +76,6 @@ const App = () => {
           w="80%"
           pl={2}
         >
-          <Preview doc={doc} currentFile={filePath} />
         </Box>
       </Flex>
     </>
