@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import Preview from '../preview.jsx';
+import { ChakraProvider } from '@chakra-ui/react'
+import theme from '../components/my_theme.jsx';
 import { doc, currentFile } from '../App.js'
 
 let root = null;
@@ -16,7 +18,11 @@ export const toggleView = async (_event, value) => {
     // load react component
     if (root === null) {
       root = ReactDOM.createRoot(document.getElementById('preview-scroll'));
-      root.render(<Preview doc={doc} currentFile={currentFile} />);
+      root.render(
+        <ChakraProvider theme={theme}>
+          <Preview doc={doc} currentFile={currentFile} />
+        </ChakraProvider>
+      );
     }
   } else if (value === 2) {  // just show editor part
     const t1 = document.getElementById("editor_Box")
