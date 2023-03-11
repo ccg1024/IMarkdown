@@ -59,7 +59,7 @@ const createWindow = () => {
   mainWindow.on('close', function(e) {
     let response = dialog.showMessageBoxSync(this, {
       type: 'info',
-      buttons: ['Ok', 'Exit'],
+      buttons: ['Yes', 'No'],
       title: 'Warning',
       cancelId: 1,
       defaultId: 0,
