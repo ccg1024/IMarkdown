@@ -86,6 +86,10 @@ const Editor = ({ initialDoc, onChange, filePath }) => {
           ...Init_extends()
         ]
       }))
+
+      editorView.dispatch({
+        effects: EditorView.scrollIntoView(1),
+      });
     }
   }, [editorView, filePath])
 
