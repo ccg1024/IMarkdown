@@ -233,7 +233,7 @@ const createWindow = () => {
 app.on('ready', createWindow);
 app.whenReady().then(() => {
   protocol.registerFileProtocol("atom", (request, callback) => {
-    const url = request.url.substr(7)
+    const url = request.url.substring(7)
     callback(decodeURI(path.normalize(url)))
   })
 })
