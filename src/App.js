@@ -7,8 +7,8 @@ import './css/App.css';
 
 const fs = window.electronAPI.require('fs')
 
-export let doc = "# In development"
-export let currentFile = ""
+export let doc = "# In development";
+export let currentFile = "";
 
 const App = () => {
 
@@ -20,7 +20,7 @@ const App = () => {
   }, [])
   const handlePathChange = useCallback(newPath => {
     setFilePath(newPath)
-    currentFile = newPath
+    currentFile = newPath;
   })
 
   useEffect(() => {
@@ -29,10 +29,10 @@ const App = () => {
       fs.readFile(value, 'utf-8', (err, data) => {
         if (err) throw err
         else {
-          toggleView('from open file', 2);  // change to editor pane
-          doc = data
+          toggleView('from open file', 2);
+          doc = data;
           setFilePath(value)
-          currentFile = value
+          currentFile = value;
           if (!recentFiles.current.includes(value)) {
             recentFiles.current = [...recentFiles.current, value]
           }
@@ -41,14 +41,6 @@ const App = () => {
     })
     window.electronAPI.toggleView(toggleView)
   }, [])
-
-  // const handleScrollFirst = (scroll) => {
-  //   let currentPercent = (scroll.target.scrollTop) / (scroll.target.scrollHeight - scroll.target.clientHeight)
-  //   if (currentPercent > 0.95) {
-  //     const pre_doc = document.getElementById('preview-scroll')
-  //     pre_doc.scrollTop = (pre_doc.scrollHeight - pre_doc.clientHeight) * currentPercent
-  //   }
-  // }
 
   return (
     <>
@@ -64,6 +56,7 @@ const App = () => {
           height='100%'
           id='editor_Box'
           w='80%'
+          style={{ display: "block" }}
         >
           <Editor initialDoc={doc} onChange={handleDocChange} filePath={filePath} />
         </Box>

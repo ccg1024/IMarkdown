@@ -4,6 +4,7 @@ import { EditorState } from '@codemirror/state'
 import { EditorView } from '@codemirror/view'
 import { Box } from '@chakra-ui/react'
 import './css/editor.css'
+import { editorScrollPos } from './utils/after_load.jsx';
 
 const fs = window.electronAPI.require('fs')
 export let previewScroll = 1
@@ -18,6 +19,31 @@ const Editor = ({ initialDoc, onChange, filePath }) => {
   // initial codemirror
   const refContainer = useRef(null)
   const [editorView, setEditorView] = useState()
+
+  useEffect(() => {
+    // use callback when display change
+    if (editorView) {
+      const targetNode = document.getElementById('editor_Box');
+      const config = { attributes: true };
+
+      const callback = (_mutationsList, _observer) => {
+        if (targetNode.style.display === 'block') {
+          // console.log('[INFO] Using listener to move ', editorScrollPos);
+          const first = editorView.state.doc.line(editorScrollPos);
+          editorView.dispatch({
+            selection: {
+              anchor: first.from,
+              head: first.from
+            },
+            effects: EditorView.scrollIntoView(first.from, { y: 'start' }),
+            scrollIntoView: true,
+          });
+        }
+      }
+      const observer = new MutationObserver(callback);
+      observer.observe(targetNode, config);
+    }
+  }, [editorView]);
 
   useEffect(() => {
     if (!refContainer.current) {
@@ -61,6 +87,7 @@ const Editor = ({ initialDoc, onChange, filePath }) => {
     if (filePath) {
       // set preview scroll to top
       previewScroll = 1
+      editorView.scrollDOM.scrollTop = 0;
       console.log('got new file and reset codemirro with ' + filePath)
       editorView.setState(EditorState.create({
         doc: initialDoc,
@@ -86,10 +113,6 @@ const Editor = ({ initialDoc, onChange, filePath }) => {
           ...Init_extends()
         ]
       }))
-
-      editorView.dispatch({
-        effects: EditorView.scrollIntoView(1),
-      });
     }
   }, [editorView, filePath])
 
