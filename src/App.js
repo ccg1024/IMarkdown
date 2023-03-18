@@ -6,38 +6,66 @@ import FileDir from './components/file_dir.jsx';
 import './css/App.css';
 
 const fs = window.electronAPI.require('fs')
-
+const path = window.electronAPI.require('path')
 export let doc = "# In development";
 export let currentFile = "";
+
+// convert path
+export const converWin32Path = (filePath) => filePath.split(path.sep).join(path.posix.sep);
 
 const App = () => {
 
   const [filePath, setFilePath] = useState('')
+  const [isChange, setIsChange] = useState(false);
+  const [tempPath, setTempPath] = useState('');
   const recentFiles = useRef([])
 
+  const handleIsChange = useCallback(newFlag => {
+    setIsChange(newFlag);
+    // console.log('into is change callback');
+  }, []);
   const handleDocChange = useCallback(newDoc => {
     doc = newDoc
+    setIsChange(true);
+    // console.log('the doc is change');
   }, [])
   const handlePathChange = useCallback(newPath => {
-    setFilePath(newPath)
-    currentFile = newPath;
-  })
+    setTempPath(newPath)
+    // currentFile = newPath;
+  }, [])
+
+  useEffect(() => {
+    if (tempPath) {
+      console.log('App useEffect set file content activated for: ' + tempPath);
+      fs.readFile(tempPath, 'utf-8', (err, data) => {
+        if (err) {
+          throw err;
+        } else {
+          toggleView('from open file', 2);
+          doc = data;
+          currentFile = tempPath;
+
+          const converPath = converWin32Path(tempPath);
+
+          if (!recentFiles.current.includes(converPath)) {
+            recentFiles.current = [...recentFiles.current, converPath];
+          }
+
+          // activte the editor useEffect to update codemirror
+          setFilePath(tempPath);
+        }
+      });
+    }
+  }, [tempPath]);
 
   useEffect(() => {
     window.electronAPI.openFile(async (_event, value) => {
-      console.log("App.js got new file path: " + value)
-      fs.readFile(value, 'utf-8', (err, data) => {
-        if (err) throw err
-        else {
-          toggleView('from open file', 2);
-          doc = data;
-          setFilePath(value)
-          currentFile = value;
-          if (!recentFiles.current.includes(value)) {
-            recentFiles.current = [...recentFiles.current, value]
-          }
-        }
-      })
+      console.log("IPC App.js got new file, set temp path: " + value);
+      setTempPath(value);
+      setIsChange(false);
+
+      // since open a new file, whatever the file is change, reset it
+      window.electronAPI.setContentChange(false);
     })
     window.electronAPI.toggleView(toggleView)
   }, [])
@@ -48,8 +76,8 @@ const App = () => {
         <FileDir
           recentFiles={recentFiles.current}
           currentFile={filePath}
+          isChange={isChange}
           handlePath={handlePathChange}
-          handleDoc={handleDocChange}
         />
         <Box
           overflow='auto'
@@ -58,7 +86,12 @@ const App = () => {
           w='80%'
           style={{ display: "block" }}
         >
-          <Editor initialDoc={doc} onChange={handleDocChange} filePath={filePath} />
+          <Editor
+            initialDoc={doc}
+            onChange={handleDocChange}
+            filePath={filePath}
+            handleIsChange={handleIsChange}
+          />
         </Box>
 
         <Box

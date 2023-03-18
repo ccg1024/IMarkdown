@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Box,
   Flex,
@@ -9,26 +9,37 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { BsFillFileEarmarkTextFill, BsFillRecordFill } from 'react-icons/bs'
-import { toggleView } from "../utils/after_load.jsx";
 
-const FileDir = ({ recentFiles, currentFile, handlePath, handleDoc }) => {
+const FileDir = ({ recentFiles, currentFile, isChange, handlePath }) => {
 
   const path = window.electronAPI.require('path')
-  const fs = window.electronAPI.require('fs')
+
+  const converWin32Path = (filePath) => filePath.split(path.sep).join(path.posix.sep);
 
   const readRecentFile = (filePath) => {
+    if (isChange) {
+      // alert('the file is unsaved');
+      window.electronAPI.showUnsavedInfo();
+      return;
+    }
     console.log("Using recent file: " + filePath)
-    fs.readFile(filePath, 'utf-8', (err, data) => {
-      if (err) throw err
-      else {
-        // show editor pane
-        toggleView("click from file dir", 2);
-        handleDoc(data)
-        handlePath(filePath)
-        window.electronAPI.setFilePath(filePath)
-      }
-    })
+    handlePath(filePath);  // activate useEffect in App.js
+    window.electronAPI.setFilePath(filePath)
   }
+
+  useEffect(() => {
+    if (isChange && currentFile !== null && currentFile !== undefined && currentFile !== '') {
+      // change current file color
+      // console.log("The file is change ", isChange);
+      // console.log("conver path: ", converWin32Path(currentFile));
+      const targetDom = document.getElementById(converWin32Path(currentFile));
+      const iconDom = targetDom.getElementsByTagName('svg')[0];
+      iconDom.style.color = '#E53E3E';
+
+      // send info to main process
+      window.electronAPI.setContentChange(true);
+    }
+  }, [isChange, currentFile]);
 
   return (
     <Box
@@ -56,7 +67,7 @@ const FileDir = ({ recentFiles, currentFile, handlePath, handleDoc }) => {
       <List>
         {
           recentFiles.map((item, index) => {
-            if (currentFile === item) {
+            if (converWin32Path(currentFile) === item) {
               return (
                 <Link
                   key={index}
@@ -67,6 +78,7 @@ const FileDir = ({ recentFiles, currentFile, handlePath, handleDoc }) => {
                 >
                   <ListItem
                     p={1}
+                    id={item}
                     key={index}
                     borderRadius="sm"
                     backgroundColor="blackAlpha.400"

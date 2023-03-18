@@ -5,12 +5,13 @@ import { EditorView } from '@codemirror/view'
 import { Box } from '@chakra-ui/react'
 import './css/editor.css'
 import { editorScrollPos } from './utils/after_load.jsx';
+import { converWin32Path } from './App.js';
 
 const fs = window.electronAPI.require('fs')
 export let previewScroll = 1
 
 
-const Editor = ({ initialDoc, onChange, filePath }) => {
+const Editor = ({ initialDoc, onChange, filePath, handleIsChange }) => {
   const handleChange = useCallback(
     state => onChange(state.doc.toString()),
     [onChange]
@@ -54,7 +55,7 @@ const Editor = ({ initialDoc, onChange, filePath }) => {
       doc: initialDoc,
       extensions: [
         EditorView.updateListener.of(update => {
-          if (update.changes) {
+          if (update.docChanged) {
             handleChange && handleChange(update.state)
           }
         }),
@@ -93,7 +94,7 @@ const Editor = ({ initialDoc, onChange, filePath }) => {
         doc: initialDoc,
         extensions: [
           EditorView.updateListener.of(update => {
-            if (update.changes) {
+            if (update.docChanged) {
               handleChange && handleChange(update.state)
             }
           }),
@@ -121,6 +122,15 @@ const Editor = ({ initialDoc, onChange, filePath }) => {
       window.electronAPI.saveFile((_event, saveFilePath) => {
         console.log('current save path: ' + saveFilePath)
         fs.writeFileSync(saveFilePath, editorView.state.doc.toString())
+        handleIsChange(false);
+
+        // send info to main process;
+        window.electronAPI.setContentChange(false);
+
+        // update the icon color at FirDir component
+        const targetDom = document.getElementById(converWin32Path(saveFilePath));
+        const iconDom = targetDom.getElementsByTagName('svg')[0];
+        iconDom.style.color = '#68D391';
       })
       console.log('run save effect')
     }

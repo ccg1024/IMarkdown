@@ -11,6 +11,7 @@ if (require('electron-squirrel-startup')) {
 // for menu
 const isMac = process.platform === 'darwin'
 let openFilePath = ''
+let isContentChange = false;
 
 async function handleOpen() {
   console.log('into Open file')
@@ -51,22 +52,39 @@ const createWindow = () => {
     },
   });
 
-  //
+  // recive file path from renderer
   ipcMain.on('set-filePath', (_event, filePath) => {
     openFilePath = filePath
   })
+
+  // recive content change flag
+  ipcMain.on('set-contentChange', (_event, isChange) => {
+    isContentChange = isChange;
+  })
+
+  // show unsaved info, when using recient file
+  ipcMain.on('show-unsavedInfo', (_event) => {
+    dialog.showMessageBoxSync(null, {
+      type: 'info',
+      title: 'Warning',
+      message: 'The file is unsaved'
+    });
+  });
+
   // show close dialog
   mainWindow.on('close', function(e) {
-    let response = dialog.showMessageBoxSync(this, {
-      type: 'info',
-      buttons: ['Yes', 'No'],
-      title: 'Warning',
-      cancelId: 1,
-      defaultId: 0,
-      detail: 'The app is under development, make sure everything is saved before exiting.'
-    });
+    if (isContentChange) {
+      let response = dialog.showMessageBoxSync(this, {
+        type: 'info',
+        buttons: ['Yes', 'No'],
+        title: 'Warning',
+        cancelId: 1,
+        defaultId: 0,
+        detail: 'The app is under development, make sure everything is saved before exiting.'
+      });
 
-    if (response == 1) e.preventDefault();
+      if (response == 1) e.preventDefault();
+    }
   })
 
   // menu template ----------------------------------------
@@ -93,11 +111,28 @@ const createWindow = () => {
         {
           label: "open file",
           click: async () => {
-            const filePath = await handleOpen()
-            if (filePath) {
-              mainWindow.webContents.send('open-file', filePath)
-              openFilePath = filePath
-              mainWindow.setTitle(path.basename(openFilePath))
+            let skipOpenFile = false;
+            if (isContentChange) {
+              let response = dialog.showMessageBoxSync(null, {
+                type: 'info',
+                buttons: ['Yes', 'No'],
+                title: 'Warning',
+                cancelId: 1,
+                defaultId: 0,
+                detail: 'current file is changed, and not save yet. Return to save File?'
+              });
+
+              if (response === 0) {
+                skipOpenFile = true;
+              }
+            }
+            if (!skipOpenFile) {
+              const filePath = await handleOpen()
+              if (filePath) {
+                mainWindow.webContents.send('open-file', filePath)
+                openFilePath = filePath
+                mainWindow.setTitle(path.basename(openFilePath))
+              }
             }
           },
           accelerator: process.platform === 'darwin' ? 'Cmd+o' : 'Ctrl+o',
