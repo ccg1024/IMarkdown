@@ -83,7 +83,7 @@ const App = () => {
           overflow='auto'
           height='100%'
           id='editor_Box'
-          w='80%'
+          w='100%'
           style={{ display: "block" }}
         >
           <Editor
@@ -99,7 +99,7 @@ const App = () => {
           className='preview_parent'
           overflow='auto'
           height='100%'
-          w="80%"
+          w="100%"
           pl={2}
         >
         </Box>
