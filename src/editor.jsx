@@ -142,6 +142,7 @@ const Editor = ({ initialDoc, onChange, filePath, handleIsChange }) => {
     ref={refContainer}
     height='100%'
     overflow='auto'
+    pl={2}
   ></Box>
 }
 
