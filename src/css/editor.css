@@ -11,6 +11,10 @@
   font-family: 'JetBrainsMono Nerd Font Mono' !important
 }
 
+.cm-focused {
+  outline: none !important;
+}
+
 .cm-scroller::-webkit-scrollbar {
   width: 4px;
 }

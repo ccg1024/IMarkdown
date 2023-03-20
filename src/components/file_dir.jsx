@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   Box,
   Flex,
@@ -15,6 +15,7 @@ import {
 
 const FileDir = ({ recentFiles, currentFile, isChange, handlePath }) => {
 
+  const menuRef = useRef(null)
   const path = window.electronAPI.require('path')
 
   const converWin32Path = (filePath) => filePath.split(path.sep).join(path.posix.sep);
@@ -45,11 +46,10 @@ const FileDir = ({ recentFiles, currentFile, isChange, handlePath }) => {
   }, [isChange, currentFile]);
 
   const toggleMenuContent = () => {
-    const menuContent = document.querySelector('#menu-content');
-    if (menuContent.style.display === 'none') {
-      menuContent.style.display = 'block';
+    if (menuRef.current.style.display === 'none') {
+      menuRef.current.style.display = 'block';
     } else {
-      menuContent.style.display = 'none';
+      menuRef.current.style.display = 'none';
     }
   }
 
@@ -67,6 +67,7 @@ const FileDir = ({ recentFiles, currentFile, isChange, handlePath }) => {
       </Box>
       <Box
         id="menu-content"
+        ref={menuRef}
         w="200px"
         backdropBlur='8px'
         backdropFilter='auto'
@@ -88,6 +89,7 @@ const FileDir = ({ recentFiles, currentFile, isChange, handlePath }) => {
             textAlign="center"
             px={2}
             fontWeight="bold"
+            userSelect={'none'}
           >recent files</Text>
         </Flex>
         <List>
@@ -101,6 +103,7 @@ const FileDir = ({ recentFiles, currentFile, isChange, handlePath }) => {
                     textDecoration='none'
                     color='black'
                     _hover={{ textDecoration: 'none' }}
+                    title={item}
                   >
                     <ListItem
                       p={1}
@@ -111,7 +114,7 @@ const FileDir = ({ recentFiles, currentFile, isChange, handlePath }) => {
                     >
                       <Flex alignItems="center" key={index} >
                         <BsFillRecordFill color="#68d391" />
-                        <Text ml={1}>
+                        <Text ml={1} userSelect={'none'}>
                           {path.basename(item)}
                         </Text>
                       </Flex>
@@ -126,6 +129,7 @@ const FileDir = ({ recentFiles, currentFile, isChange, handlePath }) => {
                     textDecoration='none'
                     color='black'
                     _hover={{ textDecoration: 'none' }}
+                    title={item}
                   >
                     <ListItem
                       p={1}
@@ -137,7 +141,7 @@ const FileDir = ({ recentFiles, currentFile, isChange, handlePath }) => {
                     >
                       <Flex alignItems="center" key={index} >
                         <BsFillRecordFill color="#718096" />
-                        <Text ml={1}>
+                        <Text ml={1} userSelect={'none'}>
                           {path.basename(item)}
                         </Text>
                       </Flex>

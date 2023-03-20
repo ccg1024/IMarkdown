@@ -142,7 +142,7 @@ export const Init_extends = () => {
       ...completionKeymap
     ]),
     // lineNumbers(),
-    highlightActiveLineGutter(),
+    // highlightActiveLineGutter(),
     history(),
     indentOnInput(),
     bracketMatching(),
