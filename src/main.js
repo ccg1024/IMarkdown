@@ -55,6 +55,7 @@ const createWindow = () => {
   // recive file path from renderer
   ipcMain.on('set-filePath', (_event, filePath) => {
     openFilePath = filePath
+    mainWindow.setTitle(openFilePath)
   })
 
   // recive content change flag
@@ -131,7 +132,7 @@ const createWindow = () => {
               if (filePath) {
                 mainWindow.webContents.send('open-file', filePath)
                 openFilePath = filePath
-                mainWindow.setTitle(path.basename(openFilePath))
+                mainWindow.setTitle(openFilePath)
               }
             }
           },
@@ -157,7 +158,7 @@ const createWindow = () => {
                 openFilePath = await handleEmptyFileSave()
                 console.log("the new file path is: " + openFilePath)
                 if (typeof (openFilePath) !== "undefined") {
-                  mainWindow.setTitle(path.basename(openFilePath))
+                  mainWindow.setTitle(openFilePath)
                 }
               }
               if (typeof (openFilePath) == "undefined") {
