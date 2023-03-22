@@ -112,9 +112,9 @@ const FileDir = ({ recentFiles, currentFile, isChange, handlePath }) => {
                       borderRadius="sm"
                       backgroundColor="blackAlpha.400"
                     >
-                      <Flex alignItems="center" key={index} >
-                        <BsFillRecordFill color="#68d391" />
-                        <Text ml={1} userSelect={'none'}>
+                      <Flex alignItems="center" key={index} overflow={'hidden'}>
+                        <BsFillRecordFill color="#68d391" style={{flexShrink: 0}}/>
+                        <Text ml={1} userSelect={'none'} flexShrink={0}>
                           {path.basename(item)}
                         </Text>
                       </Flex>
@@ -139,9 +139,9 @@ const FileDir = ({ recentFiles, currentFile, isChange, handlePath }) => {
                       onClick={e => readRecentFile(e.currentTarget.id)}
                       _hover={{ backgroundColor: 'blackAlpha.200' }}
                     >
-                      <Flex alignItems="center" key={index} >
-                        <BsFillRecordFill color="#718096" />
-                        <Text ml={1} userSelect={'none'}>
+                      <Flex alignItems="center" key={index} overflow='hidden'>
+                        <BsFillRecordFill color="#718096" style={{flexShrink: 0}}/>
+                        <Text ml={1} userSelect={'none'} flexShrink={0}>
                           {path.basename(item)}
                         </Text>
                       </Flex>
