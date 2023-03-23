@@ -33,3 +33,31 @@
   - preload.js: IPC pre-load function
   - renderer.js: Render file and call index.js
   - renderer.d.ts: A type file to solve the warning message of the editor when the IPC method is called
+
+### Codemirror
+
+```html
+<div class="cm-editor [cm-focused] [generated classes]">
+  <div class="cm-scroller">
+    <div class="cm-gutters">
+      <div class="cm-gutter [...]">
+        <!-- One gutter element for each line -->
+        <div class="cm-gutterElement">...</div>
+      </div>
+    </div>
+    <div class="cm-content" contenteditable="true">
+      <!-- The actual document content -->
+      <div class="cm-line">Content goes here</div>
+      <div class="cm-line">...</div>
+    </div>
+    <div class="cm-selectionLayer">
+      <!-- Positioned rectangles to draw the selection -->
+      <div class="cm-selectionBackground"></div>
+    </div>
+    <div class="cm-cursorLayer">
+      <!-- Positioned elements to draw cursors -->
+      <div class="cm-cursor"></div>
+    </div>
+  </div>
+</div>
+```
