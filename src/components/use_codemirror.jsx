@@ -4,8 +4,6 @@ import {
   EditorView,
   keymap,
   highlightActiveLine,
-  lineNumbers,
-  highlightActiveLineGutter,
   drawSelection,
   highlightSpecialChars,
   dropCursor,
@@ -19,13 +17,11 @@ import {
   HighlightStyle,
   syntaxHighlighting,
   foldGutter,
-  foldKeymap,
-  defaultHighlightStyle
+  foldKeymap
 } from '@codemirror/language'
-import { tags } from '@lezer/highlight'
+import { tags, Tag, styleTags } from '@lezer/highlight'
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown'
 import { languages } from '@codemirror/language-data'
-import { oneDark } from '@codemirror/theme-one-dark'
 import { vim } from '@replit/codemirror-vim'
 import { searchKeymap, highlightSelectionMatches } from '@codemirror/search'
 import {
@@ -44,61 +40,133 @@ export const transparentTheme = EditorView.theme({
   }
 })
 
+const customTags = {
+  headingMark: Tag.define(),
+  quoteMark: Tag.define(),
+  listMark: Tag.define(),
+  linkMark: Tag.define(),
+  emphasisMark: Tag.define(),
+  codeMark: Tag.define(),
+  codeText: Tag.define(),
+  codeInfo: Tag.define(),
+  linkTitle: Tag.define(),
+  linkLabel: Tag.define(),
+  url: Tag.define(),
+  inlineCode: Tag.define(),
+  tableDelimiter: Tag.define(),
+  tableRow: Tag.define()
+}
+
+const MarkStylingExtension = {
+  props: [
+    styleTags({
+      HeaderMark: customTags.headingMark,
+      QuoteMark: customTags.quoteMark,
+      ListMark: customTags.listMark,
+      LinkMark: customTags.linkMark,
+      EmphasisMark: customTags.emphasisMark,
+      CodeMark: customTags.codeMark,
+      CodeText: customTags.codeText,
+      CodeInfo: customTags.codeInfo,
+      LinkTitle: customTags.linkTitle,
+      LinkLabel: customTags.linkLabel,
+      URL: customTags.url,
+      InlineCode: customTags.inlineCode,
+      TableDelimiter: customTags.tableDelimiter,
+      TableRow: customTags.tableRow
+    })
+  ]
+}
+
+const customColors = {
+  content: {
+    head: '#586EA5',
+    quote: '#839496',
+    emphasis: '#FD5455',
+    list: '#000000',
+    url: '#718096',
+    link: '#68D391',
+    comment: '#03C988',
+    inlineCode: '#4299E1'
+  },
+  markers: {
+    headMark: '#A9B8CC',
+    quoteMark: '#CBD5E0',
+    listMark: '#A0AEC0',
+    linkMark: '#A9B8CC',
+    empahsisMark: '#FC8181',
+    codeMark: '#A0AEC0',
+    codeText: '#000000',
+    codeInfo: '#4A5568',
+    linkTitle: 'blue',
+    linkLabel: 'blue',
+    tableDelimiter: '#A0AEC0'
+  }
+}
+
 export const my_syntaxHighlighting = HighlightStyle.define([
   {
     tag: tags.heading1,
     fontWeight: 'bold',
-    color: '#E90064'
+    color: customColors.content.head,
+    fontSize: '1.2em'
   },
   {
     tag: tags.heading2,
     fontWeight: 'bold',
-    color: '#E90064'
+    color: customColors.content.head,
+    fontSize: '1.2em'
   },
   {
     tag: tags.heading3,
     fontWeight: 'bold',
-    color: '#E90064'
+    color: customColors.content.head,
+    fontSize: '1.2em'
   },
   {
     tag: tags.heading4,
     fontWeight: 'bold',
-    color: '#E90064'
+    color: customColors.content.head,
+    fontSize: '1.2em'
   },
   {
     tag: tags.heading5,
     fontWeight: 'bold',
-    color: '#E90064'
+    color: customColors.content.head,
+    fontSize: '1.2em'
   },
   {
     tag: tags.heading6,
     fontWeight: 'bold',
-    color: '#E90064'
+    color: customColors.content.head,
+    fontSize: '1.2em'
   },
   {
     tag: tags.list,
-    color: '#537FE7'
+    color: customColors.content.list
   },
   {
     tag: tags.link,
-    color: '#913175'
+    color: customColors.content.link,
+    textDecoration: 'underline'
   },
   {
     tag: tags.quote,
-    color: '#7D5A50'
+    color: customColors.content.quote
   },
   {
     tag: tags.emphasis,
-    // color: '#EA5455',
+    color: customColors.content.emphasis,
     fontStyle: 'italic'
   },
   {
     tag: tags.strong,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    color: customColors.content.emphasis
   },
   {
     tag: tags.comment,
-    color: '#03C988'
+    color: customColors.content.comment
   },
   {
     tag: tags.labelName, // javascript, java, python... etc
@@ -127,6 +195,60 @@ export const my_syntaxHighlighting = HighlightStyle.define([
   {
     tag: tags.typeName,
     color: 'blue'
+  },
+  {
+    tag: tags.heading, // table head
+    color: customColors.content.head
+  },
+  // ------ for marker highlight
+  {
+    tag: customTags.headingMark,
+    color: customColors.markers.headMark
+  },
+  {
+    tag: customTags.quoteMark,
+    color: customColors.markers.quoteMark
+  },
+  {
+    tag: customTags.listMark,
+    color: customColors.markers.listMark
+  },
+  {
+    tag: customTags.linkMark,
+    color: customColors.markers.linkMark,
+    textDecoration: 'none'
+  },
+  {
+    tag: customTags.emphasisMark,
+    color: customColors.markers.empahsisMark
+  },
+  {
+    tag: customTags.codeMark,
+    color: customColors.markers.codeMark
+  },
+  {
+    tag: customTags.codeInfo,
+    color: customColors.markers.codeInfo
+  },
+  {
+    tag: customTags.linkTitle,
+    colors: customColors.markers.linkTitle
+  },
+  {
+    tag: customTags.linkLabel,
+    color: customColors.markers.linkLabel
+  },
+  {
+    tag: customTags.url,
+    color: customColors.content.url
+  },
+  {
+    tag: customTags.inlineCode,
+    color: customColors.content.inlineCode
+  },
+  {
+    tag: customTags.tableDelimiter,
+    color: customColors.markers.tableDelimiter
   }
 ])
 
@@ -150,7 +272,8 @@ export const Init_extends = () => {
     markdown({
       base: markdownLanguage,
       codeLanguages: languages,
-      addKeymap: true
+      addKeymap: true,
+      extensions: [MarkStylingExtension]
     }),
     // oneDark,
     transparentTheme,

@@ -101,6 +101,7 @@ const App = () => {
           height="100%"
           w="100%"
           pl={2}
+          fontSize="22px"
         ></Box>
       </Flex>
     </>

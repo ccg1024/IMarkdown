@@ -153,6 +153,7 @@ const Editor = ({ initialDoc, onChange, filePath, handleIsChange }) => {
       height="100%"
       overflow="auto"
       pl={2}
+      fontSize="22px"
     ></Box>
   )
 }

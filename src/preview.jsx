@@ -134,7 +134,7 @@ const Preview = ({ doc, currentFile }) => {
         },
         th: ({ node, ...props }) => {
           delete props.isHeader
-          return <Th {...props} />
+          return <Th fontSize="1em" {...props} />
         },
         code({ node, inline, className, children, ...props }) {
           const match = /language-(\w+)/.exec(className || '')
@@ -157,6 +157,7 @@ const Preview = ({ doc, currentFile }) => {
               fontWeight="bold"
               color={useColorModeValue('#3D7AED', '#FF63C3')}
               className={className}
+              fontSize="1em"
               {...props}
             >
               {children}
