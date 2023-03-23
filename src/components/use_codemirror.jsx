@@ -132,6 +132,7 @@ export const my_syntaxHighlighting = HighlightStyle.define([
 
 export const Init_extends = () => {
   const temp = [
+    vim(),
     keymap.of([
       ...defaultKeymap,
       ...historyKeymap,
@@ -157,7 +158,6 @@ export const Init_extends = () => {
     EditorView.lineWrapping,
     drawSelection(),
     dropCursor(),
-    vim(),
     highlightSpecialChars(),
     rectangularSelection(),
     crosshairCursor(),
