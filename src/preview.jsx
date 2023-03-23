@@ -86,7 +86,7 @@ const Preview = ({ doc, currentFile }) => {
         },
         ol: ({ node, ...props }) => {
           props.ordered = 'true'
-          return <OrderedList p={0} {...props} />
+          return <OrderedList p={0} marginInlineStart="2em" {...props} />
         },
         li: ({ node, ...props }) => {
           props.ordered = props.ordered.toString()
