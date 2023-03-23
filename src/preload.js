@@ -3,11 +3,11 @@
 const { ipcRenderer, contextBridge } = require('electron')
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  openFile: (callback) => ipcRenderer.on('open-file', callback),
-  saveFile: (callback) => ipcRenderer.on('save-file', callback),
-  require: (callback) => window.require(callback),
-  toggleView: (callback) => ipcRenderer.on('toggle-view', callback),
-  setFilePath: (filePath) => ipcRenderer.send('set-filePath', filePath),
-  setContentChange: (isChange) => ipcRenderer.send('set-contentChange', isChange),
+  openFile: callback => ipcRenderer.on('open-file', callback),
+  saveFile: callback => ipcRenderer.on('save-file', callback),
+  require: callback => window.require(callback),
+  toggleView: callback => ipcRenderer.on('toggle-view', callback),
+  setFilePath: filePath => ipcRenderer.send('set-filePath', filePath),
+  setContentChange: isChange => ipcRenderer.send('set-contentChange', isChange),
   showUnsavedInfo: () => ipcRenderer.send('show-unsavedInfo')
 })

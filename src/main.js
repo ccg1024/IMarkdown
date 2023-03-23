@@ -1,17 +1,24 @@
-const { app, BrowserWindow, dialog, Menu, protocol, ipcMain } = require('electron');
-const path = require('path');
+const {
+  app,
+  BrowserWindow,
+  dialog,
+  Menu,
+  protocol,
+  ipcMain
+} = require('electron')
+const path = require('path')
 
 require('@electron/remote/main').initialize()
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
-  app.quit();
+  app.quit()
 }
 
 // for menu
 const isMac = process.platform === 'darwin'
 let openFilePath = ''
-let isContentChange = false;
+let isContentChange = false
 
 async function handleOpen() {
   console.log('into Open file')
@@ -35,10 +42,9 @@ async function handleEmptyFileSave() {
   }
 }
 
-
 const createWindow = () => {
   // Create the browser window.
-  openFilePath = ""
+  openFilePath = ''
   const mainWindow = new BrowserWindow({
     width: 1100,
     height: 700,
@@ -46,11 +52,11 @@ const createWindow = () => {
     visualEffectState: 'active',
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
-      nodeIntegration: true,  // makd sure to use `path` and `fs` in react module
+      nodeIntegration: true, // makd sure to use `path` and `fs` in react module
       enableRemoteModule: true,
       contextIsolation: true
-    },
-  });
+    }
+  })
 
   // recive file path from renderer
   ipcMain.on('set-filePath', (_event, filePath) => {
@@ -60,20 +66,20 @@ const createWindow = () => {
 
   // recive content change flag
   ipcMain.on('set-contentChange', (_event, isChange) => {
-    isContentChange = isChange;
+    isContentChange = isChange
   })
 
   // show unsaved info, when using recient file
-  ipcMain.on('show-unsavedInfo', (_event) => {
+  ipcMain.on('show-unsavedInfo', _event => {
     dialog.showMessageBoxSync(null, {
       type: 'info',
       title: 'Warning',
       message: 'The file is unsaved'
-    });
-  });
+    })
+  })
 
   // show close dialog
-  mainWindow.on('close', function(e) {
+  mainWindow.on('close', function (e) {
     if (isContentChange) {
       let response = dialog.showMessageBoxSync(this, {
         type: 'info',
@@ -81,38 +87,43 @@ const createWindow = () => {
         title: 'Warning',
         cancelId: 1,
         defaultId: 0,
-        detail: 'The app is under development, make sure everything is saved before exiting.'
-      });
+        detail:
+          'The app is under development, make sure everything is saved before exiting.'
+      })
 
-      if (response == 1) e.preventDefault();
+      if (response == 1) e.preventDefault()
     }
   })
 
   // menu template ----------------------------------------
   const template = [
     // { role: 'appMenu' }
-    ...(isMac ? [{
-      label: app.name,
-      submenu: [
-        { role: 'about' },
-        { type: 'separator' },
-        { role: 'services' },
-        { type: 'separator' },
-        { role: 'hide' },
-        { role: 'hideOthers' },
-        { role: 'unhide' },
-        { type: 'separator' },
-        { role: 'quit' }
-      ]
-    }] : []),
+    ...(isMac
+      ? [
+          {
+            label: app.name,
+            submenu: [
+              { role: 'about' },
+              { type: 'separator' },
+              { role: 'services' },
+              { type: 'separator' },
+              { role: 'hide' },
+              { role: 'hideOthers' },
+              { role: 'unhide' },
+              { type: 'separator' },
+              { role: 'quit' }
+            ]
+          }
+        ]
+      : []),
     // { role: 'fileMenu' }
     {
       label: 'File',
       submenu: [
         {
-          label: "open file",
+          label: 'open file',
           click: async () => {
-            let skipOpenFile = false;
+            let skipOpenFile = false
             if (isContentChange) {
               let response = dialog.showMessageBoxSync(null, {
                 type: 'info',
@@ -120,11 +131,12 @@ const createWindow = () => {
                 title: 'Warning',
                 cancelId: 1,
                 defaultId: 0,
-                detail: 'current file is changed, and not save yet. Return to save File?'
-              });
+                detail:
+                  'current file is changed, and not save yet. Return to save File?'
+              })
 
               if (response === 0) {
-                skipOpenFile = true;
+                skipOpenFile = true
               }
             }
             if (!skipOpenFile) {
@@ -136,13 +148,14 @@ const createWindow = () => {
               }
             }
           },
-          accelerator: process.platform === 'darwin' ? 'Cmd+o' : 'Ctrl+o',
+          accelerator: process.platform === 'darwin' ? 'Cmd+o' : 'Ctrl+o'
         },
         {
-          label: "save file",
+          label: 'save file',
           click: async () => {
             let response = dialog.showMessageBoxSync(null, {
-              message: 'Since the application is under developed, so, do you want to save file to',
+              message:
+                'Since the application is under developed, so, do you want to save file to',
               type: 'info',
               buttons: ['Yes', 'No'],
               defaultId: 0,
@@ -150,26 +163,24 @@ const createWindow = () => {
               detail: `${openFilePath}`
             })
             if (response == 1) {
-              console.log("cancel save")
-
+              console.log('cancel save')
             } else {
               console.log('using save file piple')
               if (openFilePath === '') {
                 openFilePath = await handleEmptyFileSave()
-                console.log("the new file path is: " + openFilePath)
-                if (typeof (openFilePath) !== "undefined") {
+                console.log('the new file path is: ' + openFilePath)
+                if (typeof openFilePath !== 'undefined') {
                   mainWindow.setTitle(openFilePath)
                 }
               }
-              if (typeof (openFilePath) == "undefined") {
-                openFilePath = ""
+              if (typeof openFilePath == 'undefined') {
+                openFilePath = ''
               } else {
                 mainWindow.webContents.send('save-file', openFilePath)
               }
             }
-
           },
-          accelerator: process.platform === 'darwin' ? 'Cmd+s' : 'Ctrl+s',
+          accelerator: process.platform === 'darwin' ? 'Cmd+s' : 'Ctrl+s'
         },
         { type: 'separator' },
         isMac ? { role: 'close' } : { role: 'quit' }
@@ -185,23 +196,18 @@ const createWindow = () => {
         { role: 'cut' },
         { role: 'copy' },
         { role: 'paste' },
-        ...(isMac ? [
-          { role: 'pasteAndMatchStyle' },
-          { role: 'delete' },
-          { role: 'selectAll' },
-          { type: 'separator' },
-          {
-            label: 'Speech',
-            submenu: [
-              { role: 'startSpeaking' },
-              { role: 'stopSpeaking' }
+        ...(isMac
+          ? [
+              { role: 'pasteAndMatchStyle' },
+              { role: 'delete' },
+              { role: 'selectAll' },
+              { type: 'separator' },
+              {
+                label: 'Speech',
+                submenu: [{ role: 'startSpeaking' }, { role: 'stopSpeaking' }]
+              }
             ]
-          }
-        ] : [
-          { role: 'delete' },
-          { type: 'separator' },
-          { role: 'selectAll' }
-        ])
+          : [{ role: 'delete' }, { type: 'separator' }, { role: 'selectAll' }])
       ]
     },
     // { role: 'viewMenu' }
@@ -223,15 +229,17 @@ const createWindow = () => {
           click: async () => {
             mainWindow.webContents.send('toggle-view', 1)
           },
-          accelerator: process.platform === 'darwin' ? 'Cmd+Shift+p' : 'Ctrl+Shift+p',
+          accelerator:
+            process.platform === 'darwin' ? 'Cmd+Shift+p' : 'Ctrl+Shift+p'
         },
         {
-          label: "Just Editor",
+          label: 'Just Editor',
           click: async () => {
             mainWindow.webContents.send('toggle-view', 2)
           },
-          accelerator: process.platform === 'darwin' ? 'Cmd+Shift+e' : 'Ctrl+Shift+e',
-        },
+          accelerator:
+            process.platform === 'darwin' ? 'Cmd+Shift+e' : 'Ctrl+Shift+e'
+        }
       ]
     },
     // { role: 'windowMenu' }
@@ -240,14 +248,14 @@ const createWindow = () => {
       submenu: [
         { role: 'minimize' },
         { role: 'zoom' },
-        ...(isMac ? [
-          { type: 'separator' },
-          { role: 'front' },
-          { type: 'separator' },
-          { role: 'window' }
-        ] : [
-          { role: 'close' }
-        ])
+        ...(isMac
+          ? [
+              { type: 'separator' },
+              { role: 'front' },
+              { type: 'separator' },
+              { role: 'window' }
+            ]
+          : [{ role: 'close' }])
       ]
     }
   ]
@@ -257,18 +265,18 @@ const createWindow = () => {
   Menu.setApplicationMenu(menu)
 
   // and load the index.html of the app.
-  mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+  mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
-};
+}
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+app.on('ready', createWindow)
 app.whenReady().then(() => {
-  protocol.registerFileProtocol("atom", (request, callback) => {
+  protocol.registerFileProtocol('atom', (request, callback) => {
     const url = request.url.substring(7)
     callback(decodeURI(path.normalize(url)))
   })
@@ -278,23 +286,22 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-
   console.log('into close window')
-  openFilePath = ""
+  openFilePath = ''
 
   if (process.platform !== 'darwin') {
-    app.quit();
+    app.quit()
   }
-});
+})
 
 app.on('activate', () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
-    openFilePath = ""
-    createWindow();
+    openFilePath = ''
+    createWindow()
   }
-});
+})
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.

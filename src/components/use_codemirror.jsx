@@ -26,7 +26,7 @@ import { tags } from '@lezer/highlight'
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown'
 import { languages } from '@codemirror/language-data'
 import { oneDark } from '@codemirror/theme-one-dark'
-import { vim } from "@replit/codemirror-vim"
+import { vim } from '@replit/codemirror-vim'
 import { searchKeymap, highlightSelectionMatches } from '@codemirror/search'
 import {
   autocompletion,
@@ -35,13 +35,12 @@ import {
   closeBracketsKeymap
 } from '@codemirror/autocomplete'
 
-
 export const transparentTheme = EditorView.theme({
   '&': {
     // backgroundColor: 'transparent !important',
     height: '100%',
     fontSize: '1.0em',
-    padding: '12px',
+    padding: '12px'
   }
 })
 
@@ -102,7 +101,7 @@ export const my_syntaxHighlighting = HighlightStyle.define([
     color: '#03C988'
   },
   {
-    tag: tags.labelName,  // javascript, java, python... etc
+    tag: tags.labelName, // javascript, java, python... etc
     color: '#FF8787'
   },
   {
@@ -170,7 +169,6 @@ export const Init_extends = () => {
   return temp
 }
 
-
 const useCodeMirror = ({ initialDoc, onChange }) => {
   const refContainer = useRef(null)
   const [editorView, setEditorView] = useState()
@@ -195,7 +193,7 @@ const useCodeMirror = ({ initialDoc, onChange }) => {
 
     const view = new EditorView({
       state: startState,
-      parent: refContainer.current,
+      parent: refContainer.current
       // extensions: [defaultHighlightStyle.fallback]
     })
 
@@ -204,6 +202,5 @@ const useCodeMirror = ({ initialDoc, onChange }) => {
 
   return [refContainer, editorView]
 }
-
 
 export default useCodeMirror

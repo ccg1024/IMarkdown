@@ -16,7 +16,7 @@ const components = {
       color: mode('#3d7aed', '#ff63c3')(props),
       textUnderLineOffset: 3
     })
-  },
+  }
 }
 
 const fonts = {
@@ -31,7 +31,6 @@ const config = {
   // initialColorMode: 'dark',
   useSystemColorMode: true
 }
-
 
 // const theme = extendTheme({
 //   styles: {
