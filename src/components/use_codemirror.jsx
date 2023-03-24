@@ -235,7 +235,7 @@ export const my_syntaxHighlighting = HighlightStyle.define([
 
 export const Init_extends = () => {
   const temp = [
-    vim(),
+    // vim(),
     // lineNumbers(),
     // highlightActiveLineGutter(),
     history(),
