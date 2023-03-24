@@ -102,6 +102,9 @@ const customColors = {
     linkTitle: 'blue',
     linkLabel: 'blue',
     tableDelimiter: '#A0AEC0'
+  },
+  backgroundColor: {
+    inlineCode: '#EBF8FF'
   }
 }
 
@@ -225,7 +228,8 @@ export const my_syntaxHighlighting = HighlightStyle.define([
   },
   {
     tag: customTags.inlineCode,
-    color: customColors.content.inlineCode
+    color: customColors.content.inlineCode,
+    backgroundColor: customColors.backgroundColor.inlineCode
   },
   {
     tag: customTags.tableDelimiter,
