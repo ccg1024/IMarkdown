@@ -17,7 +17,8 @@ import {
   HighlightStyle,
   syntaxHighlighting,
   foldGutter,
-  foldKeymap
+  foldKeymap,
+  defaultHighlightStyle
 } from '@codemirror/language'
 import { tags, Tag, styleTags } from '@lezer/highlight'
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown'
@@ -109,37 +110,43 @@ export const my_syntaxHighlighting = HighlightStyle.define([
     tag: tags.heading1,
     fontWeight: 'bold',
     color: customColors.content.head,
-    fontSize: '1.2em'
+    fontSize: '1.2em',
+    textDecoration: 'none !important'
   },
   {
     tag: tags.heading2,
     fontWeight: 'bold',
     color: customColors.content.head,
-    fontSize: '1.2em'
+    fontSize: '1.2em',
+    textDecoration: 'none !important'
   },
   {
     tag: tags.heading3,
     fontWeight: 'bold',
     color: customColors.content.head,
-    fontSize: '1.2em'
+    fontSize: '1.2em',
+    textDecoration: 'none !important'
   },
   {
     tag: tags.heading4,
     fontWeight: 'bold',
     color: customColors.content.head,
-    fontSize: '1.2em'
+    fontSize: '1.2em',
+    textDecoration: 'none !important'
   },
   {
     tag: tags.heading5,
     fontWeight: 'bold',
     color: customColors.content.head,
-    fontSize: '1.2em'
+    fontSize: '1.2em',
+    textDecoration: 'none !important'
   },
   {
     tag: tags.heading6,
     fontWeight: 'bold',
     color: customColors.content.head,
-    fontSize: '1.2em'
+    fontSize: '1.2em',
+    textDecoration: 'none !important'
   },
   {
     tag: tags.list,
@@ -169,41 +176,15 @@ export const my_syntaxHighlighting = HighlightStyle.define([
     color: customColors.content.comment
   },
   {
-    tag: tags.labelName, // javascript, java, python... etc
-    color: '#FF8787'
-  },
-  {
-    tag: tags.keyword, // all
-    color: 'red'
-  },
-  {
-    tag: tags.definitionKeyword,
-    color: '#2192FF'
-  },
-  {
-    tag: tags.controlKeyword,
-    color: 'orange'
-  },
-  {
-    tag: tags.moduleKeyword,
-    color: 'green'
-  },
-  {
-    tag: tags.string,
-    color: 'green'
-  },
-  {
-    tag: tags.typeName,
-    color: 'blue'
-  },
-  {
     tag: tags.heading, // table head
-    color: customColors.content.head
+    color: customColors.content.head,
+    textDecoration: 'none !important'
   },
   // ------ for marker highlight
   {
     tag: customTags.headingMark,
-    color: customColors.markers.headMark
+    color: customColors.markers.headMark,
+    textDecoration: 'none !important'
   },
   {
     tag: customTags.quoteMark,
@@ -216,7 +197,7 @@ export const my_syntaxHighlighting = HighlightStyle.define([
   {
     tag: customTags.linkMark,
     color: customColors.markers.linkMark,
-    textDecoration: 'none'
+    textDecoration: 'none !important'
   },
   {
     tag: customTags.emphasisMark,
@@ -255,14 +236,6 @@ export const my_syntaxHighlighting = HighlightStyle.define([
 export const Init_extends = () => {
   const temp = [
     vim(),
-    keymap.of([
-      ...defaultKeymap,
-      ...historyKeymap,
-      ...foldKeymap,
-      ...searchKeymap,
-      ...closeBracketsKeymap,
-      ...completionKeymap
-    ]),
     // lineNumbers(),
     // highlightActiveLineGutter(),
     history(),
@@ -277,7 +250,8 @@ export const Init_extends = () => {
     }),
     // oneDark,
     transparentTheme,
-    syntaxHighlighting(my_syntaxHighlighting, { fallback: true }),
+    syntaxHighlighting(defaultHighlightStyle),
+    syntaxHighlighting(my_syntaxHighlighting),
     EditorView.lineWrapping,
     drawSelection(),
     dropCursor(),
@@ -287,7 +261,15 @@ export const Init_extends = () => {
     foldGutter(),
     highlightSelectionMatches(),
     closeBrackets(),
-    autocompletion()
+    autocompletion(),
+    keymap.of([
+      ...defaultKeymap,
+      ...historyKeymap,
+      ...foldKeymap,
+      ...searchKeymap,
+      ...closeBracketsKeymap,
+      ...completionKeymap
+    ])
   ]
   return temp
 }
