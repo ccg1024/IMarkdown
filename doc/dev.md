@@ -61,3 +61,7 @@
   </div>
 </div>
 ```
+
+### Electron
+
+开发过程中发现，在`preload.js`中暴露接口的方式下，无法通过`ipcRenderer.removeListener`来取消通道的监听。但通过`ipcRenderer.removeAllListeners`可以取消该通道下的所有监听。
