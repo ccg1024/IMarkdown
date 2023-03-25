@@ -19,6 +19,7 @@ if (require('electron-squirrel-startup')) {
 const isMac = process.platform === 'darwin'
 let openFilePath = ''
 let isContentChange = false
+const fs = require('fs')
 
 async function handleOpen() {
   console.log('into Open file')
@@ -185,6 +186,22 @@ const createWindow = () => {
             }
           },
           accelerator: process.platform === 'darwin' ? 'Cmd+s' : 'Ctrl+s'
+        },
+        {
+          label: 'create file',
+          click: async () => {
+            let tempFilePath = await handleEmptyFileSave()
+            if (tempFilePath !== undefined) {
+              console.log('create new empty file')
+              // write empty to create file
+              fs.writeFileSync(tempFilePath, '')
+              mainWindow.setTitle(tempFilePath)
+              mainWindow.webContents.send('open-file', tempFilePath)
+              openFilePath = tempFilePath
+            } else {
+              console.log('cancel create file')
+            }
+          }
         },
         { type: 'separator' },
         isMac ? { role: 'close' } : { role: 'quit' }
