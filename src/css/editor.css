@@ -1,14 +1,13 @@
 .editor-wrapper {
-
 }
 
 .cm-editor {
-  text-align: justify;
+  text-align: left;
   padding: 0;
 }
 
 .cm-scroller {
-  font-family: 'JetBrainsMono Nerd Font Mono' !important
+  font-family: 'JetBrainsMono Nerd Font Mono' !important;
 }
 
 .cm-focused {

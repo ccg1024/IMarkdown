@@ -60,7 +60,13 @@ const FileDir = ({ recentFiles, currentFile, isChange, handlePath }) => {
 
   return (
     <>
-      <Box p={2} pt={3} id="fixed-side-bar" boxShadow="lg">
+      <Box
+        p={2}
+        pt={3}
+        id="fixed-side-bar"
+        boxShadow="lg"
+        backgroundColor="blue.50"
+      >
         <Link textDecoration="none" color="black" onClick={toggleMenuContent}>
           <BsReverseLayoutTextSidebarReverse />
         </Link>
