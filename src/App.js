@@ -36,7 +36,7 @@ const App = () => {
 
   useEffect(() => {
     if (tempPath) {
-      console.log('App useEffect set file content activated for: ' + tempPath)
+      // console.log('App useEffect set file content activated for: ' + tempPath)
       fs.readFile(tempPath, 'utf-8', (err, data) => {
         if (err) {
           throw err
@@ -59,16 +59,24 @@ const App = () => {
   }, [tempPath])
 
   useEffect(() => {
-    window.electronAPI.openFile(async (_event, value) => {
-      console.log('IPC App.js got new file, set temp path: ' + value)
-      setTempPath(value)
-      setIsChange(false)
-
-      // since open a new file, whatever the file is change, reset it
-      window.electronAPI.setContentChange(false)
-    })
+    console.log('[App.js] run IPC serve for open file, toggleView')
+    window.electronAPI.openFile(handleOpenFile)
     window.electronAPI.toggleView(toggleView)
+    return () => {
+      window.electronAPI.removeOpenFile()
+      window.electronAPI.removeToggleView()
+      console.log('[return App.js] drop listener in app.js')
+    }
   }, [])
+
+  function handleOpenFile(_event, value) {
+    // console.log('IPC App.js got new file, set temp path: ' + value)
+    setTempPath(value)
+    setIsChange(false)
+
+    // since open a new file, whatever the file is change, reset it
+    window.electronAPI.setContentChange(false)
+  }
 
   return (
     <>

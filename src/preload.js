@@ -9,5 +9,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   toggleView: callback => ipcRenderer.on('toggle-view', callback),
   setFilePath: filePath => ipcRenderer.send('set-filePath', filePath),
   setContentChange: isChange => ipcRenderer.send('set-contentChange', isChange),
-  showUnsavedInfo: () => ipcRenderer.send('show-unsavedInfo')
+  showUnsavedInfo: () => ipcRenderer.send('show-unsavedInfo'),
+  removeSaveFile: () => ipcRenderer.removeAllListeners('save-file'),
+  removeOpenFile: () => ipcRenderer.removeAllListeners('open-file'),
+  removeToggleView: () => ipcRenderer.removeAllListeners('toggle-view')
 })

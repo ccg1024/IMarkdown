@@ -18,11 +18,66 @@ const Editor = ({ initialDoc, onChange, filePath, handleIsChange }) => {
 
   // initial codemirror
   const refContainer = useRef(null)
+  const refTimer = useRef(null)
   const [editorView, setEditorView] = useState()
+
+  // can not initital in state, case the page not renderer
+  useEffect(() => {
+    // console.log('[editor.jsx] run codemirror initial')
+    if (!refContainer.current) {
+      return
+    }
+
+    const startState = EditorState.create({
+      doc: initialDoc,
+      extensions: [
+        EditorView.updateListener.of(update => {
+          if (update.docChanged) {
+            handleChange && handleChange(update.state)
+          }
+        }),
+        EditorView.domEventHandlers({
+          scroll(_event, view) {
+            if (!refContainer.current.matches(':hover')) {
+              return
+            }
+            if (!refTimer.current) {
+              refTimer.current = setTimeout(() => {
+                // got corrected position
+                const scrollPos = view.elementAtHeight(
+                  view.scrollDOM.scrollTop
+                ).from
+                // console.log(view.elementAtHeight(view.scrollDOM.scrollTop).from)
+                // console.log(view.state.doc.lineAt(view.elementAtHeight(view.scrollDOM.scrollTop).from))
+                // got doc line number
+                const lineNumber = view.state.doc.lineAt(scrollPos).number
+                previewScroll = lineNumber
+                refTimer.current = null
+              }, 500)
+            }
+          }
+        }),
+        ...Init_extends()
+      ]
+    })
+
+    const view = new EditorView({
+      state: startState,
+      parent: refContainer.current
+    })
+
+    setEditorView(view)
+
+    return () => {
+      // console.log('[return editor.jsx] run initial drop')
+      view.destroy()
+    }
+  }, [refContainer])
 
   useEffect(() => {
     // use callback when display change
     if (editorView) {
+      // console.log('[editor.jsx] run scroll sync')
       const targetNode = document.getElementById('editor_Box')
       const config = { attributes: true }
 
@@ -42,57 +97,21 @@ const Editor = ({ initialDoc, onChange, filePath, handleIsChange }) => {
       }
       const observer = new MutationObserver(callback)
       observer.observe(targetNode, config)
+
+      return () => {
+        observer.disconnect()
+        console.log('[return editor.jsx] run observer drop')
+      }
     }
   }, [editorView])
 
   useEffect(() => {
-    if (!refContainer.current) {
-      return
-    }
-
-    const startState = EditorState.create({
-      doc: initialDoc,
-      extensions: [
-        EditorView.updateListener.of(update => {
-          if (update.docChanged) {
-            handleChange && handleChange(update.state)
-          }
-        }),
-        EditorView.domEventHandlers({
-          scroll(_event, view) {
-            const self = document.getElementById('editor_Box')
-            if (!self.matches(':hover')) {
-              return
-            }
-            // got corrected position
-            const scrollPos = view.elementAtHeight(
-              view.scrollDOM.scrollTop
-            ).from
-            // console.log(view.elementAtHeight(view.scrollDOM.scrollTop).from)
-            // console.log(view.state.doc.lineAt(view.elementAtHeight(view.scrollDOM.scrollTop).from))
-            // got doc line number
-            const lineNumber = view.state.doc.lineAt(scrollPos).number
-            previewScroll = lineNumber
-          }
-        }),
-        ...Init_extends()
-      ]
-    })
-
-    const view = new EditorView({
-      state: startState,
-      parent: refContainer.current
-    })
-
-    setEditorView(view)
-  }, [refContainer])
-
-  useEffect(() => {
     if (filePath) {
+      // console.log('[editor.jsx] run reset codemirror')
       // set preview scroll to top
       previewScroll = 1
       editorView.scrollDOM.scrollTop = 0
-      console.log('got new file and reset codemirro with ' + filePath)
+      // console.log('got new file and reset codemirro with ' + filePath)
       editorView.setState(
         EditorState.create({
           doc: initialDoc,
@@ -104,47 +123,61 @@ const Editor = ({ initialDoc, onChange, filePath, handleIsChange }) => {
             }),
             EditorView.domEventHandlers({
               scroll(_event, view) {
-                const self = document.getElementById('editor_Box')
-                if (!self.matches(':hover')) {
+                if (!refContainer.current.matches(':hover')) {
                   return
                 }
-                // got corrected position
-                const scrollPos = view.elementAtHeight(
-                  view.scrollDOM.scrollTop
-                ).from
-                // console.log(view.elementAtHeight(view.scrollDOM.scrollTop).from)
-                // console.log(view.state.doc.lineAt(view.elementAtHeight(view.scrollDOM.scrollTop).from))
-                // got doc line number
-                const lineNumber = view.state.doc.lineAt(scrollPos).number
-                previewScroll = lineNumber
+                if (!refTimer.current) {
+                  refTimer.current = setTimeout(() => {
+                    // got corrected position
+                    const scrollPos = view.elementAtHeight(
+                      view.scrollDOM.scrollTop
+                    ).from
+                    // console.log(view.elementAtHeight(view.scrollDOM.scrollTop).from)
+                    // console.log(view.state.doc.lineAt(view.elementAtHeight(view.scrollDOM.scrollTop).from))
+                    // got doc line number
+                    const lineNumber = view.state.doc.lineAt(scrollPos).number
+                    previewScroll = lineNumber
+                    refTimer.current = null
+                  }, 500)
+                }
               }
             }),
             ...Init_extends()
           ]
         })
       )
+
+      return () => {
+        // console.log('[return editor.jsx] run reset codemirror drop')
+      }
     }
   }, [editorView, filePath])
 
   useEffect(() => {
     if (editorView) {
-      window.electronAPI.saveFile((_event, saveFilePath) => {
-        console.log('current save path: ' + saveFilePath)
-        fs.writeFileSync(saveFilePath, editorView.state.doc.toString())
-        handleIsChange(false)
+      window.electronAPI.saveFile(handleSaveFile)
+      // console.log('[editor.jsx] listen save ipc')
 
-        // send info to main process;
-        window.electronAPI.setContentChange(false)
-
-        // update the icon color at FirDir component
-        const targetDom = document.getElementById(converWin32Path(saveFilePath))
-        const iconDom = targetDom.getElementsByTagName('svg')[0]
-        iconDom.style.color = '#68D391'
-      })
-      console.log('run save effect')
+      return () => {
+        console.log('[return editor.jsx] run save drop')
+        window.electronAPI.removeSaveFile()
+      }
     }
-    console.log('run save outerlop')
   }, [editorView])
+
+  function handleSaveFile(_event, saveFilePath) {
+    // console.log('current save path: ' + saveFilePath)
+    fs.writeFileSync(saveFilePath, editorView.state.doc.toString())
+    handleIsChange(false)
+
+    // send info to main process;
+    window.electronAPI.setContentChange(false)
+
+    // update the icon color at FirDir component
+    const targetDom = document.getElementById(converWin32Path(saveFilePath))
+    const iconDom = targetDom.getElementsByTagName('svg')[0]
+    iconDom.style.color = '#68D391'
+  }
 
   return (
     <Box

@@ -27,6 +27,7 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 import { previewScroll } from './editor.jsx'
+import _ from 'lodash'
 
 export let previewScrollTop = 1
 
@@ -51,9 +52,9 @@ const Preview = ({ doc, currentFile }) => {
 
     // set scroll listener
     const previewBody = document.querySelector('#preview-scroll')
-    previewBody.onscroll = event => {
+    previewBody.onscroll = _.throttle(event => {
       previewScrollTop = event.target.scrollTop
-    }
+    }, 500)
   }, [])
 
   return (

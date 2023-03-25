@@ -7,6 +7,9 @@ export interface IElectronAPI {
   setFilePath: (filePath: string) => Promise<void>
   setContentChange: (isChange: boolean) => Promise<void>
   showUnsavedInfo: () => Promise<void>
+  removeSaveFile: () => Promise<void>
+  removeOpenFile: () => Promise<void>
+  removeToggleView: () => Promise<void>
 }
 
 declare global {

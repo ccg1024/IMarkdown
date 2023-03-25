@@ -26,7 +26,7 @@ const FileDir = ({ recentFiles, currentFile, isChange, handlePath }) => {
       window.electronAPI.showUnsavedInfo()
       return
     }
-    console.log('Using recent file: ' + filePath)
+    // console.log('Using recent file: ' + filePath)
     handlePath(filePath) // activate useEffect in App.js
     window.electronAPI.setFilePath(filePath)
   }
