@@ -18,6 +18,7 @@ const App = () => {
   const [filePath, setFilePath] = useState('')
   const [isChange, setIsChange] = useState(false)
   const [tempPath, setTempPath] = useState('')
+  const [sideFilePath, setSideFilePath] = useState('')
   const recentFiles = useRef([])
 
   const handleIsChange = useCallback(newFlag => {
@@ -32,6 +33,15 @@ const App = () => {
   const handlePathChange = useCallback(newPath => {
     setTempPath(newPath)
     // currentFile = newPath;
+  }, [])
+  const handleSideFilePathChange = useCallback(newPath => {
+    setSideFilePath(newPath)
+
+    const converPath = converWin32Path(newPath)
+    if (!recentFiles.current.includes(converPath)) {
+      recentFiles.current = [...recentFiles.current, converPath]
+    }
+    currentFile = newPath
   }, [])
 
   useEffect(() => {
@@ -53,6 +63,7 @@ const App = () => {
 
           // activte the editor useEffect to update codemirror
           setFilePath(tempPath)
+          setSideFilePath(tempPath)
         }
       })
     }
@@ -83,7 +94,7 @@ const App = () => {
       <Flex height="100%" width="100%" id="content_root">
         <FileDir
           recentFiles={recentFiles.current}
-          currentFile={filePath}
+          currentFile={sideFilePath}
           isChange={isChange}
           handlePath={handlePathChange}
         />
@@ -99,6 +110,7 @@ const App = () => {
             onChange={handleDocChange}
             filePath={filePath}
             handleIsChange={handleIsChange}
+            handleSideFilePathChange={handleSideFilePathChange}
           />
         </Box>
 

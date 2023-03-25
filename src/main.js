@@ -168,15 +168,19 @@ const createWindow = () => {
               console.log('using save file piple')
               if (openFilePath === '') {
                 openFilePath = await handleEmptyFileSave()
-                console.log('the new file path is: ' + openFilePath)
                 if (typeof openFilePath !== 'undefined') {
+                  console.log('the new file path is: ' + openFilePath)
                   mainWindow.setTitle(openFilePath)
+                  mainWindow.webContents.send('save-file', openFilePath, 1)
+                } else {
+                  openFilePath = ''
                 }
-              }
-              if (typeof openFilePath == 'undefined') {
-                openFilePath = ''
               } else {
-                mainWindow.webContents.send('save-file', openFilePath)
+                if (typeof openFilePath == 'undefined') {
+                  openFilePath = ''
+                } else {
+                  mainWindow.webContents.send('save-file', openFilePath)
+                }
               }
             }
           },

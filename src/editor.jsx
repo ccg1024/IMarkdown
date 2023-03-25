@@ -10,7 +10,13 @@ import { converWin32Path } from './App.js'
 const fs = window.electronAPI.require('fs')
 export let previewScroll = 1
 
-const Editor = ({ initialDoc, onChange, filePath, handleIsChange }) => {
+const Editor = ({
+  initialDoc,
+  onChange,
+  filePath,
+  handleIsChange,
+  handleSideFilePathChange
+}) => {
   const handleChange = useCallback(
     state => onChange(state.doc.toString()),
     [onChange]
@@ -165,7 +171,7 @@ const Editor = ({ initialDoc, onChange, filePath, handleIsChange }) => {
     }
   }, [editorView])
 
-  function handleSaveFile(_event, saveFilePath) {
+  function handleSaveFile(_event, saveFilePath, emptyFile) {
     // console.log('current save path: ' + saveFilePath)
     fs.writeFileSync(saveFilePath, editorView.state.doc.toString())
     handleIsChange(false)
@@ -173,10 +179,15 @@ const Editor = ({ initialDoc, onChange, filePath, handleIsChange }) => {
     // send info to main process;
     window.electronAPI.setContentChange(false)
 
-    // update the icon color at FirDir component
-    const targetDom = document.getElementById(converWin32Path(saveFilePath))
-    const iconDom = targetDom.getElementsByTagName('svg')[0]
-    iconDom.style.color = '#68D391'
+    if (emptyFile === 1) {
+      // save file from empty file path
+      handleSideFilePathChange(saveFilePath)
+    } else {
+      // update the icon color at FirDir component
+      const targetDom = document.getElementById(converWin32Path(saveFilePath))
+      const iconDom = targetDom.getElementsByTagName('svg')[0]
+      iconDom.style.color = '#68D391'
+    }
   }
 
   return (
