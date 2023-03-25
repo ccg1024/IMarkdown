@@ -186,7 +186,7 @@ const Editor = ({
       // update the icon color at FirDir component
       const targetDom = document.getElementById(converWin32Path(saveFilePath))
       const iconDom = targetDom.getElementsByTagName('svg')[0]
-      iconDom.style.color = '#68D391'
+      iconDom.style.color = '#48BB78'
     }
   }
 

@@ -43,7 +43,7 @@ const FileDir = ({ recentFiles, currentFile, isChange, handlePath }) => {
       // console.log("conver path: ", converWin32Path(currentFile));
       const targetDom = document.getElementById(converWin32Path(currentFile))
       const iconDom = targetDom.getElementsByTagName('svg')[0]
-      iconDom.style.color = '#E53E3E'
+      iconDom.style.color = '#F56565'
 
       // send info to main process
       window.electronAPI.setContentChange(true)
@@ -120,11 +120,11 @@ const FileDir = ({ recentFiles, currentFile, isChange, handlePath }) => {
                     id={item}
                     key={index}
                     borderRadius="sm"
-                    backgroundColor="blackAlpha.400"
+                    backgroundColor="blue.100"
                   >
                     <Flex alignItems="center" key={index} overflow={'hidden'}>
                       <BsFillRecordFill
-                        color="#68d391"
+                        color="#48BB78"
                         style={{ flexShrink: 0 }}
                       />
                       <Text ml={1} userSelect={'none'} flexShrink={0}>
@@ -150,11 +150,11 @@ const FileDir = ({ recentFiles, currentFile, isChange, handlePath }) => {
                     key={index}
                     borderRadius="sm"
                     onClick={e => readRecentFile(e.currentTarget.id)}
-                    _hover={{ backgroundColor: 'blackAlpha.200' }}
+                    _hover={{ backgroundColor: 'blue.50' }}
                   >
                     <Flex alignItems="center" key={index} overflow="hidden">
                       <BsFillRecordFill
-                        color="#718096"
+                        color="#C6F6D5"
                         style={{ flexShrink: 0 }}
                       />
                       <Text ml={1} userSelect={'none'} flexShrink={0}>
