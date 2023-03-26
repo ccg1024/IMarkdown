@@ -262,7 +262,7 @@ export const Init_extends = () => {
     highlightSpecialChars(),
     rectangularSelection(),
     crosshairCursor(),
-    foldGutter(),
+    // foldGutter(),
     highlightSelectionMatches(),
     closeBrackets(),
     autocompletion(),
