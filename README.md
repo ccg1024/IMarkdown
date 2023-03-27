@@ -13,9 +13,11 @@ npm start
 
 # screenshote
 
-![light-editor](./img/window-light-editor.png)
+**ArchLinux**
 
-![light-preview](./img/window-light-preview.png)
+![editor](./img/third_.png)
+
+![preview](./img/third-p.png)
 
 # LICENCE
 
