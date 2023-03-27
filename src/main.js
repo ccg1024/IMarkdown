@@ -20,6 +20,29 @@ const isMac = process.platform === 'darwin'
 let openFilePath = ''
 let isContentChange = false
 const fs = require('fs')
+const { mkdir } = require('fs/promises')
+
+const HOME_PTATH = process.env.HOME
+
+const logPath =
+  process.platform === 'win32'
+    ? HOME_PTATH + '\\Imarkdown\\log\\'
+    : HOME_PTATH + '/.local/state/Imarkdown/log/'
+
+// create cache dir
+const createFolder = async path => {
+  try {
+    if (!fs.existsSync(path)) {
+      await mkdir(path, { recursive: true })
+    }
+  } catch (error) {
+    console.log(error.message)
+  }
+}
+
+createFolder(logPath)
+
+console.log('[LOG]' + logPath)
 
 async function handleOpen() {
   console.log('into Open file')
@@ -89,7 +112,7 @@ const createWindow = () => {
         cancelId: 1,
         defaultId: 0,
         detail:
-          'The app is under development, make sure everything is saved before exiting.'
+          'The app is under development, make sure everything is saved before exiting. Exit now?'
       })
 
       if (response == 1) e.preventDefault()
@@ -154,25 +177,40 @@ const createWindow = () => {
         {
           label: 'save file',
           click: async () => {
-            let response = dialog.showMessageBoxSync(null, {
-              message:
-                'Since the application is under developed, so, do you want to save file to',
-              type: 'info',
-              buttons: ['Yes', 'No'],
-              defaultId: 0,
-              cancelId: 1,
-              detail: `${openFilePath}`
-            })
-            if (response == 1) {
-              console.log('cancel save')
-            } else {
-              console.log('using save file piple')
+            // console.log('using save file piple')
+            try {
               if (openFilePath === '') {
                 openFilePath = await handleEmptyFileSave()
                 if (typeof openFilePath !== 'undefined') {
-                  console.log('the new file path is: ' + openFilePath)
+                  // console.log('the new file path is: ' + openFilePath)
                   mainWindow.setTitle(openFilePath)
                   mainWindow.webContents.send('save-file', openFilePath, 1)
+                  // for empty file
+                  const current = new Date()
+                  const timeInfoPre = [
+                    current.getFullYear(),
+                    current.getMonth() + 1,
+                    current.getDate()
+                  ]
+                  const timeInfoAft = [
+                    current.getHours(),
+                    current.getMinutes(),
+                    current.getSeconds()
+                  ]
+                  fs.appendFile(
+                    logPath + 'imarkdown.log',
+                    '[saveEmptyFile] ' +
+                      openFilePath +
+                      ' ' +
+                      timeInfoPre.join('-') +
+                      ' ' +
+                      timeInfoAft.join(':') +
+                      '\n',
+                    'utf8',
+                    err => {
+                      if (err) throw err
+                    }
+                  )
                 } else {
                   openFilePath = ''
                 }
@@ -180,9 +218,63 @@ const createWindow = () => {
                 if (typeof openFilePath == 'undefined') {
                   openFilePath = ''
                 } else {
+                  // for opened file
+                  const current = new Date()
+                  const timeInfoPre = [
+                    current.getFullYear(),
+                    current.getMonth() + 1,
+                    current.getDate()
+                  ]
+                  const timeInfoAft = [
+                    current.getHours(),
+                    current.getMinutes(),
+                    current.getSeconds()
+                  ]
+                  fs.appendFile(
+                    logPath + 'imarkdown.log',
+                    '[saveFile] ' +
+                      openFilePath +
+                      ' ' +
+                      timeInfoPre.join('-') +
+                      ' ' +
+                      timeInfoAft.join(':') +
+                      '\n',
+                    'utf8',
+                    err => {
+                      if (err) throw err
+                    }
+                  )
                   mainWindow.webContents.send('save-file', openFilePath)
                 }
               }
+            } catch (err) {
+              // fs.writeFile(logPath + 'imarkdown.log', '[ERROR] ' + err.message)
+              console.log(err)
+              const current = new Date()
+              const timeInfoPre = [
+                current.getFullYear(),
+                current.getMonth() + 1,
+                current.getDate()
+              ]
+              const timeInfoAft = [
+                current.getHours(),
+                current.getMinutes(),
+                current.getSeconds()
+              ]
+              fs.appendFile(
+                logPath + 'imarkdown.log',
+                '[Error] ' +
+                  err +
+                  ' ' +
+                  timeInfoPre.join('-') +
+                  ' ' +
+                  timeInfoAft.join(':') +
+                  '\n',
+                'utf8',
+                err => {
+                  if (err) throw err
+                }
+              )
             }
           },
           accelerator: process.platform === 'darwin' ? 'Cmd+s' : 'Ctrl+s'
