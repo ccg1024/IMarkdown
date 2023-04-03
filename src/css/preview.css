@@ -2,10 +2,10 @@
   padding: 12px;
   text-align: justify;
   font-size: 1em;
+  font-family: "'JetBrainsMono Nerd Font Mono' !important"
 }
 
 .preview h1 {
-  font-family: 'M PLUS Rounded 1c';
   font-size: 2em;
   margin-bottom: 8pt;
   margin-top: 8pt;
@@ -13,7 +13,6 @@
   border-bottom: 2px solid;
 }
 .preview h2 {
-  font-family: 'M PLUS Rounded 1c';
   font-size: 1.8em;
   margin-bottom: 6pt;
   margin-top: 6pt;
@@ -21,28 +20,24 @@
   border-bottom: 2px dashed;
 }
 .preview h3 {
-  font-family: 'M PLUS Rounded 1c';
   font-size: 1.6em;
   margin-bottom: 4pt;
   margin-top: 4pt;
   font-weight: bold;
 }
 .preview h4 {
-  font-family: 'M PLUS Rounded 1c';
   font-size: 1.4em;
   margin-bottom: 4pt;
   margin-top: 4pt;
   font-weight: bold;
 }
 .preview h5 {
-  font-family: 'M PLUS Rounded 1c';
   font-size: 1.2em;
   margin-bottom: 4pt;
   margin-top: 4pt;
   font-weight: bold;
 }
 .preview h6 {
-  font-family: 'M PLUS Rounded 1c';
   font-size: 1em;
   margin-bottom: 4pt;
   margin-top: 4pt;
