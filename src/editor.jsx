@@ -1,3 +1,5 @@
+import prettier from 'prettier/esm/standalone.mjs'
+import markdownParser from 'prettier/esm/parser-markdown.mjs'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Init_extends } from './components/use_codemirror.jsx'
 import { EditorState } from '@codemirror/state'
@@ -173,7 +175,14 @@ const Editor = ({
 
   function handleSaveFile(_event, saveFilePath, emptyFile) {
     // console.log('current save path: ' + saveFilePath)
-    fs.writeFileSync(saveFilePath, editorView.state.doc.toString())
+    const formatedFile = prettier.format(editorView.state.doc.toString(), {
+      parser: "markdown",
+      plugins: [markdownParser]
+    })
+    editorView.dispatch({
+      changes: {from: 0, to: editorView.state.doc.length, insert: formatedFile}
+    })
+    fs.writeFileSync(saveFilePath, formatedFile)
     handleIsChange(false)
 
     // send info to main process;
