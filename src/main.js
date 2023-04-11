@@ -22,7 +22,8 @@ let isContentChange = false
 const fs = require('fs')
 const { mkdir } = require('fs/promises')
 
-const HOME_PTATH = process.env.HOME
+const HOME_PTATH =
+  process.platform === 'win32' ? process.env.USERPROFILE : process.env.HOME
 
 const configPath =
   process.platform === 'win32'
@@ -51,7 +52,14 @@ console.log('[LOG]' + logPath)
 
 async function handleOpen() {
   console.log('into Open file')
-  const { canceled, filePaths } = await dialog.showOpenDialog()
+  const { canceled, filePaths } = await dialog.showOpenDialog({
+    filters: [
+      {
+        name: 'Markdown',
+        extensions: ['md']
+      }
+    ]
+  })
 
   if (canceled) {
     return
@@ -62,7 +70,14 @@ async function handleOpen() {
 
 async function handleEmptyFileSave() {
   console.log('into handle empty file save')
-  const { canceled, filePath } = await dialog.showSaveDialog()
+  const { canceled, filePath } = await dialog.showSaveDialog({
+    filters: [
+      {
+        name: 'Markdown',
+        extensions: ['md']
+      }
+    ]
+  })
 
   if (canceled) {
     return
