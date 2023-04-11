@@ -97,13 +97,23 @@ const App = () => {
             encoding: 'utf-8'
           })
         )
-        if (settings.fontSize) {
-          const { fontSize } = settings
-          const editor = document.querySelector('#editor_Box')
-          const preview = document.querySelector('#preview-scroll')
 
-          editor.style.fontSize = fontSize + 'px'
-          preview.style.fontSize = fontSize + 'px'
+        const editor = document.querySelector('#editor_Box')
+        const preview = document.querySelector('#preview-scroll')
+
+        for (const name in settings) {
+          switch (name) {
+            case 'fontSize':
+              editor.style.fontSize = settings[name]
+              preview.style.fontSize = settings[name]
+              break
+            case 'editorFontFamily':
+              editor.style.fontFamily = settings[name]
+              break
+            case 'previewFontFamily':
+              preview.style.fontFamily = settings[name]
+              break
+          }
         }
       } catch (e) {
         console.log(e)
