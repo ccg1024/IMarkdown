@@ -8,7 +8,7 @@
   display: none;
 }
 
-.preview_parent::-webkit-scrollbar {
+/* .preview_parent::-webkit-scrollbar {
   width: 4px;
 }
 .preview_parent::-webkit-scrollbar-track {
@@ -24,4 +24,4 @@
 }
 .preview_parent:hover::-webkit-scrollbar-thumb {
   visibility: visible;
-}
+} */

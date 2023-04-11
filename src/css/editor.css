@@ -11,7 +11,7 @@
   outline: none !important;
 }
 
-.cm-scroller::-webkit-scrollbar {
+/* .cm-scroller::-webkit-scrollbar {
   width: 4px;
 }
 .cm-scroller::-webkit-scrollbar-track {
@@ -27,4 +27,4 @@
 }
 .cm-scroller:hover::-webkit-scrollbar-thumb {
   visibility: visible;
-}
+} */
