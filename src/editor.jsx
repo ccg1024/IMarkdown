@@ -175,6 +175,8 @@ const Editor = ({
 
   function handleSaveFile(_event, saveFilePath, emptyFile) {
     // console.log('current save path: ' + saveFilePath)
+    let currentCursor = editorView.state.selection.main.head
+
     const formatedFile = prettier.format(editorView.state.doc.toString(), {
       parser: 'markdown',
       plugins: [markdownParser]
@@ -186,6 +188,12 @@ const Editor = ({
         insert: formatedFile
       }
     })
+    if (formatedFile.length < currentCursor) {
+      currentCursor = formatedFile.length
+    }
+
+    editorView.dispatch({ selection: { anchor: currentCursor } })
+
     fs.writeFileSync(saveFilePath, formatedFile)
     handleIsChange(false)
 
