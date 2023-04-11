@@ -10,6 +10,7 @@ export interface IElectronAPI {
   removeSaveFile: () => Promise<void>
   removeOpenFile: () => Promise<void>
   removeToggleView: () => Promise<void>
+  getConfigPath: () => Promise<void>
 }
 
 declare global {

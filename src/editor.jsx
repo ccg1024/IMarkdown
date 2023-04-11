@@ -176,11 +176,15 @@ const Editor = ({
   function handleSaveFile(_event, saveFilePath, emptyFile) {
     // console.log('current save path: ' + saveFilePath)
     const formatedFile = prettier.format(editorView.state.doc.toString(), {
-      parser: "markdown",
+      parser: 'markdown',
       plugins: [markdownParser]
     })
     editorView.dispatch({
-      changes: {from: 0, to: editorView.state.doc.length, insert: formatedFile}
+      changes: {
+        from: 0,
+        to: editorView.state.doc.length,
+        insert: formatedFile
+      }
     })
     fs.writeFileSync(saveFilePath, formatedFile)
     handleIsChange(false)
@@ -206,7 +210,6 @@ const Editor = ({
       height="100%"
       overflow="auto"
       pl={2}
-      fontSize="22px"
     ></Box>
   )
 }

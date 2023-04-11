@@ -24,6 +24,11 @@ const { mkdir } = require('fs/promises')
 
 const HOME_PTATH = process.env.HOME
 
+const configPath =
+  process.platform === 'win32'
+    ? HOME_PTATH + '\\Imarkdown'
+    : HOME_PTATH + '/.local/state/Imarkdown'
+
 const logPath =
   process.platform === 'win32'
     ? HOME_PTATH + '\\Imarkdown\\log\\'
@@ -389,6 +394,7 @@ const createWindow = () => {
 // Some APIs can only be used after this event occurs.
 app.on('ready', createWindow)
 app.whenReady().then(() => {
+  ipcMain.handle('get-config-path', () => configPath)
   protocol.registerFileProtocol('atom', (request, callback) => {
     const url = request.url.substring(7)
     callback(decodeURI(path.normalize(url)))

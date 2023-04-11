@@ -12,5 +12,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   showUnsavedInfo: () => ipcRenderer.send('show-unsavedInfo'),
   removeSaveFile: () => ipcRenderer.removeAllListeners('save-file'),
   removeOpenFile: () => ipcRenderer.removeAllListeners('open-file'),
-  removeToggleView: () => ipcRenderer.removeAllListeners('toggle-view')
+  removeToggleView: () => ipcRenderer.removeAllListeners('toggle-view'),
+  getConfigPath: () => ipcRenderer.invoke('get-config-path')
 })

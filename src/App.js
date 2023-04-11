@@ -89,6 +89,28 @@ const App = () => {
     window.electronAPI.setContentChange(false)
   }
 
+  useEffect(() => {
+    window.electronAPI.getConfigPath().then(configPath => {
+      try {
+        const settings = JSON.parse(
+          fs.readFileSync(path.join(configPath, 'imarkdown.json'), {
+            encoding: 'utf-8'
+          })
+        )
+        if (settings.fontSize) {
+          const { fontSize } = settings
+          const editor = document.querySelector('#editor_Box')
+          const preview = document.querySelector('#preview-scroll')
+
+          editor.style.fontSize = fontSize + 'px'
+          preview.style.fontSize = fontSize + 'px'
+        }
+      } catch (e) {
+        console.log(e)
+      }
+    })
+  }, [])
+
   return (
     <>
       <Flex height="100%" width="100%" id="content_root">
@@ -103,6 +125,7 @@ const App = () => {
           height="100%"
           id="editor_Box"
           w="100%"
+          fontSize="22px"
           style={{ display: 'block' }}
         >
           <Editor
