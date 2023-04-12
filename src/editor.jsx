@@ -192,7 +192,10 @@ const Editor = ({
       currentCursor = formatedFile.length
     }
 
-    editorView.dispatch({ selection: { anchor: currentCursor } })
+    editorView.dispatch({
+      selection: { anchor: currentCursor },
+      scrollIntoView: true
+    })
 
     fs.writeFileSync(saveFilePath, formatedFile)
     handleIsChange(false)
