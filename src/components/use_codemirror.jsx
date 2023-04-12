@@ -8,7 +8,8 @@ import {
   highlightSpecialChars,
   dropCursor,
   rectangularSelection,
-  crosshairCursor
+  crosshairCursor,
+  ViewPlugin
 } from '@codemirror/view'
 import { defaultKeymap, historyKeymap, history } from '@codemirror/commands'
 import {
@@ -31,6 +32,8 @@ import {
   closeBrackets,
   closeBracketsKeymap
 } from '@codemirror/autocomplete'
+
+import CodeBlockPlugin from '../libs/codeBlockPlugin'
 
 export const transparentTheme = EditorView.theme({
   '&': {
@@ -273,7 +276,10 @@ export const Init_extends = () => {
       ...searchKeymap,
       ...closeBracketsKeymap,
       ...completionKeymap
-    ])
+    ]),
+    ViewPlugin.define(view => new CodeBlockPlugin(view), {
+      decorations: v => v.decoration
+    })
   ]
   return temp
 }
