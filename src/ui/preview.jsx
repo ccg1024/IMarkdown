@@ -1,13 +1,13 @@
-import React, { useEffect } from 'react'
-import ReactMarkdown from 'react-markdown'
+import _ from 'lodash'
+import 'katex/dist/katex.min.css'
+import rehypeRaw from 'rehype-raw'
 import remarkGfm from 'remark-gfm'
-import SyntaxHighlighter from 'react-syntax-highlighter'
-import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
-import rehypeRaw from 'rehype-raw'
-import 'katex/dist/katex.min.css'
-import './css/preview.css'
+import React, { useEffect } from 'react'
+import ReactMarkdown from 'react-markdown'
+import SyntaxHighlighter from 'react-syntax-highlighter'
+import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs'
 import {
   Box,
   Code,
@@ -26,8 +26,10 @@ import {
   UnorderedList,
   useColorModeValue
 } from '@chakra-ui/react'
-import { previewScroll } from './editor.jsx'
-import _ from 'lodash'
+
+import { previewScroll } from './editor'
+
+import '../static/css/preview.css'
 
 export let previewScrollTop = 1
 

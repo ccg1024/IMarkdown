@@ -1,6 +1,6 @@
 import { Decoration } from '@codemirror/view'
 import { RangeSetBuilder } from '@codemirror/state'
-import '../css/use-codemirror.css'
+import '../../static/css/use-codemirror.css'
 
 class CodeBlockPlugin {
   decoration = Decoration.none

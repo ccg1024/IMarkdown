@@ -1,5 +1,11 @@
-import { useEffect, useState, useRef } from 'react'
+import { vim } from '@replit/codemirror-vim'
 import { EditorState } from '@codemirror/state'
+import { useEffect, useState, useRef } from 'react'
+import { languages } from '@codemirror/language-data'
+import { tags, Tag, styleTags } from '@lezer/highlight'
+import { markdown, markdownLanguage } from '@codemirror/lang-markdown'
+import { defaultKeymap, historyKeymap, history } from '@codemirror/commands'
+import { searchKeymap, highlightSelectionMatches } from '@codemirror/search'
 import {
   EditorView,
   keymap,
@@ -11,21 +17,14 @@ import {
   crosshairCursor,
   ViewPlugin
 } from '@codemirror/view'
-import { defaultKeymap, historyKeymap, history } from '@codemirror/commands'
 import {
   indentOnInput,
   bracketMatching,
   HighlightStyle,
   syntaxHighlighting,
-  foldGutter,
   foldKeymap,
   defaultHighlightStyle
 } from '@codemirror/language'
-import { tags, Tag, styleTags } from '@lezer/highlight'
-import { markdown, markdownLanguage } from '@codemirror/lang-markdown'
-import { languages } from '@codemirror/language-data'
-import { vim } from '@replit/codemirror-vim'
-import { searchKeymap, highlightSelectionMatches } from '@codemirror/search'
 import {
   autocompletion,
   completionKeymap,
@@ -311,7 +310,6 @@ const useCodeMirror = ({ initialDoc, onChange }) => {
     const view = new EditorView({
       state: startState,
       parent: refContainer.current
-      // extensions: [defaultHighlightStyle.fallback]
     })
 
     setEditorView(view)

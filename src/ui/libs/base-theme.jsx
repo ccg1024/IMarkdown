@@ -1,5 +1,5 @@
-import { extendTheme } from '@chakra-ui/react'
 import { mode } from '@chakra-ui/theme-tools'
+import { extendTheme } from '@chakra-ui/react'
 
 const styles = {
   global: props => ({
@@ -31,17 +31,6 @@ const config = {
   // initialColorMode: 'dark',
   useSystemColorMode: true
 }
-
-// const theme = extendTheme({
-//   styles: {
-//     global: {
-//       body: {
-//         bg: 'transparent',
-//         color: 'white'
-//       }
-//     },
-//   },
-// })
 
 const theme = extendTheme({ config, styles, components, fonts, colors })
 export default theme

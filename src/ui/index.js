@@ -1,9 +1,11 @@
-import React, { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App.js'
+import React, { StrictMode } from 'react'
 import { ChakraProvider } from '@chakra-ui/react'
-import theme from './components/my_theme.jsx'
-import './css/index.css'
+
+import App from './App.js'
+import theme from './libs/base-theme'
+
+import '../static/css/index.css'
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(

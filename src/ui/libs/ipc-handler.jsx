@@ -1,10 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import Preview from '../preview.jsx'
 import { ChakraProvider } from '@chakra-ui/react'
-import theme from '../components/my_theme.jsx'
+
+import theme from './base-theme'
 import { doc, currentFile } from '../App.js'
-import { previewScrollTop } from '../preview.jsx'
+import Preview, { previewScrollTop } from '../preview'
 
 let root = null
 

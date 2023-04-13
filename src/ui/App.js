@@ -1,9 +1,11 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { Box, Flex } from '@chakra-ui/react'
-import Editor from './editor.jsx'
-import { toggleView } from './utils/after_load.jsx'
-import FileDir from './components/file_dir.jsx'
-import './css/App.css'
+import React, { useState, useCallback, useEffect, useRef } from 'react'
+
+import Editor from './editor'
+import FileDir from './components/file-dir'
+import { toggleView } from './libs/ipc-handler'
+
+import '../static/css/App.css'
 
 const fs = window.electronAPI.require('fs')
 const path = window.electronAPI.require('path')

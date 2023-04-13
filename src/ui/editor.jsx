@@ -1,14 +1,16 @@
+import { Box } from '@chakra-ui/react'
+import { Vim } from '@replit/codemirror-vim'
+import { EditorView } from '@codemirror/view'
+import { EditorState } from '@codemirror/state'
 import prettier from 'prettier/esm/standalone.mjs'
 import markdownParser from 'prettier/esm/parser-markdown.mjs'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Init_extends } from './components/use_codemirror.jsx'
-import { EditorState } from '@codemirror/state'
-import { EditorView } from '@codemirror/view'
-import { Vim } from '@replit/codemirror-vim'
-import { Box } from '@chakra-ui/react'
-import './css/editor.css'
-import { editorScrollPos } from './utils/after_load.jsx'
+
 import { converWin32Path } from './App.js'
+import { editorScrollPos } from './libs/ipc-handler.jsx'
+import { Init_extends } from './components/use-codemirror.jsx'
+
+import '../static/css/editor.css'
 
 const fs = window.electronAPI.require('fs')
 export let previewScroll = 1
