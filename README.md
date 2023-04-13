@@ -19,7 +19,10 @@ npm start
 
 ![preview](./img/third-p.png)
 
+**Windows 10**
+
+![new feature](./img/win.png)
+
 # LICENCE
 
 GPL3.
-
