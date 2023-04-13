@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Init_extends } from './components/use_codemirror.jsx'
 import { EditorState } from '@codemirror/state'
 import { EditorView } from '@codemirror/view'
+import { Vim } from '@replit/codemirror-vim'
 import { Box } from '@chakra-ui/react'
 import './css/editor.css'
 import { editorScrollPos } from './utils/after_load.jsx'
@@ -68,6 +69,9 @@ const Editor = ({
         ...Init_extends()
       ]
     })
+
+    // add view keymap, just need once
+    Vim.map('<C-n>', ':nohl<cr>')
 
     const view = new EditorView({
       state: startState,

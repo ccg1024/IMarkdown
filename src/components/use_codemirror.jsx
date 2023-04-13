@@ -242,33 +242,25 @@ export const my_syntaxHighlighting = HighlightStyle.define([
 
 export const Init_extends = () => {
   const temp = [
-    // vim(),
+    vim(),
     // lineNumbers(),
     // highlightActiveLineGutter(),
+    highlightSpecialChars(),
     history(),
-    indentOnInput(),
-    bracketMatching(),
-    highlightActiveLine(),
-    markdown({
-      base: markdownLanguage,
-      codeLanguages: languages,
-      addKeymap: true,
-      extensions: [MarkStylingExtension]
-    }),
-    // oneDark,
-    transparentTheme,
-    syntaxHighlighting(defaultHighlightStyle),
-    syntaxHighlighting(my_syntaxHighlighting),
-    EditorView.lineWrapping,
+    // foldGutter(),
     drawSelection(),
     dropCursor(),
-    highlightSpecialChars(),
-    rectangularSelection(),
-    crosshairCursor(),
-    // foldGutter(),
-    highlightSelectionMatches(),
+    EditorState.allowMultipleSelections.of(true),
+    indentOnInput(),
+    syntaxHighlighting(defaultHighlightStyle),
+    syntaxHighlighting(my_syntaxHighlighting),
+    bracketMatching(),
     closeBrackets(),
     autocompletion(),
+    rectangularSelection(),
+    crosshairCursor(),
+    highlightActiveLine(),
+    highlightSelectionMatches(),
     keymap.of([
       ...defaultKeymap,
       ...historyKeymap,
@@ -277,8 +269,18 @@ export const Init_extends = () => {
       ...closeBracketsKeymap,
       ...completionKeymap
     ]),
+    // oneDark,
+    transparentTheme,
+    EditorView.lineWrapping,
     ViewPlugin.define(view => new CodeBlockPlugin(view), {
       decorations: v => v.decoration
+    }),
+
+    markdown({
+      base: markdownLanguage,
+      codeLanguages: languages,
+      addKeymap: true,
+      extensions: [MarkStylingExtension]
     })
   ]
   return temp
