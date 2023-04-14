@@ -15,7 +15,8 @@ const {
   closeMessageConfig,
   fileUnsaveMessageConfig
 } = require('./window/config')
-const { logTime } = require('./utils/backend')
+const { logTime, converWin32Path } = require('./utils/backend')
+const ipcChannel = require('./config/backend')
 
 // ---------------------------------------------
 require('@electron/remote/main').initialize()
@@ -50,7 +51,7 @@ async function openFileCallback(win) {
   if (!skipOpenFile) {
     const filePath = await openFileDialog()
     if (filePath) {
-      win.webContents.send('open-file', filePath)
+      win.webContents.send(ipcChannel.openFileChannel, filePath)
       openFilePath = filePath
       win.setTitle(openFilePath)
     }
@@ -65,7 +66,7 @@ async function saveFileCallback(win) {
       if (tempFilePath) {
         openFilePath = tempFilePath
         win.setTitle(tempFilePath)
-        win.webContents.send('save-file', openFilePath, 1)
+        win.webContents.send(ipcChannel.saveFileChannel, openFilePath, 1)
 
         const saveLogTime = logTime()
         fs.appendFile(
@@ -87,7 +88,7 @@ async function saveFileCallback(win) {
           if (err) throw err
         }
       )
-      win.webContents.send('save-file', openFilePath)
+      win.webContents.send(ipcChannel.saveFileChannel, openFilePath)
     }
   } catch (err) {
     const saveLogTime = logTime()
@@ -107,7 +108,7 @@ async function createFileCallback(win) {
   if (tempFilePath) {
     fs.writeFileSync(tempFilePath, '')
     win.setTitle(tempFilePath)
-    win.webContents.send('open-file', tempFilePath)
+    win.webContents.send(ipcChannel.openFileChannel, tempFilePath)
     openFilePath = tempFilePath
   }
 }
@@ -131,18 +132,18 @@ const createWindow = () => {
   })
 
   // recive file path from renderer
-  ipcMain.on('set-filePath', (_event, filePath) => {
+  ipcMain.on(ipcChannel.updateFilePathChannel, (_event, filePath) => {
     openFilePath = filePath
     mainWindow.setTitle(openFilePath)
   })
 
   // recive content change flag
-  ipcMain.on('set-contentChange', (_event, isChange) => {
+  ipcMain.on(ipcChannel.setIsChangeChannel, (_event, isChange) => {
     isContentChange = isChange
   })
 
   // show unsaved info, when using recient file
-  ipcMain.on('show-unsavedInfo', _event => {
+  ipcMain.on(ipcChannel.showUnsaveChannel, _event => {
     dialog.showMessageBoxSync(null, {
       type: 'info',
       title: 'Warning',
@@ -204,7 +205,7 @@ const createWindow = () => {
         {
           label: 'Just Preview',
           click: async () => {
-            mainWindow.webContents.send('toggle-view', 1)
+            mainWindow.webContents.send(ipcChannel.toggleViewChannel, 1)
           },
           accelerator:
             process.platform === 'darwin' ? 'Cmd+Shift+p' : 'Ctrl+Shift+p'
@@ -212,7 +213,7 @@ const createWindow = () => {
         {
           label: 'Just Editor',
           click: async () => {
-            mainWindow.webContents.send('toggle-view', 2)
+            mainWindow.webContents.send(ipcChannel.toggleViewChannel, 2)
           },
           accelerator:
             process.platform === 'darwin' ? 'Cmd+Shift+e' : 'Ctrl+Shift+e'
@@ -256,7 +257,7 @@ const createWindow = () => {
 // Some APIs can only be used after this event occurs.
 app.on('ready', createWindow)
 app.whenReady().then(() => {
-  ipcMain.handle('get-config-path', () => configPath)
+  ipcMain.handle(ipcChannel.configPathChannel, () => configPath)
   protocol.registerFileProtocol('atom', (request, callback) => {
     const url = request.url.substring(7)
     callback(decodeURI(path.normalize(url)))

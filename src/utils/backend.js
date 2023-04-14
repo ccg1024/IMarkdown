@@ -1,3 +1,4 @@
+const path = require('path')
 function logTime() {
   const current = new Date()
 
@@ -14,6 +15,11 @@ function logTime() {
   return [year, month, day].join('-') + ' ' + [hour, minute, seconde].join(':')
 }
 
+function converWin32Path(filePath) {
+  return filePath.split(path.sep).join(path.posix.sep)
+}
+
 module.exports = {
-  logTime
+  logTime,
+  converWin32Path
 }

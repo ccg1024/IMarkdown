@@ -1,17 +1,24 @@
 // See the Electron documentation for details on how to use preload scripts:
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 const { ipcRenderer, contextBridge } = require('electron')
+const ipcChannel = require('./config/backend')
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  openFile: callback => ipcRenderer.on('open-file', callback),
-  saveFile: callback => ipcRenderer.on('save-file', callback),
+  openFile: callback => ipcRenderer.on(ipcChannel.openFileChannel, callback),
+  saveFile: callback => ipcRenderer.on(ipcChannel.saveFileChannel, callback),
   require: callback => window.require(callback),
-  toggleView: callback => ipcRenderer.on('toggle-view', callback),
-  setFilePath: filePath => ipcRenderer.send('set-filePath', filePath),
-  setContentChange: isChange => ipcRenderer.send('set-contentChange', isChange),
-  showUnsavedInfo: () => ipcRenderer.send('show-unsavedInfo'),
-  removeSaveFile: () => ipcRenderer.removeAllListeners('save-file'),
-  removeOpenFile: () => ipcRenderer.removeAllListeners('open-file'),
-  removeToggleView: () => ipcRenderer.removeAllListeners('toggle-view'),
-  getConfigPath: () => ipcRenderer.invoke('get-config-path')
+  toggleView: callback =>
+    ipcRenderer.on(ipcChannel.toggleViewChannel, callback),
+  setFilePath: filePath =>
+    ipcRenderer.send(ipcChannel.updateFilePathChannel, filePath),
+  setContentChange: isChange =>
+    ipcRenderer.send(ipcChannel.setIsChangeChannel, isChange),
+  showUnsavedInfo: () => ipcRenderer.send(ipcChannel.showUnsaveChannel),
+  removeSaveFile: () =>
+    ipcRenderer.removeAllListeners(ipcChannel.saveFileChannel),
+  removeOpenFile: () =>
+    ipcRenderer.removeAllListeners(ipcChannel.openFileChannel),
+  removeToggleView: () =>
+    ipcRenderer.removeAllListeners(ipcChannel.toggleViewChannel),
+  getConfigPath: () => ipcRenderer.invoke(ipcChannel.configPathChannel)
 })
