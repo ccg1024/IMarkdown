@@ -7,7 +7,17 @@ const {
   ipcMain
 } = require('electron')
 const path = require('path')
+const fs = require('fs')
 
+const { openFileDialog, handleEmptyFileSave } = require('./window/dialog')
+const {
+  generatorPath,
+  closeMessageConfig,
+  fileUnsaveMessageConfig
+} = require('./window/config')
+const { logTime } = require('./utils/backend')
+
+// ---------------------------------------------
 require('@electron/remote/main').initialize()
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -15,76 +25,94 @@ if (require('electron-squirrel-startup')) {
   app.quit()
 }
 
-// for menu
 const isMac = process.platform === 'darwin'
 let openFilePath = ''
 let isContentChange = false
-const fs = require('fs')
-const { mkdir } = require('fs/promises')
 
-const HOME_PTATH =
-  process.platform === 'win32' ? process.env.USERPROFILE : process.env.HOME
-
-const configPath =
-  process.platform === 'win32'
-    ? HOME_PTATH + '\\Imarkdown'
-    : HOME_PTATH + '/.local/state/Imarkdown'
-
-const logPath =
-  process.platform === 'win32'
-    ? HOME_PTATH + '\\Imarkdown\\log\\'
-    : HOME_PTATH + '/.local/state/Imarkdown/log/'
-
-// create cache dir
-const createFolder = async path => {
-  try {
-    if (!fs.existsSync(path)) {
-      await mkdir(path, { recursive: true })
-    }
-  } catch (error) {
-    console.log(error.message)
-  }
-}
-
-createFolder(logPath)
+const { configPath, logPath } = generatorPath()
 
 console.log('[LOG]' + logPath)
 
-async function handleOpen() {
-  console.log('into Open file')
-  const { canceled, filePaths } = await dialog.showOpenDialog({
-    filters: [
-      {
-        name: 'Markdown',
-        extensions: ['md']
-      }
-    ]
-  })
+// ---------------------------------------------------
+const ifSkipOpenFile = isChange => {
+  let skip = false
+  if (isChange) {
+    let response = dialog.showMessageBoxSync(null, fileUnsaveMessageConfig)
+    if (response === 0) {
+      skip = true
+    }
+  }
+  return skip
+}
 
-  if (canceled) {
-    return
-  } else {
-    return filePaths[0]
+async function openFileCallback(win) {
+  let skipOpenFile = ifSkipOpenFile(isContentChange)
+  if (!skipOpenFile) {
+    const filePath = await openFileDialog()
+    if (filePath) {
+      win.webContents.send('open-file', filePath)
+      openFilePath = filePath
+      win.setTitle(openFilePath)
+    }
   }
 }
 
-async function handleEmptyFileSave() {
-  console.log('into handle empty file save')
-  const { canceled, filePath } = await dialog.showSaveDialog({
-    filters: [
-      {
-        name: 'Markdown',
-        extensions: ['md']
-      }
-    ]
-  })
+async function saveFileCallback(win) {
+  try {
+    if (openFilePath === '') {
+      let tempFilePath = await handleEmptyFileSave()
 
-  if (canceled) {
-    return
-  } else {
-    return filePath
+      if (tempFilePath) {
+        openFilePath = tempFilePath
+        win.setTitle(tempFilePath)
+        win.webContents.send('save-file', openFilePath, 1)
+
+        const saveLogTime = logTime()
+        fs.appendFile(
+          logPath + 'imarkdown.log',
+          '[saveEmptyFile] ' + openFilePath + ' ' + saveLogTime + '\n',
+          'utf8',
+          err => {
+            if (err) throw err
+          }
+        )
+      }
+    } else {
+      const saveLogTime = logTime()
+      fs.appendFile(
+        logPath + 'imarkdown.log',
+        '[saveFile] ' + openFilePath + ' ' + saveLogTime + '\n',
+        'utf8',
+        err => {
+          if (err) throw err
+        }
+      )
+      win.webContents.send('save-file', openFilePath)
+    }
+  } catch (err) {
+    const saveLogTime = logTime()
+    fs.appendFile(
+      logPath + 'imarkdown.log',
+      '[Error] ' + err + ' ' + saveLogTime + '\n',
+      'utf8',
+      err => {
+        if (err) throw err
+      }
+    )
   }
 }
+
+async function createFileCallback(win) {
+  let tempFilePath = await handleEmptyFileSave()
+  if (tempFilePath) {
+    fs.writeFileSync(tempFilePath, '')
+    win.setTitle(tempFilePath)
+    win.webContents.send('open-file', tempFilePath)
+    openFilePath = tempFilePath
+  }
+}
+
+// --------------------------------------------------
 
 const createWindow = () => {
   // Create the browser window.
@@ -125,16 +153,7 @@ const createWindow = () => {
   // show close dialog
   mainWindow.on('close', function (e) {
     if (isContentChange) {
-      let response = dialog.showMessageBoxSync(this, {
-        type: 'info',
-        buttons: ['Yes', 'No'],
-        title: 'Warning',
-        cancelId: 1,
-        defaultId: 0,
-        detail:
-          'The app is under development, make sure everything is saved before exiting. Exit now?'
-      })
-
+      let response = dialog.showMessageBoxSync(this, closeMessageConfig)
       if (response == 1) e.preventDefault()
     }
   })
@@ -149,12 +168,6 @@ const createWindow = () => {
             submenu: [
               { role: 'about' },
               { type: 'separator' },
-              { role: 'services' },
-              { type: 'separator' },
-              { role: 'hide' },
-              { role: 'hideOthers' },
-              { role: 'unhide' },
-              { type: 'separator' },
               { role: 'quit' }
             ]
           }
@@ -166,196 +179,27 @@ const createWindow = () => {
       submenu: [
         {
           label: 'open file',
-          click: async () => {
-            let skipOpenFile = false
-            if (isContentChange) {
-              let response = dialog.showMessageBoxSync(null, {
-                type: 'info',
-                buttons: ['Yes', 'No'],
-                title: 'Warning',
-                cancelId: 1,
-                defaultId: 0,
-                detail:
-                  'current file is changed, and not save yet. Return to save File?'
-              })
-
-              if (response === 0) {
-                skipOpenFile = true
-              }
-            }
-            if (!skipOpenFile) {
-              const filePath = await handleOpen()
-              if (filePath) {
-                mainWindow.webContents.send('open-file', filePath)
-                openFilePath = filePath
-                mainWindow.setTitle(openFilePath)
-              }
-            }
-          },
+          click: () => openFileCallback(mainWindow),
           accelerator: process.platform === 'darwin' ? 'Cmd+o' : 'Ctrl+o'
         },
         {
           label: 'save file',
-          click: async () => {
-            // console.log('using save file piple')
-            try {
-              if (openFilePath === '') {
-                openFilePath = await handleEmptyFileSave()
-                if (typeof openFilePath !== 'undefined') {
-                  // console.log('the new file path is: ' + openFilePath)
-                  mainWindow.setTitle(openFilePath)
-                  mainWindow.webContents.send('save-file', openFilePath, 1)
-                  // for empty file
-                  const current = new Date()
-                  const timeInfoPre = [
-                    current.getFullYear(),
-                    current.getMonth() + 1,
-                    current.getDate()
-                  ]
-                  const timeInfoAft = [
-                    current.getHours(),
-                    current.getMinutes(),
-                    current.getSeconds()
-                  ]
-                  fs.appendFile(
-                    logPath + 'imarkdown.log',
-                    '[saveEmptyFile] ' +
-                      openFilePath +
-                      ' ' +
-                      timeInfoPre.join('-') +
-                      ' ' +
-                      timeInfoAft.join(':') +
-                      '\n',
-                    'utf8',
-                    err => {
-                      if (err) throw err
-                    }
-                  )
-                } else {
-                  openFilePath = ''
-                }
-              } else {
-                if (typeof openFilePath == 'undefined') {
-                  openFilePath = ''
-                } else {
-                  // for opened file
-                  const current = new Date()
-                  const timeInfoPre = [
-                    current.getFullYear(),
-                    current.getMonth() + 1,
-                    current.getDate()
-                  ]
-                  const timeInfoAft = [
-                    current.getHours(),
-                    current.getMinutes(),
-                    current.getSeconds()
-                  ]
-                  fs.appendFile(
-                    logPath + 'imarkdown.log',
-                    '[saveFile] ' +
-                      openFilePath +
-                      ' ' +
-                      timeInfoPre.join('-') +
-                      ' ' +
-                      timeInfoAft.join(':') +
-                      '\n',
-                    'utf8',
-                    err => {
-                      if (err) throw err
-                    }
-                  )
-                  mainWindow.webContents.send('save-file', openFilePath)
-                }
-              }
-            } catch (err) {
-              // fs.writeFile(logPath + 'imarkdown.log', '[ERROR] ' + err.message)
-              console.log(err)
-              const current = new Date()
-              const timeInfoPre = [
-                current.getFullYear(),
-                current.getMonth() + 1,
-                current.getDate()
-              ]
-              const timeInfoAft = [
-                current.getHours(),
-                current.getMinutes(),
-                current.getSeconds()
-              ]
-              fs.appendFile(
-                logPath + 'imarkdown.log',
-                '[Error] ' +
-                  err +
-                  ' ' +
-                  timeInfoPre.join('-') +
-                  ' ' +
-                  timeInfoAft.join(':') +
-                  '\n',
-                'utf8',
-                err => {
-                  if (err) throw err
-                }
-              )
-            }
-          },
+          click: () => saveFileCallback(mainWindow),
           accelerator: process.platform === 'darwin' ? 'Cmd+s' : 'Ctrl+s'
         },
         {
           label: 'create file',
-          click: async () => {
-            let tempFilePath = await handleEmptyFileSave()
-            if (tempFilePath !== undefined) {
-              console.log('create new empty file')
-              // write empty to create file
-              fs.writeFileSync(tempFilePath, '')
-              mainWindow.setTitle(tempFilePath)
-              mainWindow.webContents.send('open-file', tempFilePath)
-              openFilePath = tempFilePath
-            } else {
-              console.log('cancel create file')
-            }
-          }
+          click: () => createFileCallback(mainWindow)
         },
         { type: 'separator' },
         isMac ? { role: 'close' } : { role: 'quit' }
-      ]
-    },
-    // { role: 'editMenu' }
-    {
-      label: 'Edit',
-      submenu: [
-        { role: 'undo' },
-        { role: 'redo' },
-        { type: 'separator' },
-        { role: 'cut' },
-        { role: 'copy' },
-        { role: 'paste' },
-        ...(isMac
-          ? [
-              { role: 'pasteAndMatchStyle' },
-              { role: 'delete' },
-              { role: 'selectAll' },
-              { type: 'separator' },
-              {
-                label: 'Speech',
-                submenu: [{ role: 'startSpeaking' }, { role: 'stopSpeaking' }]
-              }
-            ]
-          : [{ role: 'delete' }, { type: 'separator' }, { role: 'selectAll' }])
       ]
     },
     // { role: 'viewMenu' }
     {
       label: 'View',
       submenu: [
-        { role: 'reload' },
-        { role: 'forceReload' },
         { role: 'toggleDevTools' },
-        { type: 'separator' },
-        { role: 'resetZoom' },
-        { role: 'zoomIn' },
-        { role: 'zoomOut' },
-        { type: 'separator' },
-        { role: 'togglefullscreen' },
         { type: 'separator' },
         {
           label: 'Just Preview',
@@ -372,7 +216,10 @@ const createWindow = () => {
           },
           accelerator:
             process.platform === 'darwin' ? 'Cmd+Shift+e' : 'Ctrl+Shift+e'
-        }
+        },
+        { type: 'separator' },
+        { role: 'reload' },
+        { role: 'forceReload' }
       ]
     },
     // { role: 'windowMenu' }
