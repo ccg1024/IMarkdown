@@ -10,7 +10,6 @@ import { getScrollLine } from './libs/tools'
 
 const App = () => {
   const [isChange, setIsChange] = useState(false)
-
   const [showPreview, setShowPreview] = useState(false)
   const [showEditor, setShowEditor] = useState(true)
   const [editorScroll, setEditorScroll] = useState(null)
@@ -25,7 +24,6 @@ const App = () => {
 
   const handleIsChange = useCallback(flag => {
     setIsChange(flag)
-    console.log('into change')
   })
 
   const toggleView = (_event, value) => {
@@ -48,13 +46,11 @@ const App = () => {
   }, [isChange])
 
   useEffect(() => {
-    console.log('[App.js] run IPC serve for open file, toggleView')
     window.electronAPI.openFile(handleOpenFile)
     window.electronAPI.toggleView(toggleView)
     return () => {
       window.electronAPI.removeOpenFile()
       window.electronAPI.removeToggleView()
-      console.log('[return App.js] drop listener in app.js')
     }
   }, [])
 
@@ -111,8 +107,6 @@ const App = () => {
     }
   }, [])
 
-  // console.log(recentFiles)
-  console.log(Object.keys(recentFiles))
   return (
     <>
       <Flex height="100%" width="100%" id="content_root">

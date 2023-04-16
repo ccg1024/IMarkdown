@@ -101,10 +101,7 @@ const Editor = ({
         effects: EditorView.scrollIntoView(lineObj.from, { y: 'start' }),
         scrollIntoView: true
       })
-      console.log('scroll editor')
-      return () => {
-        console.log('[return editor.jsx] run observer drop')
-      }
+      return () => {}
     }
   }, [editorView, isVisible, scrollLine])
 
@@ -166,6 +163,7 @@ const Editor = ({
         })
       )
 
+      changeGate.current = null
       return () => {
         // console.log('[return editor.jsx] run reset codemirror drop')
       }
@@ -177,7 +175,6 @@ const Editor = ({
       window.electronAPI.saveFile(handleSaveFile)
 
       return () => {
-        console.log('[return editor.jsx] run save drop')
         window.electronAPI.removeSaveFile()
       }
     }
