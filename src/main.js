@@ -66,13 +66,17 @@ async function openFileCallback(win) {
   }
 }
 
-async function saveFileCallback(win, openedFile) {
+async function saveFileCallback(win, openedFile, logPath) {
   try {
     if (openedFile === '') {
       let tempFilePath = await handleEmptyFileSave()
 
       if (tempFilePath) {
-        win.webContents.send(ipcChannel.saveFileChannel, tempFilePath)
+        win.webContents.send(
+          ipcChannel.saveFileChannel,
+          converWin32Path(tempFilePath),
+          0
+        )
 
         const saveLogTime = logTime()
         fs.appendFile(
@@ -94,7 +98,11 @@ async function saveFileCallback(win, openedFile) {
           if (err) throw err
         }
       )
-      win.webContents.send(ipcChannel.saveFileChannel, openedFile)
+      win.webContents.send(
+        ipcChannel.saveFileChannel,
+        converWin32Path(openedFile),
+        1
+      )
     }
   } catch (err) {
     const saveLogTime = logTime()
@@ -112,10 +120,12 @@ async function saveFileCallback(win, openedFile) {
 async function createFileCallback(win) {
   let tempFilePath = await handleEmptyFileSave()
   if (tempFilePath) {
-    fs.writeFileSync(tempFilePath, '')
-    win.setTitle(tempFilePath)
-    win.webContents.send(ipcChannel.openFileChannel, tempFilePath)
-    openFilePath = tempFilePath
+    win.webContents.send(
+      ipcChannel.openFileChannel,
+      converWin32Path(tempFilePath),
+      '',
+      path.basename(tempFilePath)
+    )
   }
 }
 
@@ -211,7 +221,7 @@ const createWindow = () => {
         },
         {
           label: 'save file',
-          click: () => saveFileCallback(mainWindow, openFilePath),
+          click: () => saveFileCallback(mainWindow, openFilePath, logPath),
           accelerator: process.platform === 'darwin' ? 'Cmd+s' : 'Ctrl+s'
         },
         {
