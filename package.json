@@ -54,6 +54,7 @@
     "framer-motion": "^7.6.6",
     "lodash": "^4.17.21",
     "prettier": "^2.8.7",
+    "pubsub-js": "^1.9.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.7.1",

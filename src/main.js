@@ -51,27 +51,33 @@ async function openFileCallback(win) {
   if (!skipOpenFile) {
     const filePath = await openFileDialog()
     if (filePath) {
-      win.webContents.send(ipcChannel.openFileChannel, filePath)
-      openFilePath = filePath
-      win.setTitle(openFilePath)
+      try {
+        const fileContent = fs.readFileSync(filePath, 'utf8')
+        win.webContents.send(
+          ipcChannel.openFileChannel,
+          converWin32Path(filePath),
+          fileContent,
+          path.basename(filePath)
+        )
+      } catch (e) {
+        console.log(e)
+      }
     }
   }
 }
 
-async function saveFileCallback(win) {
+async function saveFileCallback(win, openedFile) {
   try {
-    if (openFilePath === '') {
+    if (openedFile === '') {
       let tempFilePath = await handleEmptyFileSave()
 
       if (tempFilePath) {
-        openFilePath = tempFilePath
-        win.setTitle(tempFilePath)
-        win.webContents.send(ipcChannel.saveFileChannel, openFilePath, 1)
+        win.webContents.send(ipcChannel.saveFileChannel, tempFilePath)
 
         const saveLogTime = logTime()
         fs.appendFile(
           logPath + 'imarkdown.log',
-          '[saveEmptyFile] ' + openFilePath + ' ' + saveLogTime + '\n',
+          '[saveEmptyFile] ' + tempFilePath + ' ' + saveLogTime + '\n',
           'utf8',
           err => {
             if (err) throw err
@@ -82,13 +88,13 @@ async function saveFileCallback(win) {
       const saveLogTime = logTime()
       fs.appendFile(
         logPath + 'imarkdown.log',
-        '[saveFile] ' + openFilePath + ' ' + saveLogTime + '\n',
+        '[saveFile] ' + openedFile + ' ' + saveLogTime + '\n',
         'utf8',
         err => {
           if (err) throw err
         }
       )
-      win.webContents.send(ipcChannel.saveFileChannel, openFilePath)
+      win.webContents.send(ipcChannel.saveFileChannel, openedFile)
     }
   } catch (err) {
     const saveLogTime = logTime()
@@ -151,6 +157,26 @@ const createWindow = () => {
     })
   })
 
+  ipcMain.on(ipcChannel.reciveContentChannel, (_event, content, path) => {
+    fs.writeFile(path, content, err => {
+      if (err) throw err
+    })
+  })
+
+  ipcMain.on(ipcChannel.openRecentFile, (_event, filepath) => {
+    try {
+      const fileContent = fs.readFileSync(filepath, 'utf8')
+      mainWindow.webContents.send(
+        ipcChannel.openFileChannel,
+        filepath,
+        fileContent,
+        path.basename(filepath)
+      )
+    } catch (err) {
+      console.log(err)
+    }
+  })
+
   // show close dialog
   mainWindow.on('close', function (e) {
     if (isContentChange) {
@@ -185,7 +211,7 @@ const createWindow = () => {
         },
         {
           label: 'save file',
-          click: () => saveFileCallback(mainWindow),
+          click: () => saveFileCallback(mainWindow, openFilePath),
           accelerator: process.platform === 'darwin' ? 'Cmd+s' : 'Ctrl+s'
         },
         {
@@ -257,7 +283,13 @@ const createWindow = () => {
 // Some APIs can only be used after this event occurs.
 app.on('ready', createWindow)
 app.whenReady().then(() => {
-  ipcMain.handle(ipcChannel.configPathChannel, () => configPath)
+  ipcMain.handle(ipcChannel.configPathChannel, () => {
+    try {
+      return fs.readFileSync(path.join(configPath, 'imarkdown.json'), 'utf8')
+    } catch (err) {
+      console.log(err)
+    }
+  })
   protocol.registerFileProtocol('atom', (request, callback) => {
     const url = request.url.substring(7)
     callback(decodeURI(path.normalize(url)))

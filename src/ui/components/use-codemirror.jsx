@@ -40,6 +40,16 @@ export const transparentTheme = EditorView.theme({
     height: '100%',
     fontSize: '1.0em',
     padding: '12px'
+  },
+  '&.cm-focused': {
+    outline: 'none'
+  },
+  '.cm-scroller': {
+    fontFamily: 'inherit !important'
+  },
+  '&.cm-editor': {
+    textAlign: 'left',
+    padding: '0'
   }
 })
 

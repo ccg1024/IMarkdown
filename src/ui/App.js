@@ -1,75 +1,51 @@
-import { Box, Flex } from '@chakra-ui/react'
+import PubSub from 'pubsub-js'
+import { Flex } from '@chakra-ui/react'
 import React, { useState, useCallback, useEffect, useRef } from 'react'
 
 import Editor from './editor'
+import Preview from './preview'
 import FileDir from './components/file-dir'
-import { toggleView } from './libs/ipc-handler'
-
-import '../static/css/App.css'
-
-const fs = window.electronAPI.require('fs')
-const path = window.electronAPI.require('path')
-export let doc = '# In development'
-export let currentFile = ''
-
-// convert path
-export const converWin32Path = filePath =>
-  filePath.split(path.sep).join(path.posix.sep)
+import PubSubConfig from '../config/frontend'
+import { getScrollLine } from './libs/tools'
 
 const App = () => {
-  const [filePath, setFilePath] = useState('')
   const [isChange, setIsChange] = useState(false)
-  const [tempPath, setTempPath] = useState('')
-  const [sideFilePath, setSideFilePath] = useState('')
-  const recentFiles = useRef([])
 
-  const handleIsChange = useCallback(newFlag => {
-    setIsChange(newFlag)
-    // console.log('into is change callback');
-  }, [])
+  const [showPreview, setShowPreview] = useState(false)
+  const [showEditor, setShowEditor] = useState(true)
+  const [editorScroll, setEditorScroll] = useState(null)
+  const [doc, setDoc] = useState('# In development')
+  const [openedPath, setOpenedPath] = useState('')
+  const [recentFiles, setRecentFiles] = useState({})
+  const focusedFile = useRef(null)
+
   const handleDocChange = useCallback(newDoc => {
-    doc = newDoc
-    setIsChange(true)
-    // console.log('the doc is change');
+    setDoc(newDoc)
   }, [])
-  const handlePathChange = useCallback(newPath => {
-    setTempPath(newPath)
-    // currentFile = newPath;
-  }, [])
-  const handleSideFilePathChange = useCallback(newPath => {
-    setSideFilePath(newPath)
 
-    const converPath = converWin32Path(newPath)
-    if (!recentFiles.current.includes(converPath)) {
-      recentFiles.current = [...recentFiles.current, converPath]
+  const handleIsChange = useCallback(flag => {
+    setIsChange(flag)
+    console.log('into change')
+  })
+
+  const toggleView = (_event, value) => {
+    switch (value) {
+      case 1: // show preview
+        setShowEditor(false)
+        setShowPreview(true)
+        break
+      case 2: // show editor
+        const editorScrollLine = getScrollLine()
+        setShowEditor(true)
+        setShowPreview(false)
+        setEditorScroll(editorScrollLine)
+        break
     }
-    currentFile = newPath
-  }, [])
+  }
 
   useEffect(() => {
-    if (tempPath) {
-      // console.log('App useEffect set file content activated for: ' + tempPath)
-      fs.readFile(tempPath, 'utf-8', (err, data) => {
-        if (err) {
-          throw err
-        } else {
-          toggleView('from open file', 2)
-          doc = data
-          currentFile = tempPath
-
-          const converPath = converWin32Path(tempPath)
-
-          if (!recentFiles.current.includes(converPath)) {
-            recentFiles.current = [...recentFiles.current, converPath]
-          }
-
-          // activte the editor useEffect to update codemirror
-          setFilePath(tempPath)
-          setSideFilePath(tempPath)
-        }
-      })
-    }
-  }, [tempPath])
+    window.electronAPI.setContentChange(isChange)
+  }, [isChange])
 
   useEffect(() => {
     console.log('[App.js] run IPC serve for open file, toggleView')
@@ -82,24 +58,26 @@ const App = () => {
     }
   }, [])
 
-  function handleOpenFile(_event, value) {
-    // console.log('IPC App.js got new file, set temp path: ' + value)
-    setTempPath(value)
+  function handleOpenFile(_event, fullPath, fileContent, filename) {
+    setDoc(fileContent)
+    setOpenedPath(fullPath)
+    setRecentFiles(v => ({ ...v, [fullPath]: filename }))
     setIsChange(false)
+    setShowEditor(true)
+    setShowPreview(false)
+    setEditorScroll(null)
+    focusedFile.current = fullPath
 
-    // since open a new file, whatever the file is change, reset it
-    window.electronAPI.setContentChange(false)
+    window.electronAPI.setFilePath(fullPath)
+
+    PubSub.publish(PubSubConfig.reCreateStateChannel, 1)
   }
 
+  // setting config
   useEffect(() => {
-    window.electronAPI.getConfigPath().then(configPath => {
+    window.electronAPI.getConfigPath().then(configJson => {
       try {
-        const settings = JSON.parse(
-          fs.readFileSync(path.join(configPath, 'imarkdown.json'), {
-            encoding: 'utf-8'
-          })
-        )
-
+        const settings = JSON.parse(configJson)
         const editor = document.querySelector('#editor_Box')
         const preview = document.querySelector('#preview-scroll')
 
@@ -123,41 +101,34 @@ const App = () => {
     })
   }, [])
 
+  useEffect(() => {
+    let token = PubSub.subscribe(PubSubConfig.fileSaved, (_msg, _data) => {
+      setIsChange(false)
+    })
+
+    return () => {
+      PubSub.unsubscribe(token)
+    }
+  }, [])
+
+  // console.log(recentFiles)
+  console.log(Object.keys(recentFiles))
   return (
     <>
       <Flex height="100%" width="100%" id="content_root">
         <FileDir
-          recentFiles={recentFiles.current}
-          currentFile={sideFilePath}
+          recentFiles={recentFiles}
+          currentFile={focusedFile.current}
           isChange={isChange}
-          handlePath={handlePathChange}
         />
-        <Box
-          overflow="auto"
-          height="100%"
-          id="editor_Box"
-          w="100%"
-          fontSize="22px"
-          style={{ display: 'block' }}
-        >
-          <Editor
-            initialDoc={doc}
-            onChange={handleDocChange}
-            filePath={filePath}
-            handleIsChange={handleIsChange}
-            handleSideFilePathChange={handleSideFilePathChange}
-          />
-        </Box>
-
-        <Box
-          id="preview-scroll"
-          className="preview_parent"
-          overflow="auto"
-          height="100%"
-          w="100%"
-          pl={2}
-          fontSize="22px"
-        ></Box>
+        <Editor
+          initialDoc={doc}
+          onChange={handleDocChange}
+          isChangeCallback={handleIsChange}
+          isVisible={showEditor}
+          scrollLine={editorScroll}
+        />
+        <Preview doc={doc} openedPath={openedPath} isVisible={showPreview} />
       </Flex>
     </>
   )

@@ -20,5 +20,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.removeAllListeners(ipcChannel.openFileChannel),
   removeToggleView: () =>
     ipcRenderer.removeAllListeners(ipcChannel.toggleViewChannel),
-  getConfigPath: () => ipcRenderer.invoke(ipcChannel.configPathChannel)
+  getConfigPath: () => ipcRenderer.invoke(ipcChannel.configPathChannel),
+  openRecentFile: filepath =>
+    ipcRenderer.send(ipcChannel.openRecentFile, filepath)
 })
