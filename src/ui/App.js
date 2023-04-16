@@ -1,12 +1,14 @@
 import PubSub from 'pubsub-js'
 import { Flex } from '@chakra-ui/react'
-import React, { useState, useCallback, useEffect, useRef } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 
 import Editor from './editor'
 import Preview from './preview'
 import FileDir from './components/file-dir'
 import PubSubConfig from '../config/frontend'
 import { getScrollLine } from './libs/tools'
+
+const path = window.electronAPI.require('path')
 
 const App = () => {
   const [isChange, setIsChange] = useState(false)
@@ -16,7 +18,6 @@ const App = () => {
   const [doc, setDoc] = useState('# In development')
   const [openedPath, setOpenedPath] = useState('')
   const [recentFiles, setRecentFiles] = useState({})
-  const focusedFile = useRef(null)
 
   const handleDocChange = useCallback(newDoc => {
     setDoc(newDoc)
@@ -24,6 +25,13 @@ const App = () => {
 
   const handleIsChange = useCallback(flag => {
     setIsChange(flag)
+  })
+
+  const handleOpenedPath = useCallback(path => {
+    setOpenedPath(path)
+  })
+  const handleRecentFiles = useCallback(fullpath => {
+    setRecentFiles(v => ({ ...v, [fullpath]: path.basename(fullpath) }))
   })
 
   const toggleView = (_event, value) => {
@@ -62,7 +70,6 @@ const App = () => {
     setShowEditor(true)
     setShowPreview(false)
     setEditorScroll(null)
-    focusedFile.current = fullPath
 
     window.electronAPI.setFilePath(fullPath)
 
@@ -112,7 +119,7 @@ const App = () => {
       <Flex height="100%" width="100%" id="content_root">
         <FileDir
           recentFiles={recentFiles}
-          currentFile={focusedFile.current}
+          currentFile={openedPath}
           isChange={isChange}
         />
         <Editor
@@ -121,6 +128,8 @@ const App = () => {
           isChangeCallback={handleIsChange}
           isVisible={showEditor}
           scrollLine={editorScroll}
+          openedPathCallback={handleOpenedPath}
+          recentFilesCallback={handleRecentFiles}
         />
         <Preview doc={doc} openedPath={openedPath} isVisible={showPreview} />
       </Flex>

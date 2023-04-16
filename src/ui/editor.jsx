@@ -18,7 +18,9 @@ const Editor = ({
   onChange,
   isChangeCallback,
   isVisible,
-  scrollLine
+  scrollLine,
+  openedPathCallback,
+  recentFilesCallback
 }) => {
   // initial codemirror
   const refContainer = useRef(null)
@@ -180,7 +182,7 @@ const Editor = ({
     }
   }, [editorView])
 
-  function handleSaveFile(event, saveFilePath) {
+  function handleSaveFile(event, saveFilePath, saveFlag) {
     const formatedContent = formateContent(editorView)
 
     // send info to main process;
@@ -194,6 +196,12 @@ const Editor = ({
 
     PubSub.publish(PubSubConfig.fileSaved, true)
     changeGate.current = null
+
+    if (saveFlag === 0) {
+      // save empty file
+      openedPathCallback(saveFilePath)
+      recentFilesCallback(saveFilePath)
+    }
   }
 
   return (
