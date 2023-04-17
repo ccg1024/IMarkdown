@@ -135,6 +135,7 @@ const createWindow = () => {
   // Create the browser window.
   openFilePath = ''
   const mainWindow = new BrowserWindow({
+    icon: path.join(__dirname, './static/img/markdown.ico'),
     width: 1100,
     height: 700,
     vibrancy: 'under-window',
