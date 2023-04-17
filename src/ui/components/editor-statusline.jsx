@@ -70,7 +70,7 @@ const EditorStatusline = () => {
       >
         <Box display="flex" overflow="hidden" flexGrow={1}>
           <Text whiteSpace="nowrap" pr={1}>
-            Main Process
+            IPC
           </Text>
           <Box
             display="flex"
@@ -90,6 +90,7 @@ const EditorStatusline = () => {
           </Box>
         </Box>
         <Box whiteSpace="nowrap" pl={1} display="flex">
+          <Text pr={1}>LN</Text>
           <Text>{currentLine}</Text>
           <Text>:</Text>
           <Text>{totalLine}</Text>

@@ -15,7 +15,9 @@ import {
   dropCursor,
   rectangularSelection,
   crosshairCursor,
-  ViewPlugin
+  ViewPlugin,
+  lineNumbers,
+  highlightActiveLineGutter
 } from '@codemirror/view'
 import {
   indentOnInput,
@@ -50,6 +52,15 @@ export const transparentTheme = EditorView.theme({
   '&.cm-editor': {
     textAlign: 'left',
     padding: '0'
+  },
+  '.cm-gutters': {
+    backgroundColor: '#ffffff',
+    color: '#ddd',
+    border: 'none'
+  },
+  '.cm-activeLineGutter': {
+    backgroundColor: '#90cbf4',
+    color: 'black'
   }
 })
 
@@ -252,8 +263,8 @@ export const my_syntaxHighlighting = HighlightStyle.define([
 export const Init_extends = () => {
   const temp = [
     vim(),
-    // lineNumbers(),
-    // highlightActiveLineGutter(),
+    lineNumbers(),
+    highlightActiveLineGutter(),
     highlightSpecialChars(),
     history(),
     // foldGutter(),
