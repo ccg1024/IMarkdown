@@ -8,7 +8,8 @@ const options = {
   configPathChannel: 'get-config-path',
   updateFilePathChannel: 'set-open-file-path',
   reciveContentChannel: 'recieve-file-content',
-  openRecentFile: 'open-recent-file'
+  openRecentFile: 'open-recent-file',
+  sendSavedInfo: 'send-saved-info-to-renderer'
 }
 
 module.exports = options

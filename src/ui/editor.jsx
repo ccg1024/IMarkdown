@@ -6,6 +6,7 @@ import { EditorState } from '@codemirror/state'
 import React, { useEffect, useRef, useState } from 'react'
 
 import { Init_extends } from './components/use-codemirror.jsx'
+import EditorStatusline from './components/editor-statusline.jsx'
 
 import PubSubConfig from '../config/frontend'
 import { formateContent } from '../utils/frontend'
@@ -27,6 +28,7 @@ const Editor = ({
   const refTimer = useRef(null)
   const updateTimer = useRef(null)
   const changeGate = useRef(null)
+  const cursorTimer = useRef(null)
   const [editorView, setEditorView] = useState()
 
   const [createState, setCreateState] = useState(0)
@@ -53,6 +55,21 @@ const Editor = ({
                 updateTimer.current = null
               }, 1500)
             }
+          }
+
+          if (update.selectionSet) {
+            // listen cursor move
+            if (cursorTimer.current) clearTimeout(cursorTimer.current)
+
+            cursorTimer.current = setTimeout(() => {
+              let cursorPos = update.state.selection.main.head
+              let currentLine = update.state.doc.lineAt(cursorPos).number
+              let totalLine = update.state.doc.lines
+              PubSub.publish(PubSubConfig.statusLineInfo, {
+                current: currentLine,
+                total: totalLine
+              })
+            }, 500)
           }
         }),
         EditorView.domEventHandlers({
@@ -142,6 +159,20 @@ const Editor = ({
                   }, 1500)
                 }
               }
+              if (update.selectionSet) {
+                // listen cursor move
+                if (cursorTimer.current) clearTimeout(cursorTimer.current)
+
+                cursorTimer.current = setTimeout(() => {
+                  let cursorPos = update.state.selection.main.head
+                  let currentLine = update.state.doc.lineAt(cursorPos).number
+                  let totalLine = update.state.doc.lines
+                  PubSub.publish(PubSubConfig.statusLineInfo, {
+                    current: currentLine,
+                    total: totalLine
+                  })
+                }, 500)
+              }
             }),
             EditorView.domEventHandlers({
               scroll(_event, view) {
@@ -213,7 +244,10 @@ const Editor = ({
       fontSize="22px"
       display={isVisible ? 'block' : 'none'}
     >
-      <Box ref={refContainer} height="100%" overflow="auto" pl={2}></Box>
+      <Box display="flex" flexDirection="column" height="100%" width="100%">
+        <Box ref={refContainer} pl={2} flexGrow={1} overflow="auto"></Box>
+        <EditorStatusline />
+      </Box>
     </Box>
   )
 }

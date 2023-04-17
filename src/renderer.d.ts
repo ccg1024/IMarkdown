@@ -12,6 +12,8 @@ export interface IElectronAPI {
   removeToggleView: () => Promise<void>
   getConfigPath: () => Promise<void>
   openRecentFile: (filePath: string) => Promise<void>
+  sendSavedInfo: (callback: any) => Promise<void>
+  removeSendSavedInfo: () => Promise<void>
 }
 
 declare global {

@@ -168,10 +168,19 @@ const createWindow = () => {
     })
   })
 
+  // recive file content from renderer then save file content to local
   ipcMain.on(ipcChannel.reciveContentChannel, (_event, content, path) => {
+    let saveErr
     fs.writeFile(path, content, err => {
-      if (err) throw err
+      if (err) {
+        saveErr = err.message
+      }
     })
+    mainWindow.webContents.send(
+      ipcChannel.sendSavedInfo,
+      path + ' written',
+      saveErr
+    )
   })
 
   ipcMain.on(ipcChannel.openRecentFile, (_event, filepath) => {
