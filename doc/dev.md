@@ -77,9 +77,15 @@ cm.state.selection.main.head
 修改整个文档，但保留撤销历史。（用于文件内容的格式化）
 
 ```js
-cm.dispatch({changes: {from: 0, to: cm.state.doc.length, insert: text}})
+cm.dispatch({ changes: { from: 0, to: cm.state.doc.length, insert: text } })
 ```
 
 ### prettier
 
 在浏览器中使用 prettier：https://prettier.io/docs/en/browser.html
+
+### 关联文件
+
+为了让特定的文件与应用关联起来，需要在不同的`maker`中配置相应的`extendInfo`属性。
+
+> 不同平台对应不同的`maker`来生成打包文件。

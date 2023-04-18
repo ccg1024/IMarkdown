@@ -46,6 +46,7 @@ const Editor = ({
           if (update.docChanged) {
             if (!changeGate.current) {
               isChangeCallback(true)
+              PubSub.publish(PubSubConfig.statusLineModify, true)
               changeGate.current = true
             }
             if (!updateTimer.current) {
@@ -149,6 +150,7 @@ const Editor = ({
               if (update.docChanged) {
                 if (!changeGate.current) {
                   isChangeCallback(true)
+                  PubSub.publish(PubSubConfig.statusLineModify, true)
                   changeGate.current = true
                 }
                 if (!updateTimer.current) {
@@ -197,6 +199,7 @@ const Editor = ({
       )
 
       changeGate.current = null
+      PubSub.publish(PubSubConfig.statusLineClear, true)
       return () => {
         // console.log('[return editor.jsx] run reset codemirror drop')
       }
@@ -226,6 +229,7 @@ const Editor = ({
     )
 
     PubSub.publish(PubSubConfig.fileSaved, true)
+    PubSub.publish(PubSubConfig.statusLineModify, false)
     changeGate.current = null
 
     if (saveFlag === 0) {

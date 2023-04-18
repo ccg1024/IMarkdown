@@ -136,42 +136,42 @@ export const my_syntaxHighlighting = HighlightStyle.define([
     tag: tags.heading1,
     fontWeight: 'bold',
     color: customColors.content.head,
-    fontSize: '1.2em',
+    fontSize: '1em',
     textDecoration: 'none !important'
   },
   {
     tag: tags.heading2,
     fontWeight: 'bold',
     color: customColors.content.head,
-    fontSize: '1.2em',
+    fontSize: '1em',
     textDecoration: 'none !important'
   },
   {
     tag: tags.heading3,
     fontWeight: 'bold',
     color: customColors.content.head,
-    fontSize: '1.2em',
+    fontSize: '1em',
     textDecoration: 'none !important'
   },
   {
     tag: tags.heading4,
     fontWeight: 'bold',
     color: customColors.content.head,
-    fontSize: '1.2em',
+    fontSize: '1em',
     textDecoration: 'none !important'
   },
   {
     tag: tags.heading5,
     fontWeight: 'bold',
     color: customColors.content.head,
-    fontSize: '1.2em',
+    fontSize: '1em',
     textDecoration: 'none !important'
   },
   {
     tag: tags.heading6,
     fontWeight: 'bold',
     color: customColors.content.head,
-    fontSize: '1.2em',
+    fontSize: '1em',
     textDecoration: 'none !important'
   },
   {

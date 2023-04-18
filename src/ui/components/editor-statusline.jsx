@@ -34,6 +34,7 @@ const EditorStatusline = () => {
   const [message, setMessage] = useState('')
   const [currentLine, setCurrentLine] = useState(1)
   const [totalLine, setTotalLine] = useState(1)
+  const [modifyIcon, setModifyIcon] = useState('')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -42,9 +43,30 @@ const EditorStatusline = () => {
       setCurrentLine(data.current)
       setTotalLine(data.total)
     })
+    let token2 = PubSub.subscribe(
+      PubSubConfig.statusLineModify,
+      (_msg, isModify) => {
+        if (isModify) {
+          setModifyIcon('[+]')
+        } else {
+          setModifyIcon('')
+        }
+      }
+    )
+    let token3 = PubSub.subscribe(
+      PubSubConfig.statusLineClear,
+      (_msg, ifClear) => {
+        if (ifClear) {
+          setModifyIcon('')
+          setMessage('')
+        }
+      }
+    )
 
     return () => {
       PubSub.unsubscribe(token)
+      PubSub.unsubscribe(token2)
+      PubSub.unsubscribe(token3)
     }
   }, [])
 
@@ -71,6 +93,9 @@ const EditorStatusline = () => {
         <Box display="flex" overflow="hidden" flexGrow={1}>
           <Text whiteSpace="nowrap" pr={1}>
             IPC
+          </Text>
+          <Text whiteSpace="nowrap" pr={1}>
+            {modifyIcon}
           </Text>
           <Box
             display="flex"
