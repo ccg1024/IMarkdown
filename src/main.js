@@ -9,14 +9,16 @@ const {
 const path = require('path')
 const fs = require('fs')
 
-const { openFileDialog, handleEmptyFileSave } = require('./window/dialog')
-const {
-  generatorPath,
-  closeMessageConfig,
-  fileUnsaveMessageConfig
-} = require('./window/config')
-const { logTime, converWin32Path } = require('./utils/backend')
 const ipcChannel = require('./config/backend')
+const { generateMenus } = require('./window/menus')
+const { generatorPath, closeMessageConfig } = require('./window/config')
+const {
+  openFileCallback,
+  saveFileCallback,
+  createFileCallback
+} = require('./window/menus-callback')
+
+const { vimOption } = require('./config/vim-option')
 
 // ---------------------------------------------
 require('@electron/remote/main').initialize()
@@ -34,103 +36,6 @@ const { configPath, logPath } = generatorPath()
 
 console.log('[LOG]' + logPath)
 
-// ---------------------------------------------------
-const ifSkipOpenFile = isChange => {
-  let skip = false
-  if (isChange) {
-    let response = dialog.showMessageBoxSync(null, fileUnsaveMessageConfig)
-    if (response === 0) {
-      skip = true
-    }
-  }
-  return skip
-}
-
-async function openFileCallback(win) {
-  let skipOpenFile = ifSkipOpenFile(isContentChange)
-  if (!skipOpenFile) {
-    const filePath = await openFileDialog()
-    if (filePath) {
-      try {
-        const fileContent = fs.readFileSync(filePath, 'utf8')
-        win.webContents.send(
-          ipcChannel.openFileChannel,
-          converWin32Path(filePath),
-          fileContent,
-          path.basename(filePath)
-        )
-      } catch (e) {
-        console.log(e)
-      }
-    }
-  }
-}
-
-async function saveFileCallback(win, openedFile, logPath) {
-  try {
-    if (openedFile === '') {
-      let tempFilePath = await handleEmptyFileSave()
-
-      if (tempFilePath) {
-        win.webContents.send(
-          ipcChannel.saveFileChannel,
-          converWin32Path(tempFilePath),
-          0
-        )
-
-        const saveLogTime = logTime()
-        fs.appendFile(
-          logPath + 'imarkdown.log',
-          '[saveEmptyFile] ' + tempFilePath + ' ' + saveLogTime + '\n',
-          'utf8',
-          err => {
-            if (err) throw err
-          }
-        )
-      }
-    } else {
-      const saveLogTime = logTime()
-      fs.appendFile(
-        logPath + 'imarkdown.log',
-        '[saveFile] ' + openedFile + ' ' + saveLogTime + '\n',
-        'utf8',
-        err => {
-          if (err) throw err
-        }
-      )
-      win.webContents.send(
-        ipcChannel.saveFileChannel,
-        converWin32Path(openedFile),
-        1
-      )
-    }
-  } catch (err) {
-    const saveLogTime = logTime()
-    fs.appendFile(
-      logPath + 'imarkdown.log',
-      '[Error] ' + err + ' ' + saveLogTime + '\n',
-      'utf8',
-      err => {
-        if (err) throw err
-      }
-    )
-  }
-}
-
-async function createFileCallback(win) {
-  let tempFilePath = await handleEmptyFileSave()
-  if (tempFilePath) {
-    win.webContents.send(
-      ipcChannel.openFileChannel,
-      converWin32Path(tempFilePath),
-      '',
-      path.basename(tempFilePath)
-    )
-  }
-}
-
-// --------------------------------------------------
-
 const createWindow = () => {
   // Create the browser window.
   openFilePath = ''
@@ -147,6 +52,23 @@ const createWindow = () => {
       contextIsolation: true
     }
   })
+
+  // wrap menu callback
+  const openFileWrapper = () => {
+    openFileCallback(mainWindow, isContentChange)
+  }
+  const saveFileWrapper = () => {
+    saveFileCallback(mainWindow, openFilePath, logPath)
+  }
+  const createFileWrapper = () => {
+    createFileCallback(mainWindow)
+  }
+  const togglePreviewWrapper = () => {
+    mainWindow.webContents.send(ipcChannel.toggleViewChannel, 1)
+  }
+  const toggleEditorWrapper = () => {
+    mainWindow.webContents.send(ipcChannel.toggleViewChannel, 2)
+  }
 
   // recive file path from renderer
   ipcMain.on(ipcChannel.updateFilePathChannel, (_event, filePath) => {
@@ -197,6 +119,14 @@ const createWindow = () => {
     }
   })
 
+  ipcMain.handle(ipcChannel.vimOptionChannel, async (_event, value) => {
+    if (vimOption.writeFile === value) {
+      saveFileWrapper()
+    } else if (vimOption.openFile === value) {
+      openFileWrapper()
+    }
+  })
+
   // show close dialog
   mainWindow.on('close', function (e) {
     if (isContentChange) {
@@ -205,89 +135,15 @@ const createWindow = () => {
     }
   })
 
-  // menu template ----------------------------------------
-  const template = [
-    // { role: 'appMenu' }
-    ...(isMac
-      ? [
-          {
-            label: app.name,
-            submenu: [
-              { role: 'about' },
-              { type: 'separator' },
-              { role: 'quit' }
-            ]
-          }
-        ]
-      : []),
-    // { role: 'fileMenu' }
-    {
-      label: 'File',
-      submenu: [
-        {
-          label: 'open file',
-          click: () => openFileCallback(mainWindow),
-          accelerator: process.platform === 'darwin' ? 'Cmd+o' : 'Ctrl+o'
-        },
-        {
-          label: 'save file',
-          click: () => saveFileCallback(mainWindow, openFilePath, logPath),
-          accelerator: process.platform === 'darwin' ? 'Cmd+s' : 'Ctrl+s'
-        },
-        {
-          label: 'create file',
-          click: () => createFileCallback(mainWindow)
-        },
-        { type: 'separator' },
-        isMac ? { role: 'close' } : { role: 'quit' }
-      ]
-    },
-    // { role: 'viewMenu' }
-    {
-      label: 'View',
-      submenu: [
-        { role: 'toggleDevTools' },
-        { type: 'separator' },
-        {
-          label: 'Just Preview',
-          click: async () => {
-            mainWindow.webContents.send(ipcChannel.toggleViewChannel, 1)
-          },
-          accelerator:
-            process.platform === 'darwin' ? 'Cmd+Shift+p' : 'Ctrl+Shift+p'
-        },
-        {
-          label: 'Just Editor',
-          click: async () => {
-            mainWindow.webContents.send(ipcChannel.toggleViewChannel, 2)
-          },
-          accelerator:
-            process.platform === 'darwin' ? 'Cmd+Shift+e' : 'Ctrl+Shift+e'
-        },
-        { type: 'separator' },
-        { role: 'reload' },
-        { role: 'forceReload' }
-      ]
-    },
-    // { role: 'windowMenu' }
-    {
-      label: 'Window',
-      submenu: [
-        { role: 'minimize' },
-        { role: 'zoom' },
-        ...(isMac
-          ? [
-              { type: 'separator' },
-              { role: 'front' },
-              { type: 'separator' },
-              { role: 'window' }
-            ]
-          : [{ role: 'close' }])
-      ]
-    }
-  ]
-  // END ---------------------------------------------
-
+  const template = generateMenus(
+    isMac,
+    app.name,
+    openFileWrapper,
+    saveFileWrapper,
+    createFileWrapper,
+    togglePreviewWrapper,
+    toggleEditorWrapper
+  )
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
 

@@ -25,5 +25,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.send(ipcChannel.openRecentFile, filepath),
   sendSavedInfo: callback => ipcRenderer.on(ipcChannel.sendSavedInfo, callback),
   removeSendSavedInfo: () =>
-    ipcRenderer.removeAllListeners(ipcChannel.sendSavedInfo)
+    ipcRenderer.removeAllListeners(ipcChannel.sendSavedInfo),
+  vimOption: option => ipcRenderer.invoke(ipcChannel.vimOptionChannel, option)
 })

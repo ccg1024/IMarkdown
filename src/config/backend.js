@@ -9,7 +9,8 @@ const options = {
   updateFilePathChannel: 'set-open-file-path',
   reciveContentChannel: 'recieve-file-content',
   openRecentFile: 'open-recent-file',
-  sendSavedInfo: 'send-saved-info-to-renderer'
+  sendSavedInfo: 'send-saved-info-to-renderer',
+  vimOptionChannel: 'vim-option-channel'
 }
 
 module.exports = options

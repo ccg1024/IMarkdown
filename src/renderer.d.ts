@@ -14,6 +14,7 @@ export interface IElectronAPI {
   openRecentFile: (filePath: string) => Promise<void>
   sendSavedInfo: (callback: any) => Promise<void>
   removeSendSavedInfo: () => Promise<void>
+  vimOption: (option: string) => Promise<void>
 }
 
 declare global {

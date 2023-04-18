@@ -11,6 +11,7 @@ import EditorStatusline from './components/editor-statusline.jsx'
 import PubSubConfig from '../config/frontend'
 import { formateContent } from '../utils/frontend'
 const ipcChannels = require('../config/backend')
+const { vimOption } = require('../config/vim-option')
 
 export let previewScroll = 1
 
@@ -96,6 +97,15 @@ const Editor = ({
 
     // add view keymap, just need once
     Vim.map('<C-n>', ':nohl<cr>')
+    Vim.defineEx('write', 'w', () => {
+      window.electronAPI.vimOption(vimOption.writeFile)
+    })
+    Vim.defineEx('open', 'o', () => {
+      window.electronAPI.vimOption(vimOption.openFile)
+    })
+    Vim.defineEx('format', 'f', () => {
+      formateContent(view)
+    })
 
     const view = new EditorView({
       state: startState,
