@@ -80,6 +80,10 @@ cm.state.selection.main.head
 cm.dispatch({ changes: { from: 0, to: cm.state.doc.length, insert: text } })
 ```
 
+#### vim
+
+如果设置了`overflow:hidden`属性，使用 Vim 中的`G`进行跳转时，会在部分长度的文件中出现长度报错问题，猜测应该是将字符串长度对应到`viewport`滚动过程中出现错误。
+
 ### prettier
 
 在浏览器中使用 prettier：https://prettier.io/docs/en/browser.html

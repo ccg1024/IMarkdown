@@ -1,6 +1,7 @@
 module.exports = {
   vimOption: {
     writeFile: 'write',
-    openFile: 'open'
+    openFile: 'open',
+    openRecentFile: 'recent-file'
   }
 }

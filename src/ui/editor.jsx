@@ -1,5 +1,5 @@
 import PubSub from 'pubsub-js'
-import { Box } from '@chakra-ui/react'
+import { Box, useDisclosure } from '@chakra-ui/react'
 import { Vim } from '@replit/codemirror-vim'
 import { EditorView } from '@codemirror/view'
 import { EditorState } from '@codemirror/state'
@@ -7,6 +7,7 @@ import React, { useEffect, useRef, useState } from 'react'
 
 import { Init_extends } from './components/use-codemirror.jsx'
 import EditorStatusline from './components/editor-statusline.jsx'
+import { TeleRecentFile } from './components/telescope.jsx'
 
 import PubSubConfig from '../config/frontend'
 import { formateContent } from '../utils/frontend'
@@ -20,7 +21,8 @@ const Editor = ({
   isVisible,
   scrollLine,
   openedPathCallback,
-  recentFilesCallback
+  recentFilesCallback,
+  recentFiles
 }) => {
   // initial codemirror
   const refContainer = useRef(null)
@@ -31,6 +33,8 @@ const Editor = ({
   const [editorView, setEditorView] = useState()
 
   const [createState, setCreateState] = useState(0)
+
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   // can not initital in state, case the page not renderer
   useEffect(() => {
@@ -94,16 +98,28 @@ const Editor = ({
     })
 
     // add view keymap, just need once
+    Vim.unmap('<Space>')
     Vim.map('<C-n>', ':nohl<cr>')
     Vim.defineEx('write', 'w', () => {
-      window.electronAPI.vimOption(vimOption.writeFile)
+      window.electronAPI.vimOption(
+        JSON.stringify({
+          option: vimOption.writeFile
+        })
+      )
     })
     Vim.defineEx('open', 'o', () => {
-      window.electronAPI.vimOption(vimOption.openFile)
+      const optionJson = JSON.stringify({
+        option: vimOption.openFile
+      })
+      window.electronAPI.vimOption(optionJson)
     })
     Vim.defineEx('format', 'f', () => {
       formateContent(view)
     })
+    Vim.defineEx('telescopeRecentFile', 'telescopeR', () => {
+      onOpen()
+    })
+    Vim.map('<Space>n', ':telescopeRecentFile<cr>')
 
     const view = new EditorView({
       state: startState,
@@ -111,6 +127,7 @@ const Editor = ({
     })
 
     setEditorView(view)
+    view.focus()
 
     return () => {
       // console.log('[return editor.jsx] run initial drop')
@@ -129,7 +146,7 @@ const Editor = ({
         effects: EditorView.scrollIntoView(lineObj.from, { y: 'start' }),
         scrollIntoView: true
       })
-      return () => { }
+      return () => {}
     }
   }, [editorView, isVisible])
 
@@ -247,6 +264,10 @@ const Editor = ({
     }
   }
 
+  function focuseCallback() {
+    editorView.focus()
+  }
+
   return (
     <Box
       overflow="auto"
@@ -260,6 +281,12 @@ const Editor = ({
         <Box ref={refContainer} pl={2} flexGrow={1} overflow="auto"></Box>
         <EditorStatusline />
       </Box>
+      <TeleRecentFile
+        isOpen={isOpen}
+        onClose={onClose}
+        focuseCallback={focuseCallback}
+        recentFiles={recentFiles}
+      />
     </Box>
   )
 }

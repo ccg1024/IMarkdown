@@ -61,6 +61,9 @@ export const transparentTheme = EditorView.theme({
   '.cm-activeLineGutter': {
     backgroundColor: '#90cbf4',
     color: 'black'
+  },
+  '::-webkit-scrollbar': {
+    width: '10px'
   }
 })
 
@@ -304,6 +307,25 @@ export const Init_extends = () => {
     })
   ]
   return temp
+}
+
+export const TelescopeExtends = () => {
+  const telescopeExtends = [
+    vim(),
+    lineNumbers(),
+    highlightActiveLineGutter(),
+    highlightSpecialChars(),
+    drawSelection(),
+    dropCursor(),
+    EditorState.allowMultipleSelections.of(true),
+    indentOnInput(),
+    syntaxHighlighting(defaultHighlightStyle),
+    highlightActiveLine(),
+    highlightSelectionMatches(),
+    transparentTheme,
+    EditorState.readOnly.of(true)
+  ]
+  return telescopeExtends
 }
 
 const useCodeMirror = ({ initialDoc, onChange }) => {

@@ -136,6 +136,7 @@ const App = () => {
           scrollLine={scrollRef.current}
           openedPathCallback={handleOpenedPath}
           recentFilesCallback={handleRecentFiles}
+          recentFiles={recentFiles}
         />
         <Preview
           doc={doc}

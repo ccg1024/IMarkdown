@@ -120,10 +120,23 @@ const createWindow = () => {
   })
 
   ipcMain.handle(ipcChannel.vimOptionChannel, async (_event, value) => {
-    if (vimOption.writeFile === value) {
+    const jsonData = JSON.parse(value)
+    if (vimOption.writeFile === jsonData.option) {
       saveFileWrapper()
-    } else if (vimOption.openFile === value) {
+    } else if (vimOption.openFile === jsonData.option) {
       openFileWrapper()
+    } else if (vimOption.openRecentFile === jsonData.option) {
+      try {
+        const fileContent = fs.readFileSync(jsonData.filepath, 'utf8')
+        mainWindow.webContents.send(
+          ipcChannel.openFileChannel,
+          jsonData.filepath,
+          fileContent,
+          path.basename(jsonData.filepath)
+        )
+      } catch (err) {
+        console.log(err)
+      }
     }
   })
 
