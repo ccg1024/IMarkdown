@@ -2,16 +2,13 @@ import _ from 'lodash'
 import React, { useEffect } from 'react'
 import { Box } from '@chakra-ui/react'
 
-import { previewScroll } from './editor'
 import MarkComponent from './components/mark-component'
 
-export let previewScrollTop = 1
-
-const Preview = ({ doc, openedPath, isVisible }) => {
+const Preview = ({ doc, openedPath, isVisible, scrollLine }) => {
   // run once after render
   useEffect(() => {
     if (isVisible) {
-      let tempIdx = previewScroll
+      let tempIdx = scrollLine.previewScrollTo
       let target = document.querySelector(
         "[data-sourcepos^='" + tempIdx + ":']"
       )
@@ -23,14 +20,14 @@ const Preview = ({ doc, openedPath, isVisible }) => {
         target.scrollIntoView()
       }
 
-      if (previewScroll === 1) {
-        previewScrollTop = 1
+      if (scrollLine.previewScrollTo === 1) {
+        scrollLine.previewScrollTop = 1
       }
 
       // set scroll listener
       const previewBody = document.querySelector('#preview-scroll')
       previewBody.onscroll = _.throttle(event => {
-        previewScrollTop = event.target.scrollTop
+        scrollLine.previewScrollTop = event.target.scrollTop
       }, 500)
       return () => {
         previewBody.onscroll = null

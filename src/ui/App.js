@@ -1,6 +1,6 @@
 import PubSub from 'pubsub-js'
 import { Flex } from '@chakra-ui/react'
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useRef, useCallback, useEffect } from 'react'
 
 import Editor from './editor'
 import Preview from './preview'
@@ -14,10 +14,14 @@ const App = () => {
   const [isChange, setIsChange] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
   const [showEditor, setShowEditor] = useState(true)
-  const [editorScroll, setEditorScroll] = useState(null)
   const [doc, setDoc] = useState('# In development')
   const [openedPath, setOpenedPath] = useState('')
   const [recentFiles, setRecentFiles] = useState({})
+  const scrollRef = useRef({
+    previewScrollTo: 1,
+    previewScrollTop: 1,
+    editorScrollTo: 1
+  })
 
   const handleDocChange = useCallback(newDoc => {
     setDoc(newDoc)
@@ -41,10 +45,12 @@ const App = () => {
         setShowPreview(true)
         break
       case 2: // show editor
-        const editorScrollLine = getScrollLine()
+        const editorScrollLine = getScrollLine(
+          scrollRef.current.previewScrollTop
+        )
         setShowEditor(true)
         setShowPreview(false)
-        setEditorScroll(editorScrollLine)
+        scrollRef.current.editorScrollTo = editorScrollLine
         break
     }
   }
@@ -69,7 +75,7 @@ const App = () => {
     setIsChange(false)
     setShowEditor(true)
     setShowPreview(false)
-    setEditorScroll(null)
+    scrollRef.current.editorScrollTo = 1
 
     window.electronAPI.setFilePath(fullPath)
 
@@ -127,11 +133,16 @@ const App = () => {
           onChange={handleDocChange}
           isChangeCallback={handleIsChange}
           isVisible={showEditor}
-          scrollLine={editorScroll}
+          scrollLine={scrollRef.current}
           openedPathCallback={handleOpenedPath}
           recentFilesCallback={handleRecentFiles}
         />
-        <Preview doc={doc} openedPath={openedPath} isVisible={showPreview} />
+        <Preview
+          doc={doc}
+          openedPath={openedPath}
+          isVisible={showPreview}
+          scrollLine={scrollRef.current}
+        />
       </Flex>
     </>
   )

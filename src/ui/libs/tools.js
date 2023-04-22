@@ -1,8 +1,7 @@
-import { previewScrollTop } from '../preview'
 // record which line the editor should scroll to
 // export let editorScrollPos = 1
 
-export function getScrollLine() {
+export function getScrollLine(previewScrollTop) {
   let editorScrollPos = 1
   const target = document.getElementById('preview-scroll').children
   if (target.length > 0) {

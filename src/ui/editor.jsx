@@ -13,8 +13,6 @@ import { formateContent } from '../utils/frontend'
 const ipcChannels = require('../config/backend')
 const { vimOption } = require('../config/vim-option')
 
-export let previewScroll = 1
-
 const Editor = ({
   initialDoc,
   onChange,
@@ -85,7 +83,7 @@ const Editor = ({
                   view.scrollDOM.scrollTop
                 ).from
                 const lineNumber = view.state.doc.lineAt(scrollPos).number
-                previewScroll = lineNumber
+                scrollLine.previewScrollTo = lineNumber
                 refTimer.current = null
               }, 500)
             }
@@ -121,8 +119,8 @@ const Editor = ({
   }, [refContainer])
 
   useEffect(() => {
-    if (editorView && isVisible && scrollLine) {
-      const lineObj = editorView.state.doc.line(scrollLine)
+    if (editorView && isVisible) {
+      const lineObj = editorView.state.doc.line(scrollLine.editorScrollTo)
       editorView.dispatch({
         selection: {
           anchor: lineObj.from,
@@ -131,9 +129,9 @@ const Editor = ({
         effects: EditorView.scrollIntoView(lineObj.from, { y: 'start' }),
         scrollIntoView: true
       })
-      return () => {}
+      return () => { }
     }
-  }, [editorView, isVisible, scrollLine])
+  }, [editorView, isVisible])
 
   // activate create new state
   useEffect(() => {
@@ -150,7 +148,7 @@ const Editor = ({
 
   useEffect(() => {
     if (createState) {
-      previewScroll = 1
+      scrollLine.previewScrollTo = 1
       editorView.scrollDOM.scrollTop = 0
       editorView.setState(
         EditorState.create({
@@ -197,7 +195,7 @@ const Editor = ({
                       view.scrollDOM.scrollTop
                     ).from
                     const lineNumber = view.state.doc.lineAt(scrollPos).number
-                    previewScroll = lineNumber
+                    scrollLine.previewScrollTo = lineNumber
                     refTimer.current = null
                   }, 500)
                 }
