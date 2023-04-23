@@ -23,6 +23,16 @@ npm start
 
 ![new feature](./img/win.png)
 
+![defualt config](./img/win-4-23.png)
+
+# Feature
+
+- Vim support
+
+- Telescope-like recent file browsing in vim mode
+
+- Auto format
+
 # LICENCE
 
 GPL3.
