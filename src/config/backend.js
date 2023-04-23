@@ -10,7 +10,8 @@ const options = {
   reciveContentChannel: 'recieve-file-content',
   openRecentFile: 'open-recent-file',
   sendSavedInfo: 'send-saved-info-to-renderer',
-  vimOptionChannel: 'vim-option-channel'
+  vimOptionChannel: 'vim-option-channel',
+  updateCacheFromReact: 'update-cache-from-react'
 }
 
 module.exports = options

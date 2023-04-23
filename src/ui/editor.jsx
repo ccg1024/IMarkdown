@@ -57,7 +57,7 @@ const Editor = ({
               updateTimer.current = setTimeout(() => {
                 onChange(update.state.doc.toString())
                 updateTimer.current = null
-              }, 1500)
+              }, 16)
             }
           }
 
@@ -183,7 +183,7 @@ const Editor = ({
                   updateTimer.current = setTimeout(() => {
                     onChange(update.state.doc.toString())
                     updateTimer.current = null
-                  }, 1500)
+                  }, 16)
                 }
               }
               if (update.selectionSet) {
@@ -245,7 +245,6 @@ const Editor = ({
     const formatedContent = formateContent(editorView)
 
     // send info to main process;
-    window.electronAPI.setContentChange(false)
     window.electronAPI.setFilePath(saveFilePath)
     event.sender.send(
       ipcChannels.reciveContentChannel,
@@ -253,15 +252,15 @@ const Editor = ({
       saveFilePath
     )
 
-    PubSub.publish(PubSubConfig.fileSaved, true)
-    PubSub.publish(PubSubConfig.statusLineModify, false)
-    changeGate.current = null
-
     if (saveFlag === 0) {
       // save empty file
       openedPathCallback(saveFilePath)
       recentFilesCallback(saveFilePath)
     }
+
+    PubSub.publish(PubSubConfig.fileSaved, true)
+    PubSub.publish(PubSubConfig.statusLineModify, false)
+    changeGate.current = null
   }
 
   function focuseCallback() {

@@ -27,12 +27,6 @@ const FileDir = ({ recentFiles, currentFile, isChange }) => {
   const [isVisible, setIsVisible] = useState(true)
 
   const openRecentFile = filePath => {
-    if (isChange) {
-      // alert('the file is unsaved');
-      window.electronAPI.showUnsavedInfo()
-      return
-    }
-    window.electronAPI.setFilePath(filePath)
     window.electronAPI.openRecentFile(filePath)
   }
 
@@ -58,9 +52,13 @@ const FileDir = ({ recentFiles, currentFile, isChange }) => {
                     key={item}
                     title={item}
                     fullpath={item}
-                    basename={recentFiles[item]}
+                    basename={recentFiles[item].filename}
                     isActive={currentFile === item}
-                    isChange={currentFile === item ? isChange : undefined}
+                    isChange={
+                      currentFile === item
+                        ? isChange
+                        : recentFiles[item].isChange
+                    }
                     clickCallback={openRecentFile}
                   />
                 )

@@ -17,19 +17,34 @@ const ifSkipOpenFile = isChange => {
   return skip
 }
 
-async function openFileCallback(win, isChange) {
-  let skipOpenFile = ifSkipOpenFile(isChange)
-  if (!skipOpenFile) {
-    const filePath = await openFileDialog()
-    if (filePath) {
+async function openFileCallback(win, openedCache) {
+  const filePath = await openFileDialog()
+
+  if (filePath) {
+    if (Object.hasOwn(openedCache, converWin32Path(filePath))) {
+      win.webContents.send(
+        ipcChannel.openFileChannel,
+        converWin32Path(filePath),
+        openedCache[converWin32Path(filePath)].fileContent,
+        path.basename(filePath),
+        openedCache[converWin32Path(filePath)].isChange
+      )
+    } else {
       try {
         const fileContent = fs.readFileSync(filePath, 'utf8')
         win.webContents.send(
           ipcChannel.openFileChannel,
           converWin32Path(filePath),
           fileContent,
-          path.basename(filePath)
+          path.basename(filePath),
+          false
         )
+
+        return {
+          filePath: converWin32Path(filePath),
+          fileContent,
+          isChange: false
+        }
       } catch (e) {
         console.log(e)
       }
@@ -95,8 +110,14 @@ async function createFileCallback(win) {
       ipcChannel.openFileChannel,
       converWin32Path(tempFilePath),
       '',
-      path.basename(tempFilePath)
+      path.basename(tempFilePath),
+      false
     )
+    return {
+      filePath: converWin32Path(tempFilePath),
+      fileContent: '',
+      isChange: false
+    }
   }
 }
 

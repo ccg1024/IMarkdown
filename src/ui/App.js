@@ -15,27 +15,52 @@ const App = () => {
   const [showPreview, setShowPreview] = useState(false)
   const [showEditor, setShowEditor] = useState(true)
   const [doc, setDoc] = useState('# In development')
-  const [openedPath, setOpenedPath] = useState('')
   const [recentFiles, setRecentFiles] = useState({})
+
   const scrollRef = useRef({
     previewScrollTo: 1,
     previewScrollTop: 1,
     editorScrollTo: 1
   })
+  const pathRef = useRef('')
 
+  // update doc from editor
   const handleDocChange = useCallback(newDoc => {
     setDoc(newDoc)
+    if (pathRef.current) {
+      window.electronAPI.updateCache(
+        JSON.stringify({
+          filePath: pathRef.current,
+          fileContent: newDoc
+        })
+      )
+    }
   }, [])
 
+  // update isChange flag from editor
   const handleIsChange = useCallback(flag => {
     setIsChange(flag)
+    if (pathRef.current) {
+      setRecentFiles(v => ({
+        ...v,
+        [pathRef.current]: {
+          ...v[pathRef.current],
+          isChange: flag
+        }
+      }))
+    }
   })
 
+  // update opened path from editor when save a empty path file
   const handleOpenedPath = useCallback(path => {
-    setOpenedPath(path)
+    pathRef.current = path
   })
+  // update recent file from editor when save a empty path file
   const handleRecentFiles = useCallback(fullpath => {
-    setRecentFiles(v => ({ ...v, [fullpath]: path.basename(fullpath) }))
+    setRecentFiles(v => ({
+      ...v,
+      [fullpath]: { filename: path.basename(fullpath), isChange: false }
+    }))
   })
 
   const toggleView = (_event, value) => {
@@ -56,7 +81,9 @@ const App = () => {
   }
 
   useEffect(() => {
-    window.electronAPI.setContentChange(isChange)
+    if (pathRef.current) {
+      window.electronAPI.setContentChange(isChange, pathRef.current)
+    }
   }, [isChange])
 
   useEffect(() => {
@@ -68,18 +95,20 @@ const App = () => {
     }
   }, [])
 
-  function handleOpenFile(_event, fullPath, fileContent, filename) {
+  function handleOpenFile(_event, fullPath, fileContent, filename, isChange) {
+    scrollRef.current.editorScrollTo = 1
+    pathRef.current = fullPath
+
     setDoc(fileContent)
-    setOpenedPath(fullPath)
-    setRecentFiles(v => ({ ...v, [fullPath]: filename }))
-    setIsChange(false)
+    setRecentFiles(v => ({ ...v, [fullPath]: { filename, isChange } }))
+    setIsChange(isChange)
     setShowEditor(true)
     setShowPreview(false)
-    scrollRef.current.editorScrollTo = 1
 
     window.electronAPI.setFilePath(fullPath)
 
     PubSub.publish(PubSubConfig.reCreateStateChannel, 1)
+    PubSub.publish(PubSubConfig.statusLineModify, isChange)
   }
 
   // setting config
@@ -113,6 +142,13 @@ const App = () => {
   useEffect(() => {
     let token = PubSub.subscribe(PubSubConfig.fileSaved, (_msg, _data) => {
       setIsChange(false)
+      setRecentFiles(v => ({
+        ...v,
+        [pathRef.current]: {
+          ...v[pathRef.current],
+          isChange: false
+        }
+      }))
     })
 
     return () => {
@@ -125,7 +161,7 @@ const App = () => {
       <Flex height="100%" width="100%" id="content_root">
         <FileDir
           recentFiles={recentFiles}
-          currentFile={openedPath}
+          currentFile={pathRef.current}
           isChange={isChange}
         />
         <Editor
@@ -140,7 +176,7 @@ const App = () => {
         />
         <Preview
           doc={doc}
-          openedPath={openedPath}
+          openedPath={pathRef.current}
           isVisible={showPreview}
           scrollLine={scrollRef.current}
         />

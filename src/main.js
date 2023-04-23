@@ -30,7 +30,7 @@ if (require('electron-squirrel-startup')) {
 
 const isMac = process.platform === 'darwin'
 let openFilePath = ''
-let isContentChange = false
+let fileCache = {}
 
 const { configPath, logPath } = generatorPath()
 
@@ -55,13 +55,27 @@ const createWindow = () => {
 
   // wrap menu callback
   const openFileWrapper = () => {
-    openFileCallback(mainWindow, isContentChange)
+    openFileCallback(mainWindow, fileCache).then(fileObj => {
+      if (fileObj && !Object.hasOwn(fileCache, fileObj.filePath)) {
+        fileCache[fileObj.filePath] = {
+          fileContent: fileObj.fileContent,
+          isChange: fileObj.isChange
+        }
+      }
+    })
   }
   const saveFileWrapper = () => {
     saveFileCallback(mainWindow, openFilePath, logPath)
   }
   const createFileWrapper = () => {
-    createFileCallback(mainWindow)
+    createFileCallback(mainWindow).then(fileObj => {
+      if (fileObj) {
+        fileCache[fileObj.filePath] = {
+          fileContent: fileObj.fileContent,
+          isChange: fileObj.isChange
+        }
+      }
+    })
   }
   const togglePreviewWrapper = () => {
     mainWindow.webContents.send(ipcChannel.toggleViewChannel, 1)
@@ -72,23 +86,30 @@ const createWindow = () => {
 
   // recive file path from renderer
   ipcMain.on(ipcChannel.updateFilePathChannel, (_event, filePath) => {
-    openFilePath = filePath
-    mainWindow.setTitle(openFilePath)
+    if (filePath) {
+      openFilePath = filePath
+      mainWindow.setTitle(openFilePath.replace(/^.*?\//, ''))
+    }
   })
 
   // recive content change flag
-  ipcMain.on(ipcChannel.setIsChangeChannel, (_event, isChange) => {
-    isContentChange = isChange
+  ipcMain.on(ipcChannel.setIsChangeChannel, (_event, isChange, filepath) => {
+    if (filepath) {
+      if (!Object.hasOwn(fileCache, filepath)) {
+        fileCache[filepath] = {}
+      }
+      fileCache[filepath].isChange = isChange
+    }
   })
 
   // show unsaved info, when using recient file
-  ipcMain.on(ipcChannel.showUnsaveChannel, _event => {
-    dialog.showMessageBoxSync(null, {
-      type: 'info',
-      title: 'Warning',
-      message: 'The file is unsaved'
-    })
-  })
+  // ipcMain.on(ipcChannel.showUnsaveChannel, _event => {
+  //   dialog.showMessageBoxSync(null, {
+  //     type: 'info',
+  //     title: 'Warning',
+  //     message: 'The file is unsaved'
+  //   })
+  // })
 
   // recive file content from renderer then save file content to local
   ipcMain.on(ipcChannel.reciveContentChannel, (_event, content, path) => {
@@ -98,6 +119,13 @@ const createWindow = () => {
         saveErr = err.message
       }
     })
+
+    if (!Object.hasOwn(fileCache, path)) {
+      fileCache[path] = {}
+    }
+    fileCache[path].fileContent = content
+    fileCache[path].isChange = false
+
     mainWindow.webContents.send(
       ipcChannel.sendSavedInfo,
       path + ' written',
@@ -106,16 +134,14 @@ const createWindow = () => {
   })
 
   ipcMain.on(ipcChannel.openRecentFile, (_event, filepath) => {
-    try {
-      const fileContent = fs.readFileSync(filepath, 'utf8')
+    if (Object.hasOwn(fileCache, filepath)) {
       mainWindow.webContents.send(
         ipcChannel.openFileChannel,
         filepath,
-        fileContent,
-        path.basename(filepath)
+        fileCache[filepath].fileContent,
+        path.basename(filepath),
+        fileCache[filepath].isChange
       )
-    } catch (err) {
-      console.log(err)
     }
   })
 
@@ -126,23 +152,38 @@ const createWindow = () => {
     } else if (vimOption.openFile === jsonData.option) {
       openFileWrapper()
     } else if (vimOption.openRecentFile === jsonData.option) {
-      try {
-        const fileContent = fs.readFileSync(jsonData.filepath, 'utf8')
+      if (Object.hasOwn(fileCache, jsonData.filepath)) {
         mainWindow.webContents.send(
           ipcChannel.openFileChannel,
           jsonData.filepath,
-          fileContent,
-          path.basename(jsonData.filepath)
+          fileCache[jsonData.filepath].fileContent,
+          path.basename(jsonData.filepath),
+          fileCache[jsonData.filepath].isChange
         )
-      } catch (err) {
-        console.log(err)
       }
+    }
+  })
+
+  ipcMain.handle(ipcChannel.updateCacheFromReact, async (_event, cache) => {
+    if (cache) {
+      const jsonData = JSON.parse(cache)
+      if (!Object.hasOwn(fileCache, jsonData.filePath)) {
+        fileCache[jsonData.filePath] = {}
+      }
+      fileCache[jsonData.filePath].fileContent = jsonData.fileContent
     }
   })
 
   // show close dialog
   mainWindow.on('close', function (e) {
-    if (isContentChange) {
+    let showCloseDialog = false
+    for (let key in fileCache) {
+      if (fileCache[key].isChange === true) {
+        showCloseDialog = true
+        break
+      }
+    }
+    if (showCloseDialog) {
       let response = dialog.showMessageBoxSync(this, closeMessageConfig)
       if (response == 1) e.preventDefault()
     }

@@ -11,8 +11,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on(ipcChannel.toggleViewChannel, callback),
   setFilePath: filePath =>
     ipcRenderer.send(ipcChannel.updateFilePathChannel, filePath),
-  setContentChange: isChange =>
-    ipcRenderer.send(ipcChannel.setIsChangeChannel, isChange),
+  setContentChange: (isChange, filepath) =>
+    ipcRenderer.send(ipcChannel.setIsChangeChannel, isChange, filepath),
   showUnsavedInfo: () => ipcRenderer.send(ipcChannel.showUnsaveChannel),
   removeSaveFile: () =>
     ipcRenderer.removeAllListeners(ipcChannel.saveFileChannel),
@@ -26,5 +26,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   sendSavedInfo: callback => ipcRenderer.on(ipcChannel.sendSavedInfo, callback),
   removeSendSavedInfo: () =>
     ipcRenderer.removeAllListeners(ipcChannel.sendSavedInfo),
-  vimOption: option => ipcRenderer.invoke(ipcChannel.vimOptionChannel, option)
+  vimOption: option => ipcRenderer.invoke(ipcChannel.vimOptionChannel, option),
+  updateCache: cache =>
+    ipcRenderer.invoke(ipcChannel.updateCacheFromReact, cache)
 })

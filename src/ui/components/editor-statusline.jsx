@@ -6,11 +6,9 @@ import {
   Flex,
   Text,
   Modal,
-  Button,
   ModalOverlay,
   ModalContent,
   ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
   useDisclosure
@@ -35,6 +33,7 @@ const EditorStatusline = () => {
   const [currentLine, setCurrentLine] = useState(1)
   const [totalLine, setTotalLine] = useState(1)
   const [modifyIcon, setModifyIcon] = useState('')
+  const [messageHistory, setMessageHistory] = useState([])
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -57,7 +56,6 @@ const EditorStatusline = () => {
       PubSubConfig.statusLineClear,
       (_msg, ifClear) => {
         if (ifClear) {
-          setModifyIcon('')
           setMessage('')
         }
       }
@@ -73,9 +71,15 @@ const EditorStatusline = () => {
   useEffect(() => {
     window.electronAPI.sendSavedInfo((_event, info, err) => {
       if (err) {
-        setMessage(info + '[GotError]' + err)
+        setMessage([info, '[GotError]', err, messageTime()].join(' '))
+        setMessageHistory(v => [
+          ...v,
+          [info, '[GotError]', err, messageTime() + '\n'].join(' ')
+        ])
+      } else {
+        setMessage([info, messageTime()].join(' '))
+        setMessageHistory(v => [...v, [info, messageTime() + '\n'].join(' ')])
       }
-      setMessage([info, messageTime()].join(' '))
     })
 
     return () => {
@@ -127,13 +131,7 @@ const EditorStatusline = () => {
         <ModalContent>
           <ModalHeader>The message from main process</ModalHeader>
           <ModalCloseButton />
-          <ModalBody>{message}</ModalBody>
-
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={onClose}>
-              Close
-            </Button>
-          </ModalFooter>
+          <ModalBody>{messageHistory}</ModalBody>
         </ModalContent>
       </Modal>
     </>
