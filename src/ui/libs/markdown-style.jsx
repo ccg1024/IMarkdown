@@ -12,41 +12,60 @@ const MarkdownStyle = () => {
         },
         '.preview h1': {
           fontSize: '2em',
-          margin: '8px 0',
+          marginBottom: '1em',
           fontWeight: 'bold',
-          borderBottom: '2px solid'
+          textDecoration: 'underline',
+          textDecorationThickness: '4px',
+          textUnderlineOffset: '8px',
+          textDecorationColor: '#A0AEC0'
         },
         '.preview h2': {
           fontSize: '1.8em',
-          margin: '6px 0',
+          marginBottom: '1em',
           fontWeight: 'bold',
-          borderBottom: '2px dashed'
+          textDecoration: 'underline',
+          textDecorationThickness: '4px',
+          textUnderlineOffset: '8px',
+          textDecorationColor: '#A0AEC0'
         },
         '.preview h3': {
           fontSize: '1.6em',
-          margin: '4px 0',
-          fontWeight: 'bold'
+          marginBottom: '1em',
+          fontWeight: 'bold',
+          textDecoration: 'underline',
+          textDecorationThickness: '4px',
+          textUnderlineOffset: '8px',
+          textDecorationColor: '#A0AEC0'
         },
         '.preview h4': {
           fontSize: '1.4em',
-          margin: '4px 0',
-          fontWeight: 'bold'
+          marginBottom: '1em',
+          fontWeight: 'bold',
+          textDecoration: 'underline',
+          textDecorationThickness: '4px',
+          textUnderlineOffset: '8px',
+          textDecorationColor: '#A0AEC0'
         },
         '.preview h5': {
           fontSize: '1.2em',
-          margin: '4px 0',
-          fontWeight: 'bold'
+          marginBottom: '1em',
+          fontWeight: 'bold',
+          textDecoration: 'underline',
+          textDecorationThickness: '4px',
+          textUnderlineOffset: '8px',
+          textDecorationColor: '#A0AEC0'
         },
         '.preview h6': {
           fontSize: '1em',
-          margin: '4px 0',
-          fontWeight: 'bold'
+          marginBottom: '1em',
+          fontWeight: 'bold',
+          textDecoration: 'underline',
+          textDecorationThickness: '4px',
+          textUnderlineOffset: '8px',
+          textDecorationColor: '#A0AEC0'
         },
         '.preview p': {
-          margin: '10px 0'
-        },
-        '.preview ul': {
-          margin: '10px 0'
+          margin: '1em 0'
         },
         '.katex-mathml': {
           display: 'none'

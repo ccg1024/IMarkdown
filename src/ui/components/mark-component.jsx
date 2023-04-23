@@ -6,7 +6,7 @@ import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import ReactMarkdown from 'react-markdown'
 import SyntaxHighlighter from 'react-syntax-highlighter'
-import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs'
+import docco from 'react-syntax-highlighter/dist/esm/styles/hljs/docco'
 import {
   Box,
   Code,
@@ -30,24 +30,24 @@ import MarkdownStyle from '../libs/markdown-style'
 
 const MarkComponent = ({ doc, openedPath }) => {
   const path = window.electronAPI.require('path')
+  const colors = {
+    blockquote: useColorModeValue('gray.100', 'whiteAlpha.200'),
+    code: useColorModeValue('#3D7AED', '#FF63C3')
+  }
   return (
     <>
       <MarkdownStyle />
       <ReactMarkdown
         className="preview"
-        children={doc}
         components={{
           blockquote: ({ node, ...props }) => {
             return (
               <Box
-                borderRadius="5px"
-                bg={useColorModeValue('whiteAlpha.500', 'blackAlpha.500')}
-                pl={2}
-                pr={2}
-                mt={2}
-                mb={2}
-                pt="1px"
-                pb="1px"
+                overflow="auto"
+                borderRadius="md"
+                bg={colors.blockquote}
+                padding="0.5em"
+                marginY="1em"
                 boxShadow="lg"
                 {...props}
               />
@@ -62,14 +62,14 @@ const MarkComponent = ({ doc, openedPath }) => {
           },
           ol: ({ node, ...props }) => {
             props.ordered = 'true'
-            return <OrderedList p={0} marginInlineStart="1em" {...props} />
+            return <OrderedList p={0} {...props} />
           },
           li: ({ node, ...props }) => {
             props.ordered = props.ordered.toString()
             return <ListItem textAlign="justify" {...props} />
           },
           p: ({ node, ...props }) => {
-            return <Text {...props} />
+            return <Text overflow="auto" {...props} />
           },
           img: ({ node, src, ...props }) => {
             if (src.startsWith('.')) {
@@ -84,6 +84,7 @@ const MarkComponent = ({ doc, openedPath }) => {
                 borderRadius="md"
                 boxShadow="lg"
                 m="auto"
+                marginY="1em"
               />
             )
           },
@@ -116,7 +117,6 @@ const MarkComponent = ({ doc, openedPath }) => {
             const match = /language-(\w+)/.exec(className || '')
             return !inline && match ? (
               <SyntaxHighlighter
-                children={String(children).replace(/\n$/, '')}
                 style={docco}
                 language={match[1]}
                 showLineNumbers="true"
@@ -127,13 +127,16 @@ const MarkComponent = ({ doc, openedPath }) => {
                   borderRadius: '5px'
                 }}
                 {...props}
-              />
+              >
+                {String(children).replace(/\n$/, '')}
+              </SyntaxHighlighter>
             ) : (
               <Code
                 fontWeight="bold"
-                color={useColorModeValue('#3D7AED', '#FF63C3')}
+                color={colors.code}
                 className={className}
                 fontSize="1em"
+                backgroundColor="unset"
                 {...props}
               >
                 {children}
@@ -144,7 +147,9 @@ const MarkComponent = ({ doc, openedPath }) => {
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[rehypeKatex, rehypeRaw]}
         sourcePos={true}
-      />
+      >
+        {doc}
+      </ReactMarkdown>
     </>
   )
 }
