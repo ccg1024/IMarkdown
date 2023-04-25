@@ -5,7 +5,8 @@ function generateMenus(
   saveFileCallback,
   createFileCallback,
   togglePreviewCallback,
-  toggleEditorCallback
+  toggleEditorCallback,
+  livePreviewCallback
 ) {
   const template = [
     // { role: 'appMenu' }
@@ -60,6 +61,10 @@ function generateMenus(
           click: toggleEditorCallback,
           accelerator:
             process.platform === 'darwin' ? 'Cmd+Shift+e' : 'Ctrl+Shift+e'
+        },
+        {
+          label: 'Live Preview',
+          click: livePreviewCallback
         },
         { type: 'separator' },
         { role: 'reload' },

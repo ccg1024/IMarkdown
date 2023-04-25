@@ -27,12 +27,15 @@
     "@electron-forge/maker-zip": "^6.0.1",
     "@electron-forge/plugin-webpack": "^6.0.1",
     "@types/prettier": "^2.7.2",
+    "@types/pubsub-js": "^1.8.3",
     "@vercel/webpack-asset-relocator-loader": "1.7.3",
     "babel-loader": "^9.1.0",
     "css-loader": "^6.0.0",
     "electron": "21.2.3",
     "node-loader": "^2.0.0",
-    "style-loader": "^3.0.0"
+    "style-loader": "^3.0.0",
+    "ts-loader": "^9.4.2",
+    "typescript": "^5.0.4"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.3.7",
@@ -49,11 +52,13 @@
     "@electron/remote": "^2.0.8",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
+    "@lezer/highlight": "^1.1.4",
     "@replit/codemirror-vim": "^6.0.5",
     "electron-squirrel-startup": "^1.0.0",
     "framer-motion": "^7.6.6",
     "lodash": "^4.17.21",
     "prettier": "^2.8.7",
+    "process": "^0.11.10",
     "pubsub-js": "^1.9.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -61,8 +66,14 @@
     "react-markdown": "^8.0.3",
     "react-syntax-highlighter": "^15.5.0",
     "rehype-katex": "^6.0.2",
+    "rehype-parse": "^8.0.4",
     "rehype-raw": "^6.1.1",
+    "rehype-react": "^7.2.0",
+    "rehype-stringify": "^9.0.3",
     "remark-gfm": "^3.0.1",
-    "remark-math": "^5.1.1"
+    "remark-math": "^5.1.1",
+    "remark-parse": "^10.0.1",
+    "remark-rehype": "^10.1.0",
+    "unified": "^10.1.2"
   }
 }

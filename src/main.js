@@ -83,6 +83,9 @@ const createWindow = () => {
   const toggleEditorWrapper = () => {
     mainWindow.webContents.send(ipcChannel.toggleViewChannel, 2)
   }
+  const livePreviewWrapper = () => {
+    mainWindow.webContents.send(ipcChannel.toggleViewChannel, 3)
+  }
 
   // recive file path from renderer
   ipcMain.on(ipcChannel.updateFilePathChannel, (_event, filePath) => {
@@ -196,7 +199,8 @@ const createWindow = () => {
     saveFileWrapper,
     createFileWrapper,
     togglePreviewWrapper,
-    toggleEditorWrapper
+    toggleEditorWrapper,
+    livePreviewWrapper
   )
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)

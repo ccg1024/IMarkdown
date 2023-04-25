@@ -61,9 +61,6 @@ export const transparentTheme = EditorView.theme({
   '.cm-activeLineGutter': {
     backgroundColor: '#90cbf4',
     color: 'black'
-  },
-  '::-webkit-scrollbar': {
-    width: '10px'
   }
 })
 

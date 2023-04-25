@@ -93,3 +93,30 @@ cm.dispatch({ changes: { from: 0, to: cm.state.doc.length, insert: text } })
 为了让特定的文件与应用关联起来，需要在不同的`maker`中配置相应的`extendInfo`属性。
 
 > 不同平台对应不同的`maker`来生成打包文件。
+
+### remark
+
+```shell
+$ npm i assert process
+$ npm i unified remark-gfm remark-parse remark-react
+```
+
+> remark-react is no recommended, using remark-rehype and rehype-react
+
+the purpose of each package
+
+- `assert`: the `assert` module from Node.js, for the browser
+
+- `process`: provide `nextTick` functinality in browser
+
+- `unified`: An interface for processing text using syntax trees. It's what powers **remark(markdown)**, **retext(natural language)**, and **rehype(HTML)**
+
+- `remark-gfm`: remark plugin to support GFM(autolink literals, footnotes, strikethrough, tables, tasklists)
+
+- `remark-parse`: a tool that transforms markdown with plugins, work with `unified`.
+
+- `remark-react`: Legacy plugin to transform to React, not recommended
+
+> **当前问题：同时使用编辑模块与预览模块进行同步编辑时，文件达到一定的大小，就会出现一些卡顿问题，虽然使用`unified`模块渲染的结果在卡顿方面要没那么明显，但依旧存在**。
+
+> 同时，位置同步时，当一行的内容超过真个预览界面时，无法正常显示正在编辑的位置。

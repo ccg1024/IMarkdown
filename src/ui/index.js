@@ -2,6 +2,7 @@ import ReactDOM from 'react-dom/client'
 import React, { StrictMode } from 'react'
 import { ChakraProvider } from '@chakra-ui/react'
 
+import './libs/shim'
 import App from './App.js'
 import theme from './libs/base-theme'
 
