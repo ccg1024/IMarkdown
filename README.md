@@ -33,6 +33,8 @@ npm start
 
 - Auto format
 
+- Live preview
+
 # LICENCE
 
 GPL3.
