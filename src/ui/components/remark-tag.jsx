@@ -21,25 +21,42 @@ import {
   Code
 } from '@chakra-ui/react'
 
+function getStartLine(node) {
+  return node.position.start.line
+}
+function getEndLine(node) {
+  return node.position.end.line
+}
+
 export function RemarkText(props) {
+  let dataLine
+  if (props.node) {
+    dataLine = getStartLine(props.node)
+  }
   return (
-    <Text marginY="1em" data-line={props.position.start.line}>
+    <Text marginY="1em" data-line={dataLine}>
       {props.children}
     </Text>
   )
 }
 
 export function RemarkHeading(props) {
+  let dataLine
+  let tagName = 'h1'
+  if (props.node) {
+    dataLine = getStartLine(props.node)
+    tagName = props.node.tagName
+  }
   return (
     <Heading
-      as={props.tagName}
-      fontSize={'1.' + (6 - props.tagName.replace('h', '')) + 'em'}
+      as={tagName}
+      fontSize={'1.' + (6 - tagName.replace('h', '')) + 'em'}
       marginBottom="1em"
       textDecoration="underline"
       textUnderlineOffset="8px"
       textDecorationThickness="4px"
       textDecorationColor="gray.200"
-      data-line={props.position.start.line}
+      data-line={dataLine}
     >
       {props.children}
     </Heading>
@@ -47,6 +64,11 @@ export function RemarkHeading(props) {
 }
 
 export function RemarkQuote(props) {
+  let dataLine, endLine
+  if (props.node) {
+    dataLine = getStartLine(props.node)
+    endLine = getEndLine(props.node)
+  }
   return (
     <Box
       overflow="auto"
@@ -55,8 +77,8 @@ export function RemarkQuote(props) {
       padding="0.5em"
       marginY="1em"
       boxShadow="lg"
-      data-line={props.position.start.line}
-      data-endline={props.position.end.line}
+      data-line={dataLine}
+      data-endline={endLine}
     >
       {props.children}
     </Box>
@@ -64,15 +86,15 @@ export function RemarkQuote(props) {
 }
 
 export function RemarkLink(props) {
-  return <Link data-line={props.position.start.line}>{props.children}</Link>
+  let dataLine = props.node && getStartLine(props.node)
+  return <Link data-line={dataLine}>{props.children}</Link>
 }
 
 export function RemarkUl(props) {
+  let dataLine = props.node && getStartLine(props.node)
+  let endLine = props.node && getEndLine(props.node)
   return (
-    <UnorderedList
-      data-line={props.position.start.line}
-      data-endline={props.position.end.line}
-    >
+    <UnorderedList data-line={dataLine} data-endline={endLine}>
       {props.children}
     </UnorderedList>
   )
@@ -81,8 +103,8 @@ export function RemarkUl(props) {
 export function RemarkOl(props) {
   return (
     <OrderedList
-      data-line={props.position.start.line}
-      data-endline={props.position.end.line}
+      data-line={props.node && getStartLine(props.node)}
+      data-endline={props.node && getEndLine(props.node)}
     >
       {props.children}
     </OrderedList>
@@ -91,29 +113,21 @@ export function RemarkOl(props) {
 
 export function RemarkLi(props) {
   return (
-    <ListItem data-line={props.position.start.line}>{props.children}</ListItem>
+    <ListItem data-line={props.node && getStartLine(props.node)}>
+      {props.children}
+    </ListItem>
   )
 }
 
 export function RemarkImg(props) {
-  const path = window.electronAPI.require('path')
-  let imgSrc = props.src
-  const openedPath = props.openedPath
-
-  if (imgSrc.startsWith('.')) {
-    let nameLen = path.basename(openedPath).length
-    let pathPre = openedPath.substring(0, openedPath.length - nameLen)
-    imgSrc = pathPre + imgSrc
-  }
-
   return (
     <Image
-      src={'atom:///' + imgSrc}
+      src={'atom://' + props.src}
       borderRadius="md"
       boxShadow="lg"
       m="auto"
       marginY="1em"
-      data-line={props.position.start.line}
+      data-line={props.node && getStartLine(props.node)}
     />
   )
 }
@@ -122,8 +136,8 @@ export function RemarkTable(props) {
   return (
     <TableContainer
       marginY={2}
-      data-line={props.position.start.line}
-      data-endline={props.position.end.line}
+      data-line={props.node && getStartLine(props.node)}
+      data-endline={props.node && getEndLine(props.node)}
     >
       <Table variant="simple" textAlign="left">
         {props.children}
@@ -141,7 +155,9 @@ export function RemarkTbody(props) {
 }
 
 export function RemarkTr(props) {
-  return <Tr data-line={props.position.start.line}>{props.children}</Tr>
+  return (
+    <Tr data-line={props.node && getStartLine(props.node)}>{props.children}</Tr>
+  )
 }
 
 export function RemarkTd(props) {
@@ -156,8 +172,8 @@ export function RemarkCodePre(props) {
   return (
     <Box
       as="pre"
-      data-line={props.position.start.line}
-      data-endline={props.position.end.line}
+      data-line={props.node && getStartLine(props.node)}
+      data-endline={props.node && getEndLine(props.node)}
     >
       {props.children}
     </Box>
@@ -169,8 +185,8 @@ export function RemarkCode(props) {
   const match = /language-(\w+)/.exec(className || '')
   return !inline && match ? (
     <SyntaxHighlighter
-      data-line={props.position.start.line}
-      data-endline={props.position.end.line}
+      data-line={props.node && getStartLine(props.node)}
+      data-endline={props.node && getEndLine(props.node)}
       style={docco}
       language={match[1]}
       showLineNumbers="true"

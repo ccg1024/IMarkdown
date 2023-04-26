@@ -11,8 +11,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on(ipcChannel.toggleViewChannel, callback),
   setFilePath: filePath =>
     ipcRenderer.send(ipcChannel.updateFilePathChannel, filePath),
-  setContentChange: (isChange, filepath) =>
-    ipcRenderer.send(ipcChannel.setIsChangeChannel, isChange, filepath),
+  setContentChange: isChange =>
+    ipcRenderer.send(ipcChannel.setIsChangeChannel, isChange),
   showUnsavedInfo: () => ipcRenderer.send(ipcChannel.showUnsaveChannel),
   removeSaveFile: () =>
     ipcRenderer.removeAllListeners(ipcChannel.saveFileChannel),

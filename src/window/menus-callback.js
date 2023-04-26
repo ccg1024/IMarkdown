@@ -29,6 +29,9 @@ async function openFileCallback(win, openedCache) {
         path.basename(filePath),
         openedCache[converWin32Path(filePath)].isChange
       )
+      return {
+        filePath: converWin32Path(filePath)
+      }
     } else {
       try {
         const fileContent = fs.readFileSync(filePath, 'utf8')

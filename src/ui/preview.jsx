@@ -4,7 +4,7 @@ import { Box } from '@chakra-ui/react'
 
 import MarkComponent from './components/mark-component'
 
-const Preview = ({ doc, openedPath, isVisible, scrollLine }) => {
+const Preview = ({ isVisible, scrollLine }) => {
   // run once after render
   useEffect(() => {
     if (isVisible) {
@@ -45,7 +45,7 @@ const Preview = ({ doc, openedPath, isVisible, scrollLine }) => {
       fontSize="22px"
       display={isVisible ? 'block' : 'none'}
     >
-      {isVisible && <MarkComponent doc={doc} openedPath={openedPath} />}
+      {isVisible && <MarkComponent />}
     </Box>
   )
 }

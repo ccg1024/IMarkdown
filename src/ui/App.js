@@ -1,12 +1,21 @@
 import PubSub from 'pubsub-js'
 import { Flex } from '@chakra-ui/react'
-import React, { useState, useRef, useCallback, useEffect } from 'react'
+import React, {
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+  useLayoutEffect
+} from 'react'
+import { useDispatch } from 'react-redux'
 
 import Editor from './editor'
 import Preview from './preview'
 import FileDir from './components/file-dir'
 import PubSubConfig from '../config/frontend'
 import { getScrollLine } from './libs/tools'
+
+import { modifyContent } from './app/reducers/fileContentSlice'
 
 import NewPreview from './tsx/preview'
 
@@ -19,7 +28,7 @@ const App = () => {
   const [recentFiles, setRecentFiles] = useState({})
   const [isLivePre, setIsLivePre] = useState(false)
 
-  const docRef = useRef('# In development')
+  const dispatch = useDispatch()
 
   const scrollRef = useRef({
     previewScrollTo: 1,
@@ -28,23 +37,17 @@ const App = () => {
   })
   const pathRef = useRef('')
 
-  // update doc from editor
-  const handleDocChange = useCallback(async newDoc => {
-    docRef.current = newDoc
-    if (pathRef.current) {
-      window.electronAPI.updateCache(
-        JSON.stringify({
-          filePath: pathRef.current,
-          fileContent: newDoc
-        })
-      )
-    }
-    PubSub.publish(PubSubConfig.updateSideBySidePre, {
-      doc: newDoc,
-      file: pathRef.current
-    })
+  // when file saved, invoked from editor
+  const handleFileSave = useCallback(() => {
+    setIsChange(false)
+    setRecentFiles(v => ({
+      ...v,
+      [pathRef.current]: {
+        ...v[pathRef.current],
+        isChange: false
+      }
+    }))
   }, [])
-
   // update isChange flag from editor
   const handleIsChange = useCallback(flag => {
     setIsChange(flag)
@@ -57,19 +60,18 @@ const App = () => {
         }
       }))
     }
-  })
-
+  }, [])
   // update opened path from editor when save a empty path file
   const handleOpenedPath = useCallback(path => {
     pathRef.current = path
-  })
+  }, [])
   // update recent file from editor when save a empty path file
   const handleRecentFiles = useCallback(fullpath => {
     setRecentFiles(v => ({
       ...v,
       [fullpath]: { filename: path.basename(fullpath), isChange: false }
     }))
-  })
+  }, [])
 
   const toggleView = (_event, value) => {
     switch (value) {
@@ -97,12 +99,6 @@ const App = () => {
   }
 
   useEffect(() => {
-    if (pathRef.current) {
-      window.electronAPI.setContentChange(isChange, pathRef.current)
-    }
-  }, [isChange])
-
-  useEffect(() => {
     window.electronAPI.openFile(handleOpenFile)
     window.electronAPI.toggleView(toggleView)
     return () => {
@@ -115,20 +111,18 @@ const App = () => {
     scrollRef.current.editorScrollTo = 1
     pathRef.current = fullPath
 
-    docRef.current = fileContent
+    dispatch(modifyContent(fileContent))
     setRecentFiles(v => ({ ...v, [fullPath]: { filename, isChange } }))
     setIsChange(isChange)
     setShowEditor(true)
     setShowPreview(false)
-
-    window.electronAPI.setFilePath(fullPath)
 
     PubSub.publish(PubSubConfig.reCreateStateChannel, fileContent)
     PubSub.publish(PubSubConfig.statusLineModify, isChange)
   }
 
   // setting config
-  useEffect(() => {
+  useLayoutEffect(() => {
     window.electronAPI.getConfigPath().then(configJson => {
       try {
         const settings = JSON.parse(configJson)
@@ -158,23 +152,6 @@ const App = () => {
     })
   }, [])
 
-  useEffect(() => {
-    let token = PubSub.subscribe(PubSubConfig.fileSaved, (_msg, _data) => {
-      setIsChange(false)
-      setRecentFiles(v => ({
-        ...v,
-        [pathRef.current]: {
-          ...v[pathRef.current],
-          isChange: false
-        }
-      }))
-    })
-
-    return () => {
-      PubSub.unsubscribe(token)
-    }
-  }, [])
-
   return (
     <>
       <Flex height="100%" width="100%" id="content_root">
@@ -184,25 +161,16 @@ const App = () => {
           isChange={isChange}
         />
         <Editor
-          onChange={handleDocChange}
           isChangeCallback={handleIsChange}
           isVisible={showEditor}
           scrollLine={scrollRef.current}
           openedPathCallback={handleOpenedPath}
           recentFilesCallback={handleRecentFiles}
           recentFiles={recentFiles}
+          fileSaveCallback={handleFileSave}
         />
-        <Preview
-          doc={docRef.current}
-          openedPath={pathRef.current}
-          isVisible={showPreview}
-          scrollLine={scrollRef.current}
-        />
-        <NewPreview
-          doc={docRef.current}
-          openedPath={pathRef.current}
-          isVisible={isLivePre}
-        />
+        <Preview isVisible={showPreview} scrollLine={scrollRef.current} />
+        <NewPreview isVisible={isLivePre} />
       </Flex>
     </>
   )

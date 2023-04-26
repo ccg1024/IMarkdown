@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import PubSub from 'pubsub-js'
 import React, {
   useEffect,
@@ -13,6 +12,7 @@ import remarkGfm from 'remark-gfm'
 import remarkParse from 'remark-parse'
 import remarkRehype from 'remark-rehype'
 import rehypeReact from 'rehype-react'
+import { useSelector } from 'react-redux'
 
 import {
   RemarkText,
@@ -33,11 +33,11 @@ import {
   RemarkCode
 } from '../components/remark-tag'
 
+import { selectFileContent } from '../app/reducers/fileContentSlice'
+
 import PubSubConfig from '../../config/frontend'
 
 interface Props {
-  doc: string
-  openedPath: string
   isVisible: boolean
 }
 
@@ -46,17 +46,19 @@ interface LineDataSet {
   endline: number
 }
 
-interface UpdateDocInfo {
-  doc: string
-  file: string
+interface TimeoutController {
+  throttleTimer: any
+  debounceTimer: any
 }
 
-function updatePreview(
-  doc: string,
-  openedPath: string,
-  setContent: Function
-): void {
-  unified()
+// global controlls
+const timeoutController: TimeoutController = {
+  throttleTimer: null,
+  debounceTimer: null
+}
+
+function updatePreview(doc: string): React.ReactNode {
+  return unified()
     .use(remarkParse)
     .use(remarkGfm)
     .use(remarkRehype)
@@ -65,82 +67,73 @@ function updatePreview(
       Fragment,
       passNode: true,
       components: {
-        p: props => <RemarkText {...props.node} {...props} />,
-        h1: props => <RemarkHeading {...props.node} {...props} />,
-        h2: props => <RemarkHeading {...props.node} {...props} />,
-        h3: props => <RemarkHeading {...props.node} {...props} />,
-        h4: props => <RemarkHeading {...props.node} {...props} />,
-        h5: props => <RemarkHeading {...props.node} {...props} />,
-        h6: props => <RemarkHeading {...props.node} {...props} />,
-        blockquote: props => <RemarkQuote {...props.node} {...props} />,
-        a: props => <RemarkLink {...props.node} {...props} />,
-        ul: props => <RemarkUl {...props.node} {...props} />,
-        ol: props => <RemarkOl {...props.node} {...props} />,
-        li: props => <RemarkLi {...props.node} {...props} />,
-        img: props => (
-          <RemarkImg {...props.node} {...props} openedPath={openedPath} />
-        ),
-        table: props => <RemarkTable {...props.node} {...props} />,
+        p: RemarkText,
+        h1: RemarkHeading,
+        h2: RemarkHeading,
+        h3: RemarkHeading,
+        h4: RemarkHeading,
+        h5: RemarkHeading,
+        h6: RemarkHeading,
+        blockquote: RemarkQuote,
+        a: RemarkLink,
+        ul: RemarkUl,
+        ol: RemarkOl,
+        li: RemarkLi,
+        table: RemarkTable,
         thead: RemarkThead,
         tbody: RemarkTbody,
-        tr: props => <RemarkTr {...props.node} {...props} />,
+        tr: RemarkTr,
         td: RemarkTd,
         th: RemarkTh,
-        code: props => <RemarkCode {...props.node} {...props} />,
-        pre: props => <RemarkCodePre {...props.node} {...props} />
+        code: RemarkCode,
+        pre: RemarkCodePre,
+        img: RemarkImg
       }
     })
-    .process(doc)
-    .then(file => {
-      setContent(file.result)
-    })
+    .processSync(doc).result
 }
 
 const NewPreview: React.FC<Props> = props => {
   const [Content, setContent] = useState(<Fragment />)
-  const throttleRef: any = useRef(null)
-  const debounceRef: any = useRef(null)
   const domRef: React.MutableRefObject<any> = useRef(null)
-  const oldCursorLine: React.MutableRefObject<number> = useRef(1)
+  const doc = useSelector(selectFileContent)
 
   useEffect(() => {
-    updatePreview(props.doc, props.openedPath, setContent)
-  }, [props.doc, props.openedPath])
+    if (!timeoutController.throttleTimer) {
+      timeoutController.throttleTimer = setTimeout(() => {
+        const md = updatePreview(doc)
+        setContent(<>{md}</>)
+        timeoutController.throttleTimer = null
+      }, 1000)
+    }
+
+    if (timeoutController.debounceTimer)
+      clearTimeout(timeoutController.debounceTimer)
+
+    timeoutController.debounceTimer = setTimeout(() => {
+      const md = updatePreview(doc)
+      setContent(<>{md}</>)
+    }, 1500)
+  }, [doc])
 
   useEffect(() => {
-    let token = PubSub.subscribe(
-      PubSubConfig.updateSideBySidePre,
-      (_data, data: UpdateDocInfo) => {
-        if (!throttleRef.current) {
-          throttleRef.current = setTimeout(() => {
-            updatePreview(data.doc, data.file, setContent)
-            throttleRef.current = null
-          }, 500)
-        }
-
-        if (debounceRef.current) clearTimeout(debounceRef.current)
-
-        debounceRef.current = setTimeout(() => {
-          updatePreview(data.doc, data.file, setContent)
-        }, 1500)
-      }
-    )
-
-    let token2 = PubSub.subscribe(
-      PubSubConfig.syncUpdateDocScroll,
-      (_msg: string, cursorLine: number) => {
-        if (true) {
-          oldCursorLine.current = cursorLine
+    if (props.isVisible) {
+      let token2 = PubSub.subscribe(
+        PubSubConfig.syncUpdateDocScroll,
+        (_msg: string, cursorLine: number) => {
+          let jumped = false
           for (let childDom of domRef.current.children) {
             let lineDataSet: LineDataSet = childDom.dataset
             if (Number(lineDataSet.line) > cursorLine) {
               childDom.scrollIntoView()
               childDom.scrollIntoView({ block: 'center', inline: 'nearest' })
+              jumped = true
               break
             }
             if (Number(lineDataSet.line) === cursorLine) {
               childDom.scrollIntoView()
               childDom.scrollIntoView({ block: 'center', inline: 'nearest' })
+              jumped = true
               break
             } else if (
               Number(lineDataSet.endline) &&
@@ -156,17 +149,20 @@ const NewPreview: React.FC<Props> = props => {
                 offsetFromTop -
                 clientHeight / 2 +
                 (elementHeight / totalRows) * offsetStart
+              jumped = true
               break
             }
           }
+          if (!jumped) {
+            domRef.current.scrollTop = domRef.current.scrollHeight
+          }
         }
+      )
+      return () => {
+        PubSub.unsubscribe(token2)
       }
-    )
-    return () => {
-      PubSub.unsubscribe(token)
-      PubSub.unsubscribe(token2)
     }
-  }, [])
+  }, [props.isVisible])
 
   return (
     <Box

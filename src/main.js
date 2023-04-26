@@ -62,6 +62,10 @@ const createWindow = () => {
           isChange: fileObj.isChange
         }
       }
+      if (fileObj) {
+        openFilePath = fileObj.filePath
+        mainWindow.setTitle(openFilePath)
+      }
     })
   }
   const saveFileWrapper = () => {
@@ -74,6 +78,8 @@ const createWindow = () => {
           fileContent: fileObj.fileContent,
           isChange: fileObj.isChange
         }
+        openFilePath = fileObj.filePath
+        mainWindow.setTitle(openFilePath)
       }
     })
   }
@@ -87,23 +93,30 @@ const createWindow = () => {
     mainWindow.webContents.send(ipcChannel.toggleViewChannel, 3)
   }
 
+  // TEST: just for develop, to reset openFilePath
+  // should not show in reall production
+  const devToolResetOpenFilePath = () => {
+    openFilePath = ''
+    mainWindow.setTitle('IMarkdown')
+  }
+
   // recive file path from renderer
-  ipcMain.on(ipcChannel.updateFilePathChannel, (_event, filePath) => {
-    if (filePath) {
-      openFilePath = filePath
-      mainWindow.setTitle(openFilePath.replace(/^.*?\//, ''))
-    }
-  })
+  // ipcMain.on(ipcChannel.updateFilePathChannel, (_event, filePath) => {
+  //   if (filePath) {
+  //     openFilePath = filePath
+  //     mainWindow.setTitle(openFilePath.replace(/^.*?\//, ''))
+  //   }
+  // })
 
   // recive content change flag
-  ipcMain.on(ipcChannel.setIsChangeChannel, (_event, isChange, filepath) => {
-    if (filepath) {
-      if (!Object.hasOwn(fileCache, filepath)) {
-        fileCache[filepath] = {}
-      }
-      fileCache[filepath].isChange = isChange
-    }
-  })
+  // ipcMain.on(ipcChannel.setIsChangeChannel, (_event, isChange) => {
+  //   if (openFilePath) {
+  //     if (!Object.hasOwn(fileCache, openFilePath)) {
+  //       fileCache[openFilePath] = {}
+  //     }
+  //     fileCache[openFilePath].isChange = isChange
+  //   }
+  // })
 
   // show unsaved info, when using recient file
   // ipcMain.on(ipcChannel.showUnsaveChannel, _event => {
@@ -129,6 +142,11 @@ const createWindow = () => {
     fileCache[path].fileContent = content
     fileCache[path].isChange = false
 
+    if (!openFilePath) {
+      openFilePath = path
+      mainWindow.setTitle(openFilePath)
+    }
+
     mainWindow.webContents.send(
       ipcChannel.sendSavedInfo,
       path + ' written',
@@ -136,6 +154,7 @@ const createWindow = () => {
     )
   })
 
+  // open recent file when click side file dir component
   ipcMain.on(ipcChannel.openRecentFile, (_event, filepath) => {
     if (Object.hasOwn(fileCache, filepath)) {
       mainWindow.webContents.send(
@@ -145,9 +164,12 @@ const createWindow = () => {
         path.basename(filepath),
         fileCache[filepath].isChange
       )
+      openFilePath = filepath
+      mainWindow.setTitle(openFilePath)
     }
   })
 
+  // handle vim option
   ipcMain.handle(ipcChannel.vimOptionChannel, async (_event, value) => {
     const jsonData = JSON.parse(value)
     if (vimOption.writeFile === jsonData.option) {
@@ -163,22 +185,26 @@ const createWindow = () => {
           path.basename(jsonData.filepath),
           fileCache[jsonData.filepath].isChange
         )
+        openFilePath = jsonData.filepath
+        mainWindow.setTitle(openFilePath)
       }
     }
   })
 
+  // update file cache from renderer
   ipcMain.handle(ipcChannel.updateCacheFromReact, async (_event, cache) => {
-    if (cache) {
+    if (cache && openFilePath) {
       const jsonData = JSON.parse(cache)
-      if (!Object.hasOwn(fileCache, jsonData.filePath)) {
-        fileCache[jsonData.filePath] = {}
+      if (!Object.hasOwn(fileCache, openFilePath)) {
+        fileCache[openFilePath] = {}
       }
-      fileCache[jsonData.filePath].fileContent = jsonData.fileContent
+      fileCache[openFilePath].fileContent = jsonData.fileContent
+      fileCache[openFilePath].isChange = true
     }
   })
 
   // show close dialog
-  mainWindow.on('close', function (e) {
+  mainWindow.on('close', function(e) {
     let showCloseDialog = false
     for (let key in fileCache) {
       if (fileCache[key].isChange === true) {
@@ -200,7 +226,8 @@ const createWindow = () => {
     createFileWrapper,
     togglePreviewWrapper,
     toggleEditorWrapper,
-    livePreviewWrapper
+    livePreviewWrapper,
+    devToolResetOpenFilePath
   )
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
@@ -225,7 +252,10 @@ app.whenReady().then(() => {
     }
   })
   protocol.registerFileProtocol('atom', (request, callback) => {
-    const url = request.url.substring(7)
+    let url = request.url.substring(7)
+    if (url.startsWith('.') && openFilePath) {
+      url = path.join(path.dirname(openFilePath), url)
+    }
     callback(decodeURI(path.normalize(url)))
   })
 })

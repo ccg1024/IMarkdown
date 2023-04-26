@@ -25,15 +25,18 @@ import {
   UnorderedList,
   useColorModeValue
 } from '@chakra-ui/react'
+import { useSelector } from 'react-redux'
 
 import MarkdownStyle from '../libs/markdown-style'
 
-const MarkComponent = ({ doc, openedPath }) => {
-  const path = window.electronAPI.require('path')
+import { selectFileContent } from '../app/reducers/fileContentSlice'
+
+const MarkComponent = () => {
   const colors = {
     blockquote: useColorModeValue('gray.100', 'whiteAlpha.200'),
     code: useColorModeValue('#3D7AED', '#FF63C3')
   }
+  const doc = useSelector(selectFileContent)
   return (
     <>
       <MarkdownStyle />
@@ -72,14 +75,9 @@ const MarkComponent = ({ doc, openedPath }) => {
             return <Text overflow="auto" {...props} />
           },
           img: ({ node, src, ...props }) => {
-            if (src.startsWith('.')) {
-              let nameLen = path.basename(openedPath).length
-              let pathPre = openedPath.substring(0, openedPath.length - nameLen)
-              src = pathPre + src
-            }
             return (
               <Image
-                src={'atom:///' + src}
+                src={'atom://' + src}
                 {...props}
                 borderRadius="md"
                 boxShadow="lg"

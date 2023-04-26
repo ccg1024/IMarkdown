@@ -5,7 +5,7 @@ export interface IElectronAPI {
   require: (callback: any) => Promise<void>
   toggleView: (callback: any) => Promise<void>
   setFilePath: (filePath: string) => Promise<void>
-  setContentChange: (isChange: boolean, filepath: string) => Promise<void>
+  setContentChange: (isChange: boolean) => Promise<void>
   showUnsavedInfo: () => Promise<void>
   removeSaveFile: () => Promise<void>
   removeOpenFile: () => Promise<void>
