@@ -2,35 +2,20 @@ import PubSub from 'pubsub-js'
 import { Box, useDisclosure } from '@chakra-ui/react'
 import { Vim } from '@replit/codemirror-vim'
 import { EditorView } from '@codemirror/view'
-import { EditorState } from '@codemirror/state'
 import React, { useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { Init_extends } from './components/use-codemirror.jsx'
 import EditorStatusline from './components/editor-statusline.jsx'
 import { TeleRecentFile } from './components/telescope.jsx'
-import { modifyContent } from './app/reducers/fileContentSlice'
 
+import {
+  generateEditor,
+  clear as clearGenerateEditor
+} from './libs/generate-editor.js'
 import PubSubConfig from '../config/frontend'
 import { formateContent } from '../utils/frontend'
 const ipcChannels = require('../config/backend')
 const { vimOption } = require('../config/vim-option')
-
-// global contronl
-const controlls = {
-  oldCursor: 0,
-  cursorTimer: null,
-  scrollTimer: null,
-  changeGate: false
-}
-
-function updateCacheToMainProcess(cache) {
-  window.electronAPI.updateCache(
-    JSON.stringify({
-      fileContent: cache
-    })
-  )
-}
 
 const Editor = ({
   isChangeCallback,
@@ -43,73 +28,12 @@ const Editor = ({
 }) => {
   // initial codemirror
   const refContainer = useRef(null)
-  const cm = useRef(null)
+  const cmRef = useRef(null)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const reduxDispatch = useDispatch()
 
-  // can not initital in state, case the page not renderer
   useEffect(() => {
-    if (!refContainer.current) {
-      return
-    }
-
-    const startState = EditorState.create({
-      doc: '# In development',
-      extensions: [
-        EditorView.updateListener.of(update => {
-          if (update.docChanged) {
-            if (!controlls.changeGate) {
-              isChangeCallback(true)
-              PubSub.publish(PubSubConfig.statusLineModify, true)
-              controlls.changeGate = true
-            }
-            reduxDispatch(modifyContent(update.state.doc.toString()))
-            updateCacheToMainProcess(update.state.doc.toString())
-          }
-
-          if (update.selectionSet) {
-            // listen cursor move
-            if (controlls.cursorTimer) {
-              clearTimeout(controlls.cursorTimer)
-            }
-
-            controlls.cursorTimer = setTimeout(() => {
-              let cursorPos = update.state.selection.main.head
-              let currentLine = update.state.doc.lineAt(cursorPos).number
-              let totalLine = update.state.doc.lines
-              PubSub.publish(PubSubConfig.statusLineInfo, {
-                current: currentLine,
-                total: totalLine
-              })
-
-              PubSub.publish(PubSubConfig.syncUpdateDocScroll, currentLine)
-            }, 100)
-          }
-        }),
-        EditorView.domEventHandlers({
-          scroll(_event, view) {
-            if (!refContainer.current.matches(':hover')) {
-              return
-            }
-            if (!controlls.scrollTimer) {
-              controlls.scrollTimer = setTimeout(() => {
-                const scrollPos = view.elementAtHeight(
-                  view.scrollDOM.scrollTop
-                ).from
-                // get line number
-                scrollLine.previewScrollTo =
-                  view.state.doc.lineAt(scrollPos).number
-                controlls.scrollTimer = null
-              }, 500)
-            }
-          }
-        }),
-        ...Init_extends()
-      ]
-    })
-
-    // add view keymap, just need once
     Vim.unmap('<Space>')
     Vim.map('<C-n>', ':nohl<cr>')
     Vim.defineEx('write', 'w', () => {
@@ -133,26 +57,37 @@ const Editor = ({
     })
     Vim.map('<Space>n', ':telescopeRecentFile<cr>')
 
-    const view = new EditorView({
-      state: startState,
-      parent: refContainer.current
-    })
-
-    // setEditorView(view)
-    // the initial must in top, to ensure below cm.current have value
-    cm.current = view
-    view.focus()
+    let editorToken = PubSub.subscribe(
+      PubSubConfig.reCreateStateChannel,
+      (_msg, data) => {
+        scrollLine.previewScrollTo = 1
+        const view = new EditorView({
+          state: generateEditor(
+            data,
+            scrollLine,
+            isChangeCallback,
+            reduxDispatch
+          ),
+          parent: refContainer.current
+        })
+        if (cmRef.current) {
+          cmRef.current.destroy()
+        }
+        view.focus()
+        cmRef.current = view
+        clearGenerateEditor(PubSubConfig.statusLineClear)
+      }
+    )
 
     return () => {
-      // console.log('[return editor.jsx] run initial drop')
-      view.destroy()
+      PubSub.unsubscribe(editorToken)
     }
-  }, [refContainer])
+  }, [])
 
   useEffect(() => {
-    if (cm.current && isVisible) {
-      const lineObj = cm.current.state.doc.line(scrollLine.editorScrollTo)
-      cm.current.dispatch({
+    if (cmRef.current && isVisible) {
+      const lineObj = cmRef.current.state.doc.line(scrollLine.editorScrollTo)
+      cmRef.current.dispatch({
         selection: {
           anchor: lineObj.from,
           head: lineObj.from
@@ -160,98 +95,22 @@ const Editor = ({
         effects: EditorView.scrollIntoView(lineObj.from, { y: 'start' }),
         scrollIntoView: true
       })
-      return () => { }
+      return () => {}
     }
-  }, [cm, isVisible])
-
-  // activate create new state
-  useEffect(() => {
-    if (cm.current) {
-      let token = PubSub.subscribe(
-        PubSubConfig.reCreateStateChannel,
-        (_msg, data) => {
-          scrollLine.previewScrollTo = 1
-          cm.current.scrollDOM.scrollTop = 0
-          cm.current.setState(
-            EditorState.create({
-              doc: data ? data : '',
-              extensions: [
-                EditorView.updateListener.of(update => {
-                  if (update.docChanged) {
-                    if (!controlls.changeGate) {
-                      isChangeCallback(true)
-                      PubSub.publish(PubSubConfig.statusLineModify, true)
-                      controlls.changeGate = true
-                    }
-                    reduxDispatch(modifyContent(update.state.doc.toString()))
-                    updateCacheToMainProcess(update.state.doc.toString())
-                  }
-                  if (update.selectionSet) {
-                    // listen cursor move
-                    if (controlls.cursorTimer) {
-                      clearTimeout(controlls.cursorTimer)
-                    }
-
-                    controlls.cursorTimer = setTimeout(() => {
-                      let cursorPos = update.state.selection.main.head
-                      let currentLine =
-                        update.state.doc.lineAt(cursorPos).number
-                      let totalLine = update.state.doc.lines
-                      PubSub.publish(PubSubConfig.statusLineInfo, {
-                        current: currentLine,
-                        total: totalLine
-                      })
-                      PubSub.publish(
-                        PubSubConfig.syncUpdateDocScroll,
-                        currentLine
-                      )
-                    }, 100)
-                  }
-                }),
-                EditorView.domEventHandlers({
-                  scroll(_event, view) {
-                    if (!refContainer.current.matches(':hover')) {
-                      return
-                    }
-                    if (!controlls.scrollTimer) {
-                      controlls.scrollTimer = setTimeout(() => {
-                        const scrollPos = view.elementAtHeight(
-                          view.scrollDOM.scrollTop
-                        ).from
-                        scrollLine.previewScrollTo =
-                          view.state.doc.lineAt(scrollPos).number
-                        controlls.scrollTimer = null
-                      }, 500)
-                    }
-                  }
-                }),
-                ...Init_extends()
-              ]
-            })
-          )
-
-          controlls.changeGate = null
-          PubSub.publish(PubSubConfig.statusLineClear, true)
-        }
-      )
-      return () => {
-        PubSub.unsubscribe(token)
-      }
-    }
-  }, [cm])
+  }, [cmRef.current, isVisible])
 
   useEffect(() => {
-    if (cm.current) {
+    if (cmRef.current) {
       window.electronAPI.saveFile(handleSaveFile)
 
       return () => {
         window.electronAPI.removeSaveFile()
       }
     }
-  }, [cm])
+  }, [cmRef.current])
 
   function handleSaveFile(event, saveFilePath, saveFlag) {
-    const formatedContent = formateContent(cm.current)
+    const formatedContent = formateContent(cmRef.current)
 
     event.sender.send(
       ipcChannels.reciveContentChannel,
@@ -266,12 +125,11 @@ const Editor = ({
     }
 
     fileSaveCallback()
-    PubSub.publish(PubSubConfig.statusLineModify, false)
-    controlls.changeGate = null
+    clearGenerateEditor(PubSubConfig.statusLineModify)
   }
 
   function focuseCallback() {
-    cm.current.focus()
+    cmRef.current.focus()
   }
 
   return (

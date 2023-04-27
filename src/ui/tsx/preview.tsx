@@ -169,7 +169,6 @@ const PresentRehype: React.FC = () => {
 
     timeoutController.debounceTimer = setTimeout(() => {
       const md = updatePreview(doc)
-      console.log(md)
       setContent(<>{md}</>)
     }, 300)
   }, [doc])

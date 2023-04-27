@@ -19,6 +19,7 @@ const {
 } = require('./window/menus-callback')
 
 const { vimOption } = require('./config/vim-option')
+const { formatWinTitle } = require('./utils/backend')
 
 // ---------------------------------------------
 require('@electron/remote/main').initialize()
@@ -64,7 +65,7 @@ const createWindow = () => {
       }
       if (fileObj) {
         openFilePath = fileObj.filePath
-        mainWindow.setTitle(openFilePath)
+        mainWindow.setTitle(formatWinTitle(openFilePath))
       }
     })
   }
@@ -79,7 +80,7 @@ const createWindow = () => {
           isChange: fileObj.isChange
         }
         openFilePath = fileObj.filePath
-        mainWindow.setTitle(openFilePath)
+        mainWindow.setTitle(formatWinTitle(openFilePath))
       }
     })
   }
@@ -137,7 +138,7 @@ const createWindow = () => {
 
     if (!openFilePath) {
       openFilePath = path
-      mainWindow.setTitle(openFilePath)
+      mainWindow.setTitle(formatWinTitle(openFilePath))
     }
 
     mainWindow.webContents.send(
@@ -158,7 +159,7 @@ const createWindow = () => {
         fileCache[filepath].isChange
       )
       openFilePath = filepath
-      mainWindow.setTitle(openFilePath)
+      mainWindow.setTitle(formatWinTitle(openFilePath))
     }
   })
 
@@ -179,7 +180,7 @@ const createWindow = () => {
           fileCache[jsonData.filepath].isChange
         )
         openFilePath = jsonData.filepath
-        mainWindow.setTitle(openFilePath)
+        mainWindow.setTitle(formatWinTitle(openFilePath))
       }
     }
   })

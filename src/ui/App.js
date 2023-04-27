@@ -99,6 +99,10 @@ const App = () => {
   }
 
   useEffect(() => {
+    PubSub.publish(PubSubConfig.reCreateStateChannel, '# initial editor')
+  }, [])
+
+  useEffect(() => {
     window.electronAPI.openFile(handleOpenFile)
     window.electronAPI.toggleView(toggleView)
     return () => {

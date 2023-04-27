@@ -19,7 +19,12 @@ function converWin32Path(filePath) {
   return filePath.split(path.sep).join(path.posix.sep)
 }
 
+function formatWinTitle(path) {
+  return path.replace(/^.*?\//, '')
+}
+
 module.exports = {
   logTime,
-  converWin32Path
+  converWin32Path,
+  formatWinTitle
 }
