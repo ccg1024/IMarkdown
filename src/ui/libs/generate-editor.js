@@ -10,7 +10,8 @@ import PubSubConfig from '../../config/frontend'
 const controlls = {
   closeChangeGate: false,
   cursorTimer: null,
-  scrollTimer: null
+  scrollTimer: null,
+  closeGhostGate: false
 }
 
 function updateCacheToMainProcess(doc) {
@@ -25,7 +26,8 @@ export function generateEditor(
   doc,
   scrollLine,
   isChangeCallback,
-  reduxDispatch
+  reduxDispatch,
+  setShowGhostCallback
 ) {
   scrollLine.previewScrollTo = 1
   const state = EditorState.create({
@@ -34,6 +36,10 @@ export function generateEditor(
       EditorView.updateListener.of(update => {
         // for doc change
         if (update.docChanged) {
+          if (!controlls.closeGhostGate) {
+            setShowGhostCallback(false)
+            controlls.closeGhostGate = true
+          }
           if (!controlls.closeChangeGate) {
             isChangeCallback(true)
             PubSub.publish(PubSubConfig.statusLineModify, true)

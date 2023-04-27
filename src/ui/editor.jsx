@@ -2,11 +2,12 @@ import PubSub from 'pubsub-js'
 import { Box, useDisclosure } from '@chakra-ui/react'
 import { Vim } from '@replit/codemirror-vim'
 import { EditorView } from '@codemirror/view'
-import React, { useEffect, useRef } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import EditorStatusline from './components/editor-statusline.jsx'
 import { TeleRecentFile } from './components/telescope.jsx'
+import GhostInfo from './components/ghostInfo.jsx'
 
 import {
   generateEditor,
@@ -30,8 +31,13 @@ const Editor = ({
   const refContainer = useRef(null)
   const cmRef = useRef(null)
 
+  const [showGhost, setShowGhost] = useState(true)
+
   const { isOpen, onOpen, onClose } = useDisclosure()
   const reduxDispatch = useDispatch()
+  const setShowGhostCallback = useCallback(flag => {
+    setShowGhost(flag)
+  }, [])
 
   useEffect(() => {
     Vim.unmap('<Space>')
@@ -66,7 +72,8 @@ const Editor = ({
             data,
             scrollLine,
             isChangeCallback,
-            reduxDispatch
+            reduxDispatch,
+            setShowGhostCallback
           ),
           parent: refContainer.current
         })
@@ -95,7 +102,7 @@ const Editor = ({
         effects: EditorView.scrollIntoView(lineObj.from, { y: 'start' }),
         scrollIntoView: true
       })
-      return () => {}
+      return () => { }
     }
   }, [cmRef.current, isVisible])
 
@@ -140,7 +147,9 @@ const Editor = ({
       id="editor_Box"
       fontSize="22px"
       display={isVisible ? 'block' : 'none'}
+      position="relative"
     >
+      {showGhost && <GhostInfo />}
       <Box display="flex" flexDirection="column" height="100%" width="100%">
         <Box ref={refContainer} pl={2} flexGrow={1} overflow="auto"></Box>
         <EditorStatusline />

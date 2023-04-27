@@ -99,7 +99,7 @@ const App = () => {
   }
 
   useEffect(() => {
-    PubSub.publish(PubSubConfig.reCreateStateChannel, '# initial editor')
+    PubSub.publish(PubSubConfig.reCreateStateChannel, '')
   }, [])
 
   useEffect(() => {
