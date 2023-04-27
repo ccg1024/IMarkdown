@@ -93,28 +93,8 @@ function updatePreview(doc: string): React.ReactNode {
     .processSync(doc).result
 }
 
-const NewPreview: React.FC<Props> = props => {
-  const [Content, setContent] = useState(<Fragment />)
+const NewPreview: React.FC<Props> = React.memo(props => {
   const domRef: React.MutableRefObject<any> = useRef(null)
-  const doc = useSelector(selectFileContent)
-
-  useEffect(() => {
-    if (!timeoutController.throttleTimer) {
-      timeoutController.throttleTimer = setTimeout(() => {
-        const md = updatePreview(doc)
-        setContent(<>{md}</>)
-        timeoutController.throttleTimer = null
-      }, 1000)
-    }
-
-    if (timeoutController.debounceTimer)
-      clearTimeout(timeoutController.debounceTimer)
-
-    timeoutController.debounceTimer = setTimeout(() => {
-      const md = updatePreview(doc)
-      setContent(<>{md}</>)
-    }, 1500)
-  }, [doc])
 
   useEffect(() => {
     if (props.isVisible) {
@@ -173,9 +153,27 @@ const NewPreview: React.FC<Props> = props => {
       paddingX={2}
       display={props.isVisible ? 'block' : 'none'}
     >
-      {props.isVisible && Content}
+      {props.isVisible && <PresentRehype />}
     </Box>
   )
+})
+
+const PresentRehype: React.FC = () => {
+  const [content, setContent] = useState<React.ReactNode>()
+  const doc = useSelector(selectFileContent)
+
+  useEffect(() => {
+    if (timeoutController.debounceTimer) {
+      clearTimeout(timeoutController.debounceTimer)
+    }
+
+    timeoutController.debounceTimer = setTimeout(() => {
+      const md = updatePreview(doc)
+      console.log(md)
+      setContent(<>{md}</>)
+    }, 300)
+  }, [doc])
+  return <>{content}</>
 }
 
 export default NewPreview

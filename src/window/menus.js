@@ -6,8 +6,7 @@ function generateMenus(
   createFileCallback,
   togglePreviewCallback,
   toggleEditorCallback,
-  livePreviewCallback,
-  devToolResetOpenFilePath
+  livePreviewCallback
 ) {
   const template = [
     // { role: 'appMenu' }
@@ -86,15 +85,6 @@ function generateMenus(
               { role: 'window' }
             ]
           : [{ role: 'close' }])
-      ]
-    },
-    {
-      label: 'DevTool',
-      submenu: [
-        {
-          label: 'clear main path',
-          click: devToolResetOpenFilePath
-        }
       ]
     }
   ]

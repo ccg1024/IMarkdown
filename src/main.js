@@ -93,13 +93,6 @@ const createWindow = () => {
     mainWindow.webContents.send(ipcChannel.toggleViewChannel, 3)
   }
 
-  // TEST: just for develop, to reset openFilePath
-  // should not show in reall production
-  const devToolResetOpenFilePath = () => {
-    openFilePath = ''
-    mainWindow.setTitle('IMarkdown')
-  }
-
   // recive file path from renderer
   // ipcMain.on(ipcChannel.updateFilePathChannel, (_event, filePath) => {
   //   if (filePath) {
@@ -204,7 +197,7 @@ const createWindow = () => {
   })
 
   // show close dialog
-  mainWindow.on('close', function(e) {
+  mainWindow.on('close', function (e) {
     let showCloseDialog = false
     for (let key in fileCache) {
       if (fileCache[key].isChange === true) {
@@ -226,8 +219,7 @@ const createWindow = () => {
     createFileWrapper,
     togglePreviewWrapper,
     toggleEditorWrapper,
-    livePreviewWrapper,
-    devToolResetOpenFilePath
+    livePreviewWrapper
   )
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
