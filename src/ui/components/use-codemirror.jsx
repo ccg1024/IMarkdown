@@ -61,6 +61,14 @@ export const transparentTheme = EditorView.theme({
   '.cm-activeLineGutter': {
     backgroundColor: '#90cbf4',
     color: 'black'
+  },
+  '.cm-fat-cursor': {
+    background: '#63B3ED !important'
+  },
+  '&:not(.cm-focused) .cm-fat-cursor': {
+    background: 'none !important',
+    outline: 'solid 1px #63B3ED !important',
+    color: 'transparent !important'
   }
 })
 

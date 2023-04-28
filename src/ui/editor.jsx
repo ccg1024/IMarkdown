@@ -2,7 +2,7 @@ import PubSub from 'pubsub-js'
 import { Box, useDisclosure } from '@chakra-ui/react'
 import { Vim } from '@replit/codemirror-vim'
 import { EditorView } from '@codemirror/view'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 
 import EditorStatusline from './components/editor-statusline.jsx'
@@ -30,18 +30,9 @@ const Editor = ({
   // initial codemirror
   const refContainer = useRef(null)
   const cmRef = useRef(null)
-  const ghostRef = useRef(null)
-
-  const [showGhost, setShowGhost] = useState(true)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const reduxDispatch = useDispatch()
-  const setShowGhostCallback = useCallback(flag => {
-    if (!ghostRef.current) {
-      setShowGhost(flag)
-    }
-    ghostRef.current = true
-  }, [])
 
   useEffect(() => {
     Vim.unmap('<Space>')
@@ -76,16 +67,12 @@ const Editor = ({
             data,
             scrollLine,
             isChangeCallback,
-            reduxDispatch,
-            setShowGhostCallback
+            reduxDispatch
           ),
           parent: refContainer.current
         })
         if (cmRef.current) {
           cmRef.current.destroy()
-        }
-        if (!ghostRef.current && data) {
-          setShowGhost(false)
         }
         view.focus()
         cmRef.current = view
@@ -109,9 +96,9 @@ const Editor = ({
         effects: EditorView.scrollIntoView(lineObj.from, { y: 'start' }),
         scrollIntoView: true
       })
-      return () => { }
+      return () => {}
     }
-  }, [cmRef.current, isVisible])
+  }, [cmRef, isVisible])
 
   useEffect(() => {
     if (cmRef.current) {
@@ -156,7 +143,7 @@ const Editor = ({
       display={isVisible ? 'block' : 'none'}
       position="relative"
     >
-      {showGhost && <GhostInfo />}
+      <GhostInfo />
       <Box display="flex" flexDirection="column" height="100%" width="100%">
         <Box ref={refContainer} pl={2} flexGrow={1} overflow="auto"></Box>
         <EditorStatusline />

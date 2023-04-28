@@ -26,8 +26,7 @@ export function generateEditor(
   doc,
   scrollLine,
   isChangeCallback,
-  reduxDispatch,
-  setShowGhostCallback
+  reduxDispatch
 ) {
   scrollLine.previewScrollTo = 1
   const state = EditorState.create({
@@ -37,7 +36,7 @@ export function generateEditor(
         // for doc change
         if (update.docChanged) {
           if (!controlls.closeGhostGate) {
-            setShowGhostCallback(false)
+            PubSub.publish(PubSubConfig.ghostInfoChannel, 'close')
             controlls.closeGhostGate = true
           }
           if (!controlls.closeChangeGate) {
@@ -86,6 +85,11 @@ export function generateEditor(
       ...Init_extends()
     ]
   })
+
+  if (doc && !controlls.closeGhostGate) {
+    PubSub.publish(PubSubConfig.ghostInfoChannel, 'close')
+    controlls.closeGhostGate = true
+  }
 
   return state
 }

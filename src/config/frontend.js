@@ -5,7 +5,8 @@ const PubSubConfig = {
   statusLineModify: 'editor-status-line-modify',
   statusLineClear: 'editor-status-line-clear',
   updateCacheToMain: 'update-cache-to-main',
-  syncUpdateDocScroll: 'sync-update-doc-scroll'
+  syncUpdateDocScroll: 'sync-update-doc-scroll',
+  ghostInfoChannel: 'ghost-info-channel'
 }
 
 export default PubSubConfig
