@@ -11,7 +11,8 @@ const options = {
   openRecentFile: 'open-recent-file',
   sendSavedInfo: 'send-saved-info-to-renderer',
   vimOptionChannel: 'vim-option-channel',
-  updateCacheFromReact: 'update-cache-from-react'
+  updateCacheFromReact: 'update-cache-from-react',
+  initialedRender: 'initialed-renderer'
 }
 
 module.exports = options

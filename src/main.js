@@ -19,7 +19,7 @@ const {
 } = require('./window/menus-callback')
 
 const { vimOption } = require('./config/vim-option')
-const { formatWinTitle } = require('./utils/backend')
+const { formatWinTitle, converWin32Path } = require('./utils/backend')
 
 // ---------------------------------------------
 require('@electron/remote/main').initialize()
@@ -194,6 +194,28 @@ const createWindow = () => {
       }
       fileCache[openFilePath].fileContent = jsonData.fileContent
       fileCache[openFilePath].isChange = true
+    }
+  })
+
+  ipcMain.handle(ipcChannel.initialedRender, async () => {
+    if (process.argv.length >= 2 && process.argv[1] !== '.') {
+      openFilePath = converWin32Path(process.argv[1])
+      mainWindow.setTitle(formatWinTitle(openFilePath))
+      try {
+        const fileContent = fs.readFileSync(openFilePath, 'utf8')
+        fileCache[openFilePath] = {
+          fileContent,
+          isChange: false
+        }
+        return JSON.stringify({
+          fullpath: openFilePath,
+          fileContent,
+          basename: path.basename(openFilePath),
+          isChange: false
+        })
+      } catch (err) {
+        throw err
+      }
     }
   })
 

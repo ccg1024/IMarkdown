@@ -99,7 +99,26 @@ const App = () => {
   }
 
   useEffect(() => {
-    PubSub.publish(PubSubConfig.reCreateStateChannel, '')
+    window.electronAPI.initialedRender().then(result => {
+      if (result) {
+        const initialFile = JSON.parse(result)
+        pathRef.current = initialFile.fullpath
+        dispatch(modifyContent(initialFile.fileContent))
+        setRecentFiles(v => ({
+          ...v,
+          [initialFile.fullpath]: {
+            filename: initialFile.basename,
+            isChange: initialFile.isChange
+          }
+        }))
+        PubSub.publish(
+          PubSubConfig.reCreateStateChannel,
+          initialFile.fileContent
+        )
+      } else {
+        PubSub.publish(PubSubConfig.reCreateStateChannel, '')
+      }
+    })
   }, [])
 
   useEffect(() => {

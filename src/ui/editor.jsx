@@ -30,13 +30,17 @@ const Editor = ({
   // initial codemirror
   const refContainer = useRef(null)
   const cmRef = useRef(null)
+  const ghostRef = useRef(null)
 
   const [showGhost, setShowGhost] = useState(true)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const reduxDispatch = useDispatch()
   const setShowGhostCallback = useCallback(flag => {
-    setShowGhost(flag)
+    if (!ghostRef.current) {
+      setShowGhost(flag)
+    }
+    ghostRef.current = true
   }, [])
 
   useEffect(() => {
@@ -79,6 +83,9 @@ const Editor = ({
         })
         if (cmRef.current) {
           cmRef.current.destroy()
+        }
+        if (!ghostRef.current && data) {
+          setShowGhost(false)
         }
         view.focus()
         cmRef.current = view

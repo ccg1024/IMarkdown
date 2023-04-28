@@ -16,6 +16,7 @@ export interface IElectronAPI {
   removeSendSavedInfo: () => Promise<void>
   vimOption: (option: string) => Promise<void>
   updateCache: (cache: string) => Promise<void>
+  initialedRender: () => Promise<void>
 }
 
 declare global {

@@ -28,5 +28,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.removeAllListeners(ipcChannel.sendSavedInfo),
   vimOption: option => ipcRenderer.invoke(ipcChannel.vimOptionChannel, option),
   updateCache: cache =>
-    ipcRenderer.invoke(ipcChannel.updateCacheFromReact, cache)
+    ipcRenderer.invoke(ipcChannel.updateCacheFromReact, cache),
+  initialedRender: () => ipcRenderer.invoke(ipcChannel.initialedRender)
 })

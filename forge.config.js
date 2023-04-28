@@ -7,7 +7,9 @@ module.exports = {
     {
       name: '@electron-forge/maker-squirrel',
       config: {
-        setupIcon: './src/static/img/markdown.ico'
+        setupIcon: './src/static/img/markdown.ico',
+        authors: 'ccg',
+        description: 'A lightweight cross-platform markdown editor'
       }
     },
     {
