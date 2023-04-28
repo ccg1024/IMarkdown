@@ -51,7 +51,9 @@ const Editor = ({
       window.electronAPI.vimOption(optionJson)
     })
     Vim.defineEx('format', 'f', () => {
-      formateContent(view)
+      if (cmRef.current) {
+        formateContent(cmRef.current)
+      }
     })
     Vim.defineEx('telescopeRecentFile', 'telescopeR', () => {
       onOpen()
