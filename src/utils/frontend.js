@@ -1,3 +1,4 @@
+import { EditorView } from '@codemirror/view'
 import prettier from 'prettier/esm/standalone.mjs'
 import markdownParser from 'prettier/esm/parser-markdown.mjs'
 
@@ -20,7 +21,8 @@ export const formateContent = cm => {
         to: cm.state.doc.length,
         insert: formatedContent
       },
-      selection: { anchor: currentCursor },
+      selection: { anchor: currentCursor, head: currentCursor },
+      effects: EditorView.scrollIntoView(currentCursor, { y: 'nearest' }),
       scrollIntoView: true
     })
   }
