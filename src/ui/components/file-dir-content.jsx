@@ -4,6 +4,7 @@ import { Box, Flex, List, Text, useColorModeValue } from '@chakra-ui/react'
 const DirContent = ({ children }) => {
   return (
     <Box
+      position="absolute"
       id="menu-content"
       w="200px"
       height="100%"
@@ -11,13 +12,7 @@ const DirContent = ({ children }) => {
       backdropFilter="auto"
       p={2}
       overflow="auto"
-      backgroundColor={useColorModeValue(
-        'rgb(255, 250, 240, 0.24)',
-        'blackAlpha.400'
-      )}
-      style={{
-        boxShadow: '5px 0px 32px -21px rgba(0,0,0,0.7)'
-      }}
+      backgroundColor={useColorModeValue('#FCFCFC', 'blackAlpha.400')}
     >
       <Flex
         alignItems="center"
