@@ -37,6 +37,8 @@ import { selectFileContent } from '../app/reducers/fileContentSlice'
 
 import PubSubConfig from '../../config/frontend'
 
+import '../../static/css/preview-scroll.css'
+
 interface Props {
   isVisible: boolean
 }

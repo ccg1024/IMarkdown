@@ -35,6 +35,7 @@ const Editor = ({
   const reduxDispatch = useDispatch()
 
   useEffect(() => {
+    Vim.unmap('<C-o>', 'insert')
     Vim.unmap('<Space>')
     Vim.map('<C-n>', ':nohl<cr>')
     Vim.defineEx('write', 'w', () => {

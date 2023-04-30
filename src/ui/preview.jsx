@@ -4,6 +4,8 @@ import { Box } from '@chakra-ui/react'
 
 import MarkComponent from './components/mark-component'
 
+import '../static/css/preview-scroll.css'
+
 const Preview = ({ isVisible, scrollLine }) => {
   // run once after render
   useEffect(() => {
