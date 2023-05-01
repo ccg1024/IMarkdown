@@ -13,21 +13,13 @@ npm start
 
 # screenshote
 
-**ArchLinux**
-
-> UI is outdated
-
-![editor](./img/third_.png)
-
-![preview](./img/third-p.png)
-
 **Windows 10**
 
-![new feature](./img/win-4-28.png)
+![new feature](./img/win-5-1.png)
 
-![defualt config](./img/win-4-28-1.png)
+![defualt config](./img/win-5-1-2.png)
 
-![live-preview](./img/win-4-28-2.png)
+![live-preview](./img/win-5-1-3.png)
 
 # Feature
 
