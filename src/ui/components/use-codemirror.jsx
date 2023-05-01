@@ -55,19 +55,18 @@ export const transparentTheme = EditorView.theme({
   },
   '.cm-gutters': {
     backgroundColor: '#ffffff',
-    color: '#ddd',
+    color: '#8F8F8F',
     border: 'none'
   },
   '.cm-activeLineGutter': {
-    backgroundColor: '#90cbf4',
-    color: 'black'
+    backgroundColor: '#CCCCCC44'
   },
   '.cm-fat-cursor': {
-    background: '#63B3ED !important'
+    background: '#48BB78 !important'
   },
   '&:not(.cm-focused) .cm-fat-cursor': {
     background: 'none !important',
-    outline: 'solid 1px #63B3ED !important',
+    outline: 'solid 1px #48BB78 !important',
     color: 'transparent !important'
   },
   '.cm-scroller::-webkit-scrollbar': {
@@ -90,6 +89,9 @@ export const transparentTheme = EditorView.theme({
   '.cm-scroller::-webkit-scrollbar-track': {
     // the track where the scroll-thumb scroll on
     backgroundColor: 'rgba(0, 0, 0, 0)'
+  },
+  '.cm-activeLine': {
+    backgroundColor: '#CCCCCC44'
   }
 })
 
@@ -280,8 +282,8 @@ export const my_syntaxHighlighting = HighlightStyle.define([
   },
   {
     tag: customTags.inlineCode,
-    color: customColors.content.inlineCode,
-    backgroundColor: customColors.backgroundColor.inlineCode
+    color: customColors.content.inlineCode
+    // backgroundColor: customColors.backgroundColor.inlineCode
   },
   {
     tag: customTags.tableDelimiter,

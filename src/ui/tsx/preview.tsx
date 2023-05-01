@@ -30,8 +30,9 @@ import {
   RemarkTd,
   RemarkTh,
   RemarkCodePre,
-  RemarkCode
+  RemarkHr
 } from '../components/remark-tag'
+import RemarkCode from './components/remark-code'
 
 import { selectFileContent } from '../app/reducers/fileContentSlice'
 
@@ -89,7 +90,8 @@ function updatePreview(doc: string): React.ReactNode {
         th: RemarkTh,
         code: RemarkCode,
         pre: RemarkCodePre,
-        img: RemarkImg
+        img: RemarkImg,
+        hr: RemarkHr
       }
     })
     .processSync(doc).result
@@ -106,15 +108,13 @@ const NewPreview: React.FC<Props> = React.memo(props => {
           let jumped = false
           for (let childDom of domRef.current.children) {
             let lineDataSet: LineDataSet = childDom.dataset
-            if (Number(lineDataSet.line) > cursorLine) {
-              childDom.scrollIntoView()
-              childDom.scrollIntoView({ block: 'center', inline: 'nearest' })
-              jumped = true
-              break
-            }
-            if (Number(lineDataSet.line) === cursorLine) {
-              childDom.scrollIntoView()
-              childDom.scrollIntoView({ block: 'center', inline: 'nearest' })
+            if (
+              Number(lineDataSet.line) > cursorLine ||
+              Number(lineDataSet.line) === cursorLine
+            ) {
+              let offsetFromTop = childDom.offsetTop
+              let clientHeight = domRef.current.clientHeight
+              domRef.current.scrollTop = offsetFromTop - clientHeight / 2
               jumped = true
               break
             } else if (
@@ -151,9 +151,9 @@ const NewPreview: React.FC<Props> = React.memo(props => {
       id="live-preview"
       ref={domRef}
       overflow="auto"
-      width="100%"
-      paddingX={2}
-      display={props.isVisible ? 'block' : 'none'}
+      width={props.isVisible ? '100%' : '0%'}
+      paddingX={props.isVisible ? 2 : 0}
+      transition="width 0.5s"
     >
       {props.isVisible && <PresentRehype />}
     </Box>

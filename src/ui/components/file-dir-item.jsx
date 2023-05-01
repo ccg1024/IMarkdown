@@ -22,16 +22,21 @@ const FileDirItem = ({
         p={1}
         id={fullpath}
         borderRadius="sm"
-        backgroundColor={isActive ? 'blue.100' : ''}
+        backgroundColor={isActive ? 'blue.500' : 'unset'}
         onClick={isActive ? () => {} : e => clickCallback(e.currentTarget.id)}
-        _hover={!isActive ? { backgroundColor: 'blue.50' } : ''}
+        _hover={!isActive && { backgroundColor: 'blue.50' }}
       >
         <Flex alignItems="center" overflow="hidden">
           <BsFillRecordFill
             color={isChange ? '#F56565' : isActive ? '#48BB78' : '#C6F6D5'}
             style={{ flexShrink: 0 }}
           />
-          <Text ml={1} userSelect="none" flexShrink={0}>
+          <Text
+            ml={1}
+            userSelect="none"
+            flexShrink={0}
+            color={isActive ? 'white' : 'black'}
+          >
             {basename}
           </Text>
         </Flex>

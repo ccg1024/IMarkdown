@@ -90,7 +90,7 @@ const EditorStatusline = () => {
   return (
     <>
       <Flex
-        backgroundColor="green.300"
+        backgroundColor="gray.200"
         justifyContent="space-between"
         paddingX={2}
       >
@@ -104,7 +104,7 @@ const EditorStatusline = () => {
           <Box
             display="flex"
             overflow="hidden"
-            backgroundColor="blue.50"
+            backgroundColor="#f7f7f7"
             px={1}
             flexGrow={1}
             alignItems="center"

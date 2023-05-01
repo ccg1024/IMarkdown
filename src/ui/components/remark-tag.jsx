@@ -18,7 +18,8 @@ import {
   Thead,
   Tr,
   UnorderedList,
-  Code
+  Code,
+  Divider
 } from '@chakra-ui/react'
 
 function getStartLine(node) {
@@ -174,6 +175,10 @@ export function RemarkCodePre(props) {
       as="pre"
       data-line={props.node && getStartLine(props.node)}
       data-endline={props.node && getEndLine(props.node)}
+      boxSizing="border-box"
+      padding={2}
+      backgroundColor={useColorModeValue('#CCCCCC22')}
+      overflow="auto"
     >
       {props.children}
     </Box>
@@ -209,5 +214,14 @@ export function RemarkCode(props) {
     >
       {props.children}
     </Code>
+  )
+}
+
+export function RemarkHr(props) {
+  return (
+    <Divider
+      borderBottomWidth="2px"
+      data-line={props.node && getStartLine(props.node)}
+    />
   )
 }
