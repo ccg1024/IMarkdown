@@ -114,6 +114,10 @@ cm.dispatch({ changes: { from: 0, to: cm.state.doc.length, insert: text } })
 
 通过`decoration.line`方式给代码块添加背景高亮的形式与`drawSelection`插件是由一些冲突的，后者无法影响前者修改的区域。导致被选中的区域没有任何背景变化，在视角上难以区分。但`vim`模式又依赖`drawSelection`插件来实现 Visual 模式。
 
+**Fixed**
+
+只需要将为颜色设置透明度即可正常显示`drawSelection`部分，应该是显示层级的原因，设置的颜色显示优先级大于`drawSelection`的部分。同理，当前高亮行的颜色也需要设置透明度。
+
 ### prettier
 
 在浏览器中使用 prettier：https://prettier.io/docs/en/browser.html
@@ -169,4 +173,8 @@ the purpose of each package
 
 > 最终的解决方案应该是使用部分渲染——像 codemirror 一样，只将展示在屏幕内容的数据进行重绘。网上的三方库的案例为列表数据，怎么应用到虚拟 DOM 对象上还需要进一步探索。
 
-- `electron-forge`没有设置自动检查`main.js`文件的改动并重新加载，github 上有对这个问题的提问，里面的解决方案是在终端中输入`rs`来重新启动应用。
+`electron-forge`没有设置自动检查`main.js`文件的改动并重新加载，github 上有对这个问题的提问，里面的解决方案是在终端中输入`rs`来重新启动应用。
+
+#### 2023-5-1
+
+上述的输入卡顿问题是因为使用插件`react-syntax-highlighter`渲染预览模块导致的，将该部分替换成 codemirror 的`runmode`便可解决，经过测试 archlinux 的笔记文件，只有到文件内容达到一千多行时，才会出现些许的卡顿情况，且当输入速度不快时也不会感觉到，对于该项目而言足够了。

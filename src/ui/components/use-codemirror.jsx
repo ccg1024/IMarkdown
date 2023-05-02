@@ -46,6 +46,9 @@ export const transparentTheme = EditorView.theme({
   '&.cm-focused': {
     outline: 'none'
   },
+  '&.cm-focused .cm-cursor': {
+    transition: 'all 80ms'
+  },
   '.cm-scroller': {
     fontFamily: 'inherit !important'
   },
