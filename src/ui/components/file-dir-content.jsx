@@ -1,33 +1,31 @@
 import React from 'react'
 import { Box, Flex, List, Text, useColorModeValue } from '@chakra-ui/react'
+import uiColor from '../libs/colors'
 
 const DirContent = ({ children }) => {
   return (
     <Box
-      position="absolute"
       id="menu-content"
-      w="200px"
+      width="60%"
       height="100%"
       backdropBlur="8px"
       backdropFilter="auto"
-      p={2}
       overflow="auto"
-      backgroundColor={useColorModeValue('#FCFCFC', 'blackAlpha.400')}
+      backgroundColor={useColorModeValue(
+        uiColor.leftSideBar.backgroundColorLight,
+        uiColor.leftSideBar.backgroundColorDark
+      )}
     >
-      <Flex
-        alignItems="center"
-        justifyContent="center"
-        borderBottom="2px"
-        borderBottomColor="whiteAlpha.600"
-      >
+      <Flex alignItems="center" justifyContent="center">
         <Text
           as="h1"
+          padding={2}
           textAlign="center"
-          px={2}
-          fontWeight="bold"
           userSelect={'none'}
+          fontSize="1.2em"
+          color={useColorModeValue('gray.400', 'gray.400')}
         >
-          recent files
+          Recent Files
         </Text>
       </Flex>
       <List>{children}</List>

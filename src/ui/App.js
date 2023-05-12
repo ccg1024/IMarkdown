@@ -152,6 +152,7 @@ const App = () => {
         const editor = document.querySelector('#editor_Box')
         const preview = document.querySelector('#preview-scroll')
         const live = document.querySelector('#live-preview')
+        const sideBar = document.querySelector('#side-bar')
 
         for (const name in settings) {
           switch (name) {
@@ -159,6 +160,7 @@ const App = () => {
               editor.style.fontSize = settings[name]
               preview.style.fontSize = settings[name]
               live.style.fontSize = settings[name]
+              sideBar.style.fontSize = settings[name]
               break
             case 'editorFontFamily':
               editor.style.fontFamily = settings[name]
@@ -166,6 +168,7 @@ const App = () => {
             case 'previewFontFamily':
               preview.style.fontFamily = settings[name]
               live.style.fontFamily = settings[name]
+              sideBar.style.fontFamily = settings[name]
               break
           }
         }
