@@ -9,7 +9,7 @@ import React, {
 } from 'react'
 import { useDispatch } from 'react-redux'
 
-import Editor from './editor'
+import Editor from './tsx/editor'
 import Preview from './preview'
 import FileDir from './components/file-dir'
 import PubSubConfig from '../config/frontend'
