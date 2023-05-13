@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React from 'react'
 import { Box, List, ListItem, useColorModeValue } from '@chakra-ui/react'
 
 import FileDirItem from './file-dir-item'
@@ -41,7 +41,7 @@ const FileDir = ({ recentFiles, currentFile, isChange }) => {
   }
 
   return (
-    <Box id="side-bar" display="flex" flexShrink={0} width="40%">
+    <Box id="side-bar" display="flex" flexShrink={0} height="100%">
       <FixedLeftBar />
       <DirContent>
         {recentPaths.map(item => {

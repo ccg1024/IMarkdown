@@ -28,7 +28,6 @@ import {
   defaultHighlightStyle
 } from '@codemirror/language'
 import {
-  autocompletion,
   completionKeymap,
   closeBrackets,
   closeBracketsKeymap
@@ -58,8 +57,20 @@ export const transparentTheme = EditorView.theme({
   },
   '.cm-gutters': {
     backgroundColor: '#ffffff',
-    color: '#8F8F8F',
-    border: 'none'
+    color: '#8F8F8F'
+  },
+  '.cm-gutters .cm-gutterElement': {
+    paddingLeft: '1em',
+    paddingRight: '10px',
+    borderTopLeftRadius: '2px',
+    borderBottomLeftRadius: '2px'
+  },
+  '.cm-line': {
+    paddingLeft: '2px',
+    paddingRight: '2px'
+  },
+  '.cm-content': {
+    marginRight: '5px'
   },
   '.cm-activeLineGutter': {
     backgroundColor: '#CCCCCC44'
@@ -94,7 +105,9 @@ export const transparentTheme = EditorView.theme({
     backgroundColor: 'rgba(0, 0, 0, 0)'
   },
   '.cm-activeLine': {
-    backgroundColor: '#CCCCCC44'
+    backgroundColor: '#CCCCCC44',
+    borderTopRightRadius: '2px',
+    borderBottomRightRadius: '2px'
   }
 })
 
@@ -310,7 +323,6 @@ export const Init_extends = () => {
     syntaxHighlighting(my_syntaxHighlighting),
     bracketMatching(),
     closeBrackets(),
-    autocompletion(),
     rectangularSelection(),
     crosshairCursor(),
     highlightActiveLine(),

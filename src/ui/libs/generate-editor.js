@@ -22,12 +22,7 @@ function updateCacheToMainProcess(doc) {
   )
 }
 
-export function generateEditor(
-  doc,
-  scrollLine,
-  isChangeCallback,
-  reduxDispatch
-) {
+export function generateEditor(doc, scrollLine, reduxDispatch) {
   scrollLine.previewScrollTo = 1
   const state = EditorState.create({
     doc: doc,
@@ -40,7 +35,6 @@ export function generateEditor(
             controlls.closeGhostGate = true
           }
           if (!controlls.closeChangeGate) {
-            isChangeCallback(true)
             PubSub.publish(PubSubConfig.statusLineModify, true)
             controlls.closeChangeGate = true
           }

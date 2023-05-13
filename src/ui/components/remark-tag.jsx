@@ -52,6 +52,7 @@ export function RemarkHeading(props) {
     <Heading
       as={tagName}
       fontSize={'1.' + (6 - tagName.replace('h', '')) + 'em'}
+      fontFamily="inherit"
       marginBottom="1em"
       textDecoration="underline"
       textUnderlineOffset="8px"
@@ -77,7 +78,7 @@ export function RemarkQuote(props) {
       backgroundColor={useColorModeValue('gray.100', 'whiteAlpha.200')}
       padding="0.5em"
       marginY="1em"
-      boxShadow="lg"
+      boxShadow="md"
       data-line={dataLine}
       data-endline={endLine}
     >

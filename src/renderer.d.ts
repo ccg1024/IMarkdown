@@ -1,3 +1,5 @@
+import { HeadInfo } from './ui/tsx/types/render'
+
 // remove editor warn about electronAPI types
 export interface IElectronAPI {
   openFile: (callback: any) => Promise<void>
@@ -17,6 +19,7 @@ export interface IElectronAPI {
   vimOption: (option: string) => Promise<void>
   updateCache: (cache: string) => Promise<void>
   initialedRender: () => Promise<void>
+  updateHeadInfo: (headInfo: HeadInfo) => Promise<void>
 }
 
 declare global {

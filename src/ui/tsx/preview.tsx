@@ -151,9 +151,9 @@ const NewPreview: React.FC<Props> = React.memo(props => {
       id="live-preview"
       ref={domRef}
       overflow="auto"
-      width={props.isVisible ? '100%' : '0%'}
-      paddingX={props.isVisible ? 2 : 0}
-      transition="width 0.5s"
+      width="100%"
+      paddingX={2}
+      display={props.isVisible ? 'block' : 'none'}
     >
       {props.isVisible && <PresentRehype />}
     </Box>

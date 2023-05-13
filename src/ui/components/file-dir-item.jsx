@@ -1,6 +1,11 @@
 import React from 'react'
-import { Link, ListItem, Flex, Text } from '@chakra-ui/react'
-import { BsFillRecordFill } from 'react-icons/bs'
+import {
+  ListItem,
+  Flex,
+  Text,
+  Heading,
+  useColorModeValue
+} from '@chakra-ui/react'
 
 const FileDirItem = ({
   title,
@@ -14,7 +19,9 @@ const FileDirItem = ({
     <ListItem
       p={1}
       id={fullpath}
-      borderRadius="sm"
+      borderBottom="1px"
+      borderStyle="solid"
+      borderColor={useColorModeValue('gray.300', 'gray.300')}
       backgroundColor={isActive ? 'blue.500' : 'unset'}
       onClick={isActive ? () => {} : e => clickCallback(e.currentTarget.id)}
       _hover={{
@@ -22,16 +29,32 @@ const FileDirItem = ({
         cursor: 'pointer'
       }}
     >
-      <Flex alignItems="center" overflow="hidden">
-        <Text
-          ml={1}
-          padding={2}
-          fontSize="1em"
-          userSelect="none"
-          flexShrink={0}
+      <Flex
+        overflow="hidden"
+        alignItems="start"
+        flexDirection="column"
+        padding={2}
+      >
+        <Heading
+          fontSize="1.5em"
+          marginBottom={2}
+          fontFamily="inherit"
           color={isActive ? 'white' : 'black'}
         >
-          {basename}
+          Note Title
+        </Heading>
+        <Text fontSize="1em" color={isActive ? 'white' : 'black'}>
+          2023-5-12
+        </Text>
+        <Text
+          width="100%"
+          overflow="hidden"
+          fontSize="1em"
+          whiteSpace="nowrap"
+          textOverflow="ellipsis"
+          color={isActive ? 'white' : 'black'}
+        >
+          some infot mation about this note
         </Text>
       </Flex>
     </ListItem>

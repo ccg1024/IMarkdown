@@ -10,3 +10,9 @@ export interface IRecentFiles {
     isChange: string
   }
 }
+
+export interface HeadInfo {
+  date?: string
+  desc?: string
+  title?: string
+}

@@ -47,6 +47,8 @@ const RemarkCode: React.FC<
         color={useColorModeValue('#3D7AED', '#FF63C3')}
         backgroundColor="unset"
         fontWeight="bold"
+        fontFamily="inherit"
+        fontSize="1em"
       >
         {props.children}
       </Code>

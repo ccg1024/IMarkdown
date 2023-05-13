@@ -1,5 +1,5 @@
 import PubSub from 'pubsub-js'
-import { Flex } from '@chakra-ui/react'
+import { Flex, Box } from '@chakra-ui/react'
 import React, {
   useState,
   useRef,
@@ -11,66 +11,47 @@ import { useDispatch } from 'react-redux'
 
 import Editor from './tsx/editor'
 import Preview from './preview'
-import FileDir from './components/file-dir'
 import PubSubConfig from '../config/frontend'
 import { getScrollLine } from './libs/tools'
 
 import { modifyContent } from './app/reducers/fileContentSlice'
+import { modifyCurrentFile } from './app/reducers/currentFileSlice'
+import { modifyRecentFiles } from './app/reducers/recentFilesSlice'
 
 import NewPreview from './tsx/preview'
+import MarkHeadInfo from './tsx/components/mark-head'
+import SideBar from './tsx/components/side-bar'
 
-const path = window.electronAPI.require('path')
+import { formatedTime } from './tsx/libs/tools'
 
 const App = () => {
-  const [isChange, setIsChange] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
   const [showEditor, setShowEditor] = useState(true)
-  const [recentFiles, setRecentFiles] = useState({})
   const [isLivePre, setIsLivePre] = useState(false)
 
-  const dispatch = useDispatch()
+  const dispatch = useCallback(useDispatch(), [])
 
   const scrollRef = useRef({
     previewScrollTo: 1,
     previewScrollTop: 1,
     editorScrollTo: 1
   })
-  const pathRef = useRef('')
+  const sideBarRef = useRef(null)
 
-  // when file saved, invoked from editor
-  const handleFileSave = useCallback(() => {
-    setIsChange(false)
-    setRecentFiles(v => ({
-      ...v,
-      [pathRef.current]: {
-        ...v[pathRef.current],
-        isChange: false
+  const handleFullScreen = useCallback(() => {
+    const sideBar = sideBarRef.current
+    if (sideBar) {
+      if (sideBar.style.display === 'none') {
+        sideBar.style.display = 'block'
+      } else {
+        sideBar.style.display = 'none'
       }
-    }))
-  }, [])
-  // update isChange flag from editor
-  const handleIsChange = useCallback(flag => {
-    setIsChange(flag)
-    if (pathRef.current) {
-      setRecentFiles(v => ({
-        ...v,
-        [pathRef.current]: {
-          ...v[pathRef.current],
-          isChange: flag
-        }
-      }))
     }
   }, [])
-  // update opened path from editor when save a empty path file
-  const handleOpenedPath = useCallback(path => {
-    pathRef.current = path
-  }, [])
-  // update recent file from editor when save a empty path file
-  const handleRecentFiles = useCallback(fullpath => {
-    setRecentFiles(v => ({
-      ...v,
-      [fullpath]: { filename: path.basename(fullpath), isChange: false }
-    }))
+  const handleLivePreview = useCallback(() => {
+    setShowPreview(false)
+    setShowEditor(true)
+    setIsLivePre(v => !v)
   }, [])
 
   const toggleView = (_event, value) => {
@@ -102,15 +83,16 @@ const App = () => {
     window.electronAPI.initialedRender().then(result => {
       if (result) {
         const initialFile = JSON.parse(result)
-        pathRef.current = initialFile.fullpath
         dispatch(modifyContent(initialFile.fileContent))
-        setRecentFiles(v => ({
-          ...v,
-          [initialFile.fullpath]: {
-            filename: initialFile.basename,
-            isChange: initialFile.isChange
-          }
-        }))
+        dispatch(
+          modifyRecentFiles({
+            id: initialFile.fullpath,
+            date: formatedTime(initialFile.headInfo.date),
+            desc: initialFile.headInfo.desc,
+            title: initialFile.headInfo.title
+          })
+        )
+        dispatch(modifyCurrentFile(initialFile.fullpath))
         PubSub.publish(
           PubSubConfig.reCreateStateChannel,
           initialFile.fileContent
@@ -130,13 +112,19 @@ const App = () => {
     }
   }, [])
 
-  function handleOpenFile(_event, fullPath, fileContent, filename, isChange) {
+  function handleOpenFile(_event, fullPath, fileContent, headInfo, isChange) {
     scrollRef.current.editorScrollTo = 1
-    pathRef.current = fullPath
 
     dispatch(modifyContent(fileContent))
-    setRecentFiles(v => ({ ...v, [fullPath]: { filename, isChange } }))
-    setIsChange(isChange)
+    dispatch(
+      modifyRecentFiles({
+        id: fullPath,
+        date: formatedTime(headInfo.date),
+        desc: headInfo.desc,
+        title: headInfo.title
+      })
+    )
+    dispatch(modifyCurrentFile(fullPath))
     setShowEditor(true)
     setShowPreview(false)
 
@@ -150,25 +138,22 @@ const App = () => {
       try {
         const settings = JSON.parse(configJson)
         const editor = document.querySelector('#editor_Box')
-        const preview = document.querySelector('#preview-scroll')
-        const live = document.querySelector('#live-preview')
-        const sideBar = document.querySelector('#side-bar')
+        // const preview = document.querySelector('#preview-scroll')
+        // const live = document.querySelector('#live-preview')
+        // const sideBar = document.querySelector('#side-bar')
 
         for (const name in settings) {
           switch (name) {
             case 'fontSize':
-              editor.style.fontSize = settings[name]
-              preview.style.fontSize = settings[name]
-              live.style.fontSize = settings[name]
-              sideBar.style.fontSize = settings[name]
+              document.querySelector('#content_root').style.fontSize =
+                settings[name]
               break
             case 'editorFontFamily':
               editor.style.fontFamily = settings[name]
               break
             case 'previewFontFamily':
-              preview.style.fontFamily = settings[name]
-              live.style.fontFamily = settings[name]
-              sideBar.style.fontFamily = settings[name]
+              document.querySelector('#content_root').style.fontFamily =
+                settings[name]
               break
           }
         }
@@ -181,22 +166,27 @@ const App = () => {
   return (
     <>
       <Flex height="100%" width="100%" id="content_root">
-        <FileDir
-          recentFiles={recentFiles}
-          currentFile={pathRef.current}
-          isChange={isChange}
-        />
-        <Editor
-          isChangeCallback={handleIsChange}
-          isVisible={showEditor}
-          scrollLine={scrollRef.current}
-          openedPathCallback={handleOpenedPath}
-          recentFilesCallback={handleRecentFiles}
-          recentFiles={recentFiles}
-          fileSaveCallback={handleFileSave}
-        />
-        <Preview isVisible={showPreview} scrollLine={scrollRef.current} />
-        <NewPreview isVisible={isLivePre} />
+        <Box ref={sideBarRef} width="35%" height="100%" flexShrink={0}>
+          <SideBar />
+        </Box>
+        <Box
+          display="flex"
+          flexShrink={0}
+          flexGrow={1}
+          width="65%"
+          height="100%"
+          flexDirection="column"
+        >
+          <MarkHeadInfo
+            fullScreenCallback={handleFullScreen}
+            livePreviewCallback={handleLivePreview}
+          />
+          <Flex height="100%" width="100%" overflow="auto">
+            <Editor isVisible={showEditor} scrollLine={scrollRef.current} />
+            <Preview isVisible={showPreview} scrollLine={scrollRef.current} />
+            <NewPreview isVisible={isLivePre} />
+          </Flex>
+        </Box>
       </Flex>
     </>
   )

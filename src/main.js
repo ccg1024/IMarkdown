@@ -8,6 +8,7 @@ const {
 } = require('electron')
 const path = require('path')
 const fs = require('fs')
+const matter = require('gray-matter')
 
 const ipcChannel = require('./config/backend')
 const { generateMenus } = require('./window/menus')
@@ -60,6 +61,7 @@ const createWindow = () => {
       if (fileObj && !Object.hasOwn(fileCache, fileObj.filePath)) {
         fileCache[fileObj.filePath] = {
           fileContent: fileObj.fileContent,
+          headInfo: fileObj.headInfo,
           isChange: fileObj.isChange
         }
       }
@@ -77,6 +79,7 @@ const createWindow = () => {
       if (fileObj) {
         fileCache[fileObj.filePath] = {
           fileContent: fileObj.fileContent,
+          headInfo: fileObj.headInfo,
           isChange: fileObj.isChange
         }
         openFilePath = fileObj.filePath
@@ -94,59 +97,36 @@ const createWindow = () => {
     mainWindow.webContents.send(ipcChannel.toggleViewChannel, 3)
   }
 
-  // recive file path from renderer
-  // ipcMain.on(ipcChannel.updateFilePathChannel, (_event, filePath) => {
-  //   if (filePath) {
-  //     openFilePath = filePath
-  //     mainWindow.setTitle(openFilePath.replace(/^.*?\//, ''))
-  //   }
-  // })
-
-  // recive content change flag
-  // ipcMain.on(ipcChannel.setIsChangeChannel, (_event, isChange) => {
-  //   if (openFilePath) {
-  //     if (!Object.hasOwn(fileCache, openFilePath)) {
-  //       fileCache[openFilePath] = {}
-  //     }
-  //     fileCache[openFilePath].isChange = isChange
-  //   }
-  // })
-
-  // show unsaved info, when using recient file
-  // ipcMain.on(ipcChannel.showUnsaveChannel, _event => {
-  //   dialog.showMessageBoxSync(null, {
-  //     type: 'info',
-  //     title: 'Warning',
-  //     message: 'The file is unsaved'
-  //   })
-  // })
-
   // recive file content from renderer then save file content to local
-  ipcMain.on(ipcChannel.reciveContentChannel, (_event, content, path) => {
-    let saveErr
-    fs.writeFile(path, content, err => {
-      if (err) {
-        saveErr = err.message
+  ipcMain.on(
+    ipcChannel.reciveContentChannel,
+    (_event, totalContent, markContent, path) => {
+      let saveErr
+      fs.writeFile(path, totalContent, err => {
+        if (err) {
+          saveErr = err.message
+        }
+      })
+
+      if (!Object.hasOwn(fileCache, path)) {
+        fileCache[path] = {}
+        fileCache[path].headInfo = {}
       }
-    })
+      fileCache[path].fileContent = markContent
+      fileCache[path].isChange = false
 
-    if (!Object.hasOwn(fileCache, path)) {
-      fileCache[path] = {}
+      if (!openFilePath) {
+        openFilePath = path
+        mainWindow.setTitle(formatWinTitle(openFilePath))
+      }
+
+      mainWindow.webContents.send(
+        ipcChannel.sendSavedInfo,
+        path + ' written',
+        saveErr
+      )
     }
-    fileCache[path].fileContent = content
-    fileCache[path].isChange = false
-
-    if (!openFilePath) {
-      openFilePath = path
-      mainWindow.setTitle(formatWinTitle(openFilePath))
-    }
-
-    mainWindow.webContents.send(
-      ipcChannel.sendSavedInfo,
-      path + ' written',
-      saveErr
-    )
-  })
+  )
 
   // open recent file when click side file dir component
   ipcMain.on(ipcChannel.openRecentFile, (_event, filepath) => {
@@ -155,7 +135,7 @@ const createWindow = () => {
         ipcChannel.openFileChannel,
         filepath,
         fileCache[filepath].fileContent,
-        path.basename(filepath),
+        fileCache[filepath].headInfo,
         fileCache[filepath].isChange
       )
       openFilePath = filepath
@@ -176,7 +156,7 @@ const createWindow = () => {
           ipcChannel.openFileChannel,
           jsonData.filepath,
           fileCache[jsonData.filepath].fileContent,
-          path.basename(jsonData.filepath),
+          fileCache[jsonData.filepath].headInfo,
           fileCache[jsonData.filepath].isChange
         )
         openFilePath = jsonData.filepath
@@ -191,11 +171,32 @@ const createWindow = () => {
       const jsonData = JSON.parse(cache)
       if (!Object.hasOwn(fileCache, openFilePath)) {
         fileCache[openFilePath] = {}
+        fileCache[openFilePath].headInfo = {}
       }
       fileCache[openFilePath].fileContent = jsonData.fileContent
       fileCache[openFilePath].isChange = true
     }
   })
+  // update head info from renderer
+  ipcMain.handle(
+    ipcChannel.updateHeadInfoFromReact,
+    async (_event, headInfo) => {
+      if (headInfo && openFilePath) {
+        if (!Object.hasOwn(fileCache, openFilePath)) {
+          fileCache[openFilePath] = {}
+          fileCache[openFilePath].headInfo = {}
+        }
+        if (headInfo.title) {
+          fileCache[openFilePath].headInfo.title = headInfo.title
+          fileCache[openFilePath].isChange = true
+        }
+        if (headInfo.desc) {
+          fileCache[openFilePath].headInfo.desc = headInfo.desc
+          fileCache[openFilePath].isChange = true
+        }
+      }
+    }
+  )
 
   ipcMain.handle(ipcChannel.initialedRender, async () => {
     if (process.argv.length >= 2 && process.argv[1] !== '.') {
@@ -203,14 +204,16 @@ const createWindow = () => {
       mainWindow.setTitle(formatWinTitle(openFilePath))
       try {
         const fileContent = fs.readFileSync(openFilePath, 'utf8')
+        const parsContent = matter(fileContent)
         fileCache[openFilePath] = {
-          fileContent,
+          fileContent: parsContent.content,
+          headInfo: parsContent.data,
           isChange: false
         }
         return JSON.stringify({
           fullpath: openFilePath,
-          fileContent,
-          basename: path.basename(openFilePath),
+          fileContent: parsContent.content,
+          headInfo: parsContent.data,
           isChange: false
         })
       } catch (err) {
