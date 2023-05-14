@@ -75,10 +75,7 @@ function generateMenus(
           click: toggleSideCallback,
           accelerator:
             process.platform === 'darwin' ? 'Cmd+Shift+s' : 'Ctrl+Shift+s'
-        },
-        { type: 'separator' },
-        { role: 'reload' },
-        { role: 'forceReload' }
+        }
       ]
     },
     // { role: 'windowMenu' }
