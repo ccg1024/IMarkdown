@@ -30,6 +30,7 @@ const App = () => {
   const [showEditor, setShowEditor] = useState(false)
   const [isLivePre, setIsLivePre] = useState(false)
   const [showHeadInfo, setShowHeadInfo] = useState(false)
+  const uiControl = useRef(false)
 
   const dispatch = useCallback(useDispatch(), [])
 
@@ -59,24 +60,30 @@ const App = () => {
   const toggleView = (_event, value) => {
     switch (value) {
       case 1: // show preview
-        setShowEditor(false)
-        setShowPreview(true)
-        setIsLivePre(false)
+        if (uiControl.current) {
+          setShowEditor(false)
+          setShowPreview(true)
+          setIsLivePre(false)
+        }
         break
       case 2: // show editor
-        const editorScrollLine = getScrollLine(
-          scrollRef.current.previewScrollTop
-        )
-        scrollRef.current.editorScrollTo = editorScrollLine
-        scrollRef.current.previewScrollTo = editorScrollLine
-        setShowEditor(true)
-        setShowPreview(false)
-        setIsLivePre(false)
+        if (uiControl.current) {
+          const editorScrollLine = getScrollLine(
+            scrollRef.current.previewScrollTop
+          )
+          scrollRef.current.editorScrollTo = editorScrollLine
+          scrollRef.current.previewScrollTo = editorScrollLine
+          setShowEditor(true)
+          setShowPreview(false)
+          setIsLivePre(false)
+        }
         break
       case 3:
-        setShowEditor(true)
-        setShowPreview(false)
-        setIsLivePre(true)
+        if (uiControl.current) {
+          setShowEditor(true)
+          setShowPreview(false)
+          setIsLivePre(true)
+        }
         break
       case 4:
         handleFullScreen()
@@ -104,6 +111,7 @@ const App = () => {
         )
         setShowEditor(true)
         setShowHeadInfo(true)
+        uiControl.current = true
       } else {
         PubSub.publish(PubSubConfig.reCreateStateChannel, '')
       }
@@ -135,6 +143,9 @@ const App = () => {
     setShowEditor(true)
     setShowPreview(false)
     setShowHeadInfo(true)
+    if (!uiControl.current) {
+      uiControl.current = true
+    }
 
     PubSub.publish(PubSubConfig.reCreateStateChannel, fileContent)
     PubSub.publish(PubSubConfig.statusLineModify, isChange)
