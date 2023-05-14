@@ -5,7 +5,7 @@ const { dialog } = require('electron')
 const ipcChannel = require('../config/backend')
 const { fileUnsaveMessageConfig } = require('./config')
 const { openFileDialog, handleEmptyFileSave } = require('./dialog')
-const { logTime, converWin32Path } = require('../utils/backend')
+const { converWin32Path } = require('../utils/backend')
 
 const createFileTime = () => {
   const currentTime = new Date()
@@ -67,13 +67,13 @@ async function openFileCallback(win, openedCache) {
           isChange: false
         }
       } catch (e) {
-        console.log(e)
+        throw e
       }
     }
   }
 }
 
-async function saveFileCallback(win, openedFile, logPath) {
+async function saveFileCallback(win, openedFile) {
   try {
     if (openedFile === '') {
       let tempFilePath = await handleEmptyFileSave()
@@ -84,27 +84,8 @@ async function saveFileCallback(win, openedFile, logPath) {
           converWin32Path(tempFilePath),
           0
         )
-
-        const saveLogTime = logTime()
-        fs.appendFile(
-          logPath + 'imarkdown.log',
-          '[saveEmptyFile] ' + tempFilePath + ' ' + saveLogTime + '\n',
-          'utf8',
-          err => {
-            if (err) throw err
-          }
-        )
       }
     } else {
-      const saveLogTime = logTime()
-      fs.appendFile(
-        logPath + 'imarkdown.log',
-        '[saveFile] ' + openedFile + ' ' + saveLogTime + '\n',
-        'utf8',
-        err => {
-          if (err) throw err
-        }
-      )
       win.webContents.send(
         ipcChannel.saveFileChannel,
         converWin32Path(openedFile),
@@ -112,15 +93,7 @@ async function saveFileCallback(win, openedFile, logPath) {
       )
     }
   } catch (err) {
-    const saveLogTime = logTime()
-    fs.appendFile(
-      logPath + 'imarkdown.log',
-      '[Error] ' + err + ' ' + saveLogTime + '\n',
-      'utf8',
-      err => {
-        if (err) throw err
-      }
-    )
+    throw err
   }
 }
 

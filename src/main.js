@@ -72,7 +72,7 @@ const createWindow = () => {
     })
   }
   const saveFileWrapper = () => {
-    saveFileCallback(mainWindow, openFilePath, logPath)
+    saveFileCallback(mainWindow, openFilePath)
   }
   const createFileWrapper = () => {
     createFileCallback(mainWindow).then(fileObj => {
@@ -108,8 +108,19 @@ const createWindow = () => {
       fs.writeFile(path, totalContent, err => {
         if (err) {
           saveErr = err.message
+          throw err
         }
       })
+      fs.appendFile(
+        logPath + 'imarkdown.log',
+        `[LOG] ${new Date().toLocaleString()} ${path} written\n`,
+        'utf8',
+        err => {
+          if (err) {
+            throw err
+          }
+        }
+      )
 
       if (!Object.hasOwn(fileCache, path)) {
         fileCache[path] = {}
@@ -125,7 +136,7 @@ const createWindow = () => {
 
       mainWindow.webContents.send(
         ipcChannel.sendSavedInfo,
-        path + ' written',
+        path + ' written\n',
         saveErr
       )
     }
