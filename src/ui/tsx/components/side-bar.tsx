@@ -141,7 +141,15 @@ const FixedLeftBar: FC = (): JSX.Element => {
       width="45%"
     >
       <Flex alignItems="center" paddingY={2} paddingX={4}>
-        <BsMarkdown style={{ fontSize: '1.5em' }} />
+        <BsMarkdown
+          style={{
+            fontSize: '1.5em',
+            color: useColorModeValue(
+              'var(--chakra-colors-blue-600)',
+              'var(--chakra-colors-blue-600)'
+            )
+          }}
+        />
         <Text
           marginLeft={2}
           fontSize="1.1em"

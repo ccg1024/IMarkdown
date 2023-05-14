@@ -1,16 +1,22 @@
-import React, { FC, MouseEventHandler, useCallback } from 'react'
+import PubSub from 'pubsub-js'
+import React, { FC, MouseEventHandler, MouseEvent, useCallback } from 'react'
 import {
   Text,
   Box,
+  Menu,
+  MenuList,
+  MenuItem,
   Editable,
+  MenuButton,
   EditableInput,
   EditablePreview,
   useColorModeValue
 } from '@chakra-ui/react'
 import { useSelector, useDispatch } from 'react-redux'
-import { BsFullscreen, BsLayoutSplit } from 'react-icons/bs'
+import { BsFullscreen, BsLayoutSplit, BsChevronRight } from 'react-icons/bs'
 import { Global } from '@emotion/react'
 
+import PubSubConfig from '../../../config/frontend'
 import { selectCurrentFile } from '../../app/reducers/currentFileSlice'
 import {
   selectRecentFiles,
@@ -36,6 +42,14 @@ interface MarkHeadInfoProps {
   livePreviewCallback: MouseEventHandler<SVGElement>
 }
 
+interface MarkHeadInfoControlGate {
+  statuslineGate: number | null
+}
+
+const controlGate: MarkHeadInfoControlGate = {
+  statuslineGate: null
+}
+
 const MarkHeadInfo: FC<MarkHeadInfoProps> = (props): JSX.Element => {
   const currentFile: string = useSelector(selectCurrentFile)
   const recentFiles: RecentFilesStateItem = useSelector(selectRecentFiles)
@@ -53,6 +67,13 @@ const MarkHeadInfo: FC<MarkHeadInfoProps> = (props): JSX.Element => {
         })
       )
       window.electronAPI.updateHeadInfo({ title: nextValue })
+
+      if (controlGate.statuslineGate) {
+        window.clearTimeout(controlGate.statuslineGate)
+      }
+      controlGate.statuslineGate = window.setTimeout(() => {
+        PubSub.publish(PubSubConfig.statusLineModify, true)
+      }, 500)
     }
   }
   const onChangeDesc = (nextValue: string) => {
@@ -64,6 +85,24 @@ const MarkHeadInfo: FC<MarkHeadInfoProps> = (props): JSX.Element => {
         })
       )
       window.electronAPI.updateHeadInfo({ desc: nextValue })
+      if (controlGate.statuslineGate) {
+        window.clearTimeout(controlGate.statuslineGate)
+      }
+      controlGate.statuslineGate = window.setTimeout(() => {
+        PubSub.publish(PubSubConfig.statusLineModify, true)
+      }, 500)
+    }
+  }
+  const clickMenu: MouseEventHandler<HTMLDivElement> = (
+    event: MouseEvent<HTMLDivElement>
+  ) => {
+    const { target } = event
+
+    if (target) {
+      const tag = (target as HTMLButtonElement).dataset.tag
+      if (tag) {
+        // console.log(tag)
+      }
     }
   }
 
@@ -103,9 +142,18 @@ const MarkHeadInfo: FC<MarkHeadInfoProps> = (props): JSX.Element => {
         gap={2}
         display="flex"
         fontSize="0.8em"
+        alignItems="center"
         color={useColorModeValue('gray.500', 'gray.500')}
       >
-        <Text>NoteBook:</Text>
+        <Menu>
+          <MenuButton>NoteBook</MenuButton>
+          <MenuList onClick={clickMenu}>
+            <MenuItem data-tag="tag one">In development</MenuItem>
+            <MenuItem data-tag="tag two">In development</MenuItem>
+            <MenuItem data-tag="tag three">In development</MenuItem>
+          </MenuList>
+        </Menu>
+        <BsChevronRight />
         <Text>{noteTime ? noteTime : 'Unknow time'}</Text>
       </Box>
       <Editable
