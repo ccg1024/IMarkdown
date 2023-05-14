@@ -117,7 +117,7 @@ const MarkHeadInfo: FC<MarkHeadInfoProps> = (props): JSX.Element => {
   }
 
   return (
-    <Box padding={4} marginBottom={2} fontSize="24px">
+    <Box padding={4} marginBottom={2}>
       <Box
         display="flex"
         justifyContent="space-between"

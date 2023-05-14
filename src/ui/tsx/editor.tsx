@@ -132,7 +132,6 @@ const Editor: React.FC<EditorProps> = props => {
       width="100%"
       height="100%"
       id="editor_Box"
-      fontSize="22px"
       display={props.isVisible ? 'block' : 'none'}
     >
       <Box display="flex" flexDirection="column" height="100%" width="100%">

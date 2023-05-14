@@ -44,7 +44,6 @@ const Preview = ({ isVisible, scrollLine }) => {
       height="100%"
       width="100%"
       pl={2}
-      fontSize="22px"
       display={isVisible ? 'block' : 'none'}
     >
       {isVisible && <MarkComponent />}
