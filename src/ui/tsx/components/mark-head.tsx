@@ -40,9 +40,9 @@ const MarkHeadInfo: FC<MarkHeadInfoProps> = (props): JSX.Element => {
   const currentFile: string = useSelector(selectCurrentFile)
   const recentFiles: RecentFilesStateItem = useSelector(selectRecentFiles)
   const reduxDispatch = useCallback(useDispatch(), [])
-  const noteTitle = currentFile && recentFiles[currentFile].title
-  const noteTime = currentFile && recentFiles[currentFile].date
-  const noteDesc = currentFile && recentFiles[currentFile].desc
+  const noteTitle = (currentFile && recentFiles[currentFile].title) || ''
+  const noteTime = (currentFile && recentFiles[currentFile].date) || ''
+  const noteDesc = (currentFile && recentFiles[currentFile].desc) || ''
 
   const onChangeTitle = (nextValue: string) => {
     if (currentFile) {
