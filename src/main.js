@@ -96,6 +96,9 @@ const createWindow = () => {
   const livePreviewWrapper = () => {
     mainWindow.webContents.send(ipcChannel.toggleViewChannel, 3)
   }
+  const toggleSideWrapper = () => {
+    mainWindow.webContents.send(ipcChannel.toggleViewChannel, 4)
+  }
 
   // recive file content from renderer then save file content to local
   ipcMain.on(
@@ -245,7 +248,8 @@ const createWindow = () => {
     createFileWrapper,
     togglePreviewWrapper,
     toggleEditorWrapper,
-    livePreviewWrapper
+    livePreviewWrapper,
+    toggleSideWrapper
   )
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)

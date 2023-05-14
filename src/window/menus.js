@@ -6,7 +6,8 @@ function generateMenus(
   createFileCallback,
   togglePreviewCallback,
   toggleEditorCallback,
-  livePreviewCallback
+  livePreviewCallback,
+  toggleSideCallback
 ) {
   const template = [
     // { role: 'appMenu' }
@@ -38,7 +39,8 @@ function generateMenus(
         },
         {
           label: 'create file',
-          click: createFileCallback
+          click: createFileCallback,
+          accelerator: process.platform === 'darwin' ? 'Cmd+n' : 'Ctrl+n'
         },
         { type: 'separator' },
         isMac ? { role: 'close' } : { role: 'quit' }
@@ -64,7 +66,15 @@ function generateMenus(
         },
         {
           label: 'Live Preview',
-          click: livePreviewCallback
+          click: livePreviewCallback,
+          accelerator:
+            process.platform === 'darwin' ? 'Cmd+Shift+l' : 'Ctrl+Shift+l'
+        },
+        {
+          label: 'Toggle Sidebar',
+          click: toggleSideCallback,
+          accelerator:
+            process.platform === 'darwin' ? 'Cmd+Shift+s' : 'Ctrl+Shift+s'
         },
         { type: 'separator' },
         { role: 'reload' },

@@ -76,6 +76,9 @@ const App = () => {
         setShowPreview(false)
         setIsLivePre(true)
         break
+      case 4:
+        handleFullScreen()
+        break
     }
   }
 
