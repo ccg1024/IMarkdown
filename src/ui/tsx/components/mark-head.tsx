@@ -29,8 +29,18 @@ const MarkHeadInfoStyle: FC = (): JSX.Element => {
   return (
     <Global
       styles={{
+        '.toggle-icon': {
+          color: useColorModeValue(
+            'var(--chakra-colors-gray-200)',
+            'var(--chakra-colors-gray-200)'
+          )
+        },
         '.toggle-icon:hover': {
-          cursor: 'pointer'
+          cursor: 'pointer',
+          color: useColorModeValue(
+            'var(--chakra-colors-gray-500)',
+            'var(--chakra-colors-gray-500)'
+          )
         }
       }}
     />

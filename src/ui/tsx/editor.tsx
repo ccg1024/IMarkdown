@@ -7,10 +7,7 @@ import { IpcRendererEvent } from 'electron/renderer'
 import { useDispatch } from 'react-redux'
 
 import EditorStatusline from '../components/editor-statusline'
-import GhostInfo from '../components/ghostInfo'
 
-import { modifyCurrentFile } from '../app/reducers/currentFileSlice'
-import { modifyRecentFiles } from '../app/reducers/recentFilesSlice'
 import { getCurrentMarkHead } from '../app/store'
 
 import {
@@ -137,9 +134,7 @@ const Editor: React.FC<EditorProps> = props => {
       id="editor_Box"
       fontSize="22px"
       display={props.isVisible ? 'block' : 'none'}
-      position="relative"
     >
-      <GhostInfo />
       <Box display="flex" flexDirection="column" height="100%" width="100%">
         <Box ref={refContainer} pl={4} flexGrow={1} overflow="auto"></Box>
         <EditorStatusline />

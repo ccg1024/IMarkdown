@@ -13,6 +13,7 @@ import Editor from './tsx/editor'
 import Preview from './preview'
 import PubSubConfig from '../config/frontend'
 import { getScrollLine } from './libs/tools'
+import GhostInfo from './tsx/components/ghost-info'
 
 import { modifyContent } from './app/reducers/fileContentSlice'
 import { modifyCurrentFile } from './app/reducers/currentFileSlice'
@@ -26,8 +27,9 @@ import { formatedTime } from './tsx/libs/tools'
 
 const App = () => {
   const [showPreview, setShowPreview] = useState(false)
-  const [showEditor, setShowEditor] = useState(true)
+  const [showEditor, setShowEditor] = useState(false)
   const [isLivePre, setIsLivePre] = useState(false)
+  const [showHeadInfo, setShowHeadInfo] = useState(false)
 
   const dispatch = useCallback(useDispatch(), [])
 
@@ -100,6 +102,8 @@ const App = () => {
           PubSubConfig.reCreateStateChannel,
           initialFile.fileContent
         )
+        setShowEditor(true)
+        setShowHeadInfo(true)
       } else {
         PubSub.publish(PubSubConfig.reCreateStateChannel, '')
       }
@@ -130,6 +134,7 @@ const App = () => {
     dispatch(modifyCurrentFile(fullPath))
     setShowEditor(true)
     setShowPreview(false)
+    setShowHeadInfo(true)
 
     PubSub.publish(PubSubConfig.reCreateStateChannel, fileContent)
     PubSub.publish(PubSubConfig.statusLineModify, isChange)
@@ -179,11 +184,16 @@ const App = () => {
           width="65%"
           height="100%"
           flexDirection="column"
+          position="relative"
         >
-          <MarkHeadInfo
-            fullScreenCallback={handleFullScreen}
-            livePreviewCallback={handleLivePreview}
-          />
+          {showHeadInfo ? (
+            <MarkHeadInfo
+              fullScreenCallback={handleFullScreen}
+              livePreviewCallback={handleLivePreview}
+            />
+          ) : (
+            <GhostInfo />
+          )}
           <Flex height="100%" width="100%" overflow="auto">
             <Editor isVisible={showEditor} scrollLine={scrollRef.current} />
             <Preview isVisible={showPreview} scrollLine={scrollRef.current} />

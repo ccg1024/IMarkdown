@@ -10,8 +10,7 @@ import PubSubConfig from '../../config/frontend'
 const controlls = {
   closeChangeGate: false,
   cursorTimer: null,
-  scrollTimer: null,
-  closeGhostGate: false
+  scrollTimer: null
 }
 
 function updateCacheToMainProcess(doc) {
@@ -30,10 +29,6 @@ export function generateEditor(doc, scrollLine, reduxDispatch) {
       EditorView.updateListener.of(update => {
         // for doc change
         if (update.docChanged) {
-          if (!controlls.closeGhostGate) {
-            PubSub.publish(PubSubConfig.ghostInfoChannel, 'close')
-            controlls.closeGhostGate = true
-          }
           if (!controlls.closeChangeGate) {
             PubSub.publish(PubSubConfig.statusLineModify, true)
             controlls.closeChangeGate = true
@@ -79,11 +74,6 @@ export function generateEditor(doc, scrollLine, reduxDispatch) {
       ...Init_extends()
     ]
   })
-
-  if (doc && !controlls.closeGhostGate) {
-    PubSub.publish(PubSubConfig.ghostInfoChannel, 'close')
-    controlls.closeGhostGate = true
-  }
 
   return state
 }
