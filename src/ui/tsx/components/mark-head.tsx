@@ -13,7 +13,13 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 import { useSelector, useDispatch } from 'react-redux'
-import { BsFullscreen, BsLayoutSplit, BsChevronRight } from 'react-icons/bs'
+import {
+  BsEye,
+  BsPencil,
+  BsFullscreen,
+  BsLayoutSplit,
+  BsChevronRight
+} from 'react-icons/bs'
 import { Global } from '@emotion/react'
 
 import PubSubConfig from '../../../config/frontend'
@@ -50,6 +56,8 @@ const MarkHeadInfoStyle: FC = (): JSX.Element => {
 interface MarkHeadInfoProps {
   fullScreenCallback: MouseEventHandler<SVGElement>
   livePreviewCallback: MouseEventHandler<SVGElement>
+  justPreviewCallback: MouseEventHandler<SVGElement>
+  justEditorCallback: MouseEventHandler<SVGElement>
 }
 
 interface MarkHeadInfoControlGate {
@@ -136,7 +144,12 @@ const MarkHeadInfo: FC<MarkHeadInfoProps> = (props): JSX.Element => {
           <EditableInput paddingLeft={2} />
         </Editable>
         <MarkHeadInfoStyle />
-        <Box display="flex" gap={2} alignItems="center">
+        <Box
+          display="flex"
+          gap={2}
+          alignItems="center"
+          marginRight={2}
+        >
           <BsFullscreen
             className="toggle-icon"
             onClick={props.fullScreenCallback}
@@ -144,6 +157,14 @@ const MarkHeadInfo: FC<MarkHeadInfoProps> = (props): JSX.Element => {
           <BsLayoutSplit
             className="toggle-icon"
             onClick={props.livePreviewCallback}
+          />
+          <BsEye
+            className="toggle-icon"
+            onClick={props.justPreviewCallback}
+          />
+          <BsPencil
+            className="toggle-icon"
+            onClick={props.justEditorCallback}
           />
         </Box>
       </Box>

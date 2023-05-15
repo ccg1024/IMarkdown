@@ -23,6 +23,7 @@ export interface IElectronAPI {
   closeWindow: () => Promise<void>
   minWindow: () => Promise<void>
   maxWindow: () => Promise<void>
+  sendMenuOption: (option: string) => Promise<void>
 }
 
 declare global {

@@ -254,6 +254,17 @@ const createWindow = () => {
     }
   })
 
+  // get menu option from react
+  ipcMain.on(ipcChannel.sendMenuOption, (_event, option) => {
+    if (option === 'open file') {
+      openFileWrapper()
+    } else if (option === 'save file') {
+      saveFileWrapper()
+    } else if (option === 'create file') {
+      createFileWrapper()
+    }
+  })
+
   // show close dialog
   mainWindow.on('close', function (e) {
     let showCloseDialog = false

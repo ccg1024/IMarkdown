@@ -221,6 +221,7 @@ export function RemarkCode(props) {
 export function RemarkHr(props) {
   return (
     <Divider
+      marginY="1em"
       borderBottomWidth="2px"
       data-line={props.node && getStartLine(props.node)}
     />

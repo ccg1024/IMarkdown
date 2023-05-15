@@ -1,4 +1,10 @@
-import React, { FC, ReactNode, useCallback } from 'react'
+import React, {
+  FC,
+  MouseEvent,
+  MouseEventHandler,
+  ReactNode,
+  useCallback
+} from 'react'
 import {
   Box,
   Text,
@@ -7,10 +13,14 @@ import {
   ListItem,
   Heading,
   Input,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
   useColorModeValue
 } from '@chakra-ui/react'
 import { useSelector } from 'react-redux'
-import { BsMarkdown } from 'react-icons/bs'
+import { BsMarkdown, BsThreeDotsVertical } from 'react-icons/bs'
 
 import uiColor from '../../libs/colors'
 import {
@@ -28,6 +38,25 @@ interface SideBarDetailItemProps {
 
 interface SideBarDetailProps {
   children: ReactNode
+}
+
+interface MenuItemChildProps {
+  label: string
+  accelerator: string
+}
+
+const MenuItemChild: FC<MenuItemChildProps> = (props): JSX.Element => {
+  return (
+    <Flex
+      justifyContent="space-between"
+      alignItems="center"
+      width="100%"
+      data-option={props.label}
+    >
+      <Text data-option={props.label}>{props.label}</Text>
+      <Text data-option={props.label}>{props.accelerator}</Text>
+    </Flex>
+  )
 }
 
 const SideBarDetailItem: FC<SideBarDetailItemProps> = (props): JSX.Element => {
@@ -129,6 +158,19 @@ const SideBarDetail: FC<SideBarDetailProps> = (props): JSX.Element => {
 }
 
 const FixedLeftBar: FC = (): JSX.Element => {
+  const clickMenu: MouseEventHandler<HTMLDivElement> = useCallback(
+    (event: MouseEvent<HTMLDivElement>) => {
+      const { target } = event
+
+      if (target) {
+        const option = (target as HTMLButtonElement).dataset.option
+        if (option) {
+          window.electronAPI.sendMenuOption(option)
+        }
+      }
+    },
+    []
+  )
   return (
     <Box
       id="fixed-side-bar"
@@ -140,24 +182,51 @@ const FixedLeftBar: FC = (): JSX.Element => {
       color={useColorModeValue('gray.300', 'gray.300')}
       width="45%"
     >
-      <Flex alignItems="center" paddingY={2} paddingX={4}>
-        <BsMarkdown
-          style={{
-            fontSize: '1.5em',
-            color: useColorModeValue(
-              'var(--chakra-colors-blue-600)',
-              'var(--chakra-colors-blue-600)'
-            )
-          }}
-        />
-        <Text
-          marginLeft={2}
-          fontSize="1.1em"
-          textAlign="left"
-          userSelect="none"
-        >
-          Imarkdown
-        </Text>
+      <Flex
+        alignItems="center"
+        paddingY={2}
+        paddingX={4}
+        justifyContent="space-between"
+      >
+        <Box alignItems="center" display="flex">
+          <BsMarkdown
+            style={{
+              fontSize: '1.5em',
+              color: useColorModeValue(
+                'var(--chakra-colors-blue-600)',
+                'var(--chakra-colors-blue-600)'
+              )
+            }}
+          />
+          <Text
+            marginLeft={2}
+            fontSize="1.1em"
+            textAlign="left"
+            userSelect="none"
+          >
+            Imarkdown
+          </Text>
+        </Box>
+
+        <Menu>
+          <MenuButton>
+            <BsThreeDotsVertical />
+          </MenuButton>
+          <MenuList
+            color={useColorModeValue('black', 'white')}
+            onClick={clickMenu}
+          >
+            <MenuItem data-option="open file">
+              <MenuItemChild label="open file" accelerator="ctrl+o" />
+            </MenuItem>
+            <MenuItem data-option="save file">
+              <MenuItemChild label="save file" accelerator="ctrl+s" />
+            </MenuItem>
+            <MenuItem data-option="create file">
+              <MenuItemChild label="create file" accelerator="ctrl+n" />
+            </MenuItem>
+          </MenuList>
+        </Menu>
       </Flex>
       <List>
         <ListItem

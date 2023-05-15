@@ -16,7 +16,8 @@ const options = {
   updateHeadInfoFromReact: 'update-head-info-from-react',
   closeWindowFromReact: 'close-window',
   minWindowFromReact: 'min-window',
-  maxWindowFromReact: 'max-window'
+  maxWindowFromReact: 'max-window',
+  sendMenuOption: 'send-menu-option'
 }
 
 module.exports = options

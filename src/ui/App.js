@@ -57,6 +57,19 @@ const App = () => {
     setShowEditor(true)
     setIsLivePre(v => !v)
   }, [])
+  const handleJustPreview = useCallback(() => {
+    setShowEditor(false)
+    setShowPreview(true)
+    setIsLivePre(false)
+  }, [])
+  const handleJustEditor = useCallback(() => {
+    const editorScrollLine = getScrollLine(scrollRef.current.previewScrollTop)
+    scrollRef.current.editorScrollTo = editorScrollLine
+    scrollRef.current.previewScrollTo = editorScrollLine
+    setShowEditor(true)
+    setShowPreview(false)
+    setIsLivePre(false)
+  }, [])
 
   const toggleView = (_event, value) => {
     switch (value) {
@@ -203,6 +216,8 @@ const App = () => {
             <MarkHeadInfo
               fullScreenCallback={handleFullScreen}
               livePreviewCallback={handleLivePreview}
+              justPreviewCallback={handleJustPreview}
+              justEditorCallback={handleJustEditor}
             />
           ) : (
             <GhostInfo />

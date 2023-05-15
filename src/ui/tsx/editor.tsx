@@ -106,7 +106,8 @@ const Editor: React.FC<EditorProps> = props => {
     saveFilePath: string,
     saveFlag: number
   ) {
-    const formatedContent = formateContent(cmRef.current)
+    // const formatedContent = formateContent(cmRef.current)
+    const formatedContent = cmRef.current.state.doc.toString()
 
     const currentMarkHead = getCurrentMarkHead()
     const totalContent = concatHeadAndContent(currentMarkHead, formatedContent)

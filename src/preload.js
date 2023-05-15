@@ -34,5 +34,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke(ipcChannel.updateHeadInfoFromReact, headInfo),
   closeWindow: () => ipcRenderer.send(ipcChannel.closeWindowFromReact),
   minWindow: () => ipcRenderer.send(ipcChannel.minWindowFromReact),
-  maxWindow: () => ipcRenderer.send(ipcChannel.maxWindowFromReact)
+  maxWindow: () => ipcRenderer.send(ipcChannel.maxWindowFromReact),
+  sendMenuOption: option => ipcRenderer.send(ipcChannel.sendMenuOption, option)
 })
