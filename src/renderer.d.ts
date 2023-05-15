@@ -20,6 +20,9 @@ export interface IElectronAPI {
   updateCache: (cache: string) => Promise<void>
   initialedRender: () => Promise<void>
   updateHeadInfo: (headInfo: HeadInfo) => Promise<void>
+  closeWindow: () => Promise<void>
+  minWindow: () => Promise<void>
+  maxWindow: () => Promise<void>
 }
 
 declare global {

@@ -13,7 +13,10 @@ const options = {
   vimOptionChannel: 'vim-option-channel',
   updateCacheFromReact: 'update-cache-from-react',
   initialedRender: 'initialed-renderer',
-  updateHeadInfoFromReact: 'update-head-info-from-react'
+  updateHeadInfoFromReact: 'update-head-info-from-react',
+  closeWindowFromReact: 'close-window',
+  minWindowFromReact: 'min-window',
+  maxWindowFromReact: 'max-window'
 }
 
 module.exports = options

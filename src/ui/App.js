@@ -22,6 +22,7 @@ import { modifyRecentFiles } from './app/reducers/recentFilesSlice'
 import NewPreview from './tsx/preview'
 import MarkHeadInfo from './tsx/components/mark-head'
 import SideBar from './tsx/components/side-bar'
+import TitleBar from './tsx/components/title-bar'
 
 import { formatedTime } from './tsx/libs/tools'
 
@@ -197,6 +198,7 @@ const App = () => {
           flexDirection="column"
           position="relative"
         >
+          <TitleBar />
           {showHeadInfo ? (
             <MarkHeadInfo
               fullScreenCallback={handleFullScreen}

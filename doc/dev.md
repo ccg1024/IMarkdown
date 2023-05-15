@@ -1,3 +1,7 @@
+---
+title: Dev doc
+desc: 开发文档
+---
 **$PROJECT_ROOT**
 
 - src: code place
@@ -178,3 +182,15 @@ the purpose of each package
 #### 2023-5-1
 
 上述的输入卡顿问题是因为使用插件`react-syntax-highlighter`渲染预览模块导致的，将该部分替换成 codemirror 的`runmode`便可解决，经过测试 archlinux 的笔记文件，只有到文件内容达到一千多行时，才会出现些许的卡顿情况，且当输入速度不快时也不会感觉到，对于该项目而言足够了。
+
+#### 2023-5-15
+
+隐藏系统标题栏，待构建自定义标题栏。目前可用标题栏快捷键。
+
+- `ctl/cmd+o`: 打开文件
+- `ctl/cmd+s`: 保存文件
+- `ctl/cmd+n`: 创建新文件
+- `ctl/cmd+shift+p`: 仅预览
+- `ctl/cmd+shift+e`: 仅编辑
+- `ctl/cmd+shift+l`: 开启实时预览
+- `ctl/cmd+shift+s`: 切换侧边栏

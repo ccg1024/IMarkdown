@@ -45,8 +45,9 @@ const createWindow = () => {
     icon: path.join(__dirname, './static/img/markdown.ico'),
     width: 1280,
     height: 800,
-    minWidth: 1280,
-    minHeight: 800,
+    minWidth: 1000,
+    minHeight: 400,
+    titleBarStyle: 'hidden',
     vibrancy: 'under-window',
     visualEffectState: 'active',
     webPreferences: {
@@ -235,6 +236,21 @@ const createWindow = () => {
       } catch (err) {
         throw err
       }
+    }
+  })
+
+  // close, min, max window from renderer click
+  ipcMain.on(ipcChannel.closeWindowFromReact, _event => {
+    mainWindow.close()
+  })
+  ipcMain.on(ipcChannel.minWindowFromReact, _event => {
+    mainWindow.minimize()
+  })
+  ipcMain.on(ipcChannel.maxWindowFromReact, _event => {
+    if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize()
+    } else {
+      mainWindow.maximize()
     }
   })
 
