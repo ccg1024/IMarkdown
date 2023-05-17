@@ -1,4 +1,4 @@
-import _, { constant } from 'lodash'
+import _ from 'lodash'
 import PubSub from 'pubsub-js'
 import React, {
   useEffect,
@@ -149,27 +149,39 @@ const NewPreview: React.FC<Props> = React.memo(props => {
       )
 
       domRef.current.onscroll = _.throttle((event: Event) => {
-        let target = event.target as HTMLElement
-        let gap = target.getBoundingClientRect().top
-        for (
-          let childDomIndx = 0;
-          childDomIndx < domRef.current.children.length;
-          childDomIndx++
-        ) {
-          let childDom = domRef.current.children[childDomIndx] as HTMLElement
-          let nextDom = domRef.current.children[childDomIndx + 1] as HTMLElement
-          if (
-            childDom.offsetTop - gap <= target.scrollTop &&
-            nextDom.offsetTop - gap > target.scrollTop
+        if (domRef.current.matches(':hover')) {
+          let target = event.target as HTMLElement
+          let gap = target.getBoundingClientRect().top
+          for (
+            let childDomIndx = 0;
+            childDomIndx < domRef.current.children.length;
+            childDomIndx++
           ) {
-            let lineDataSet = childDom.dataset as LineDataSet
-            // console.log(childDom.offsetTop - gap - target.scrollTop)
-            // console.log(
-            //   childDom.getBoundingClientRect().bottom -
-            //     childDom.getBoundingClientRect().top
-            // )
-            PubSub.publish(PubSubConfig.liveScrollChannel, lineDataSet.line)
-            break
+            let childDom = domRef.current.children[childDomIndx] as HTMLElement
+            let nextDom = domRef.current.children[
+              childDomIndx + 1
+            ] as HTMLElement
+            if (
+              childDom.offsetTop - gap <= target.scrollTop &&
+              nextDom.offsetTop - gap > target.scrollTop
+            ) {
+              let lineDataSet = childDom.dataset as LineDataSet
+              let nextLineDataSet = nextDom.dataset as LineDataSet
+              let childDomHeight = childDom.offsetHeight
+              if (
+                Math.abs(childDom.offsetTop - gap - target.scrollTop) >=
+                childDomHeight
+              ) {
+                PubSub.publish(PubSubConfig.liveScrollChannel, {
+                  line: nextLineDataSet.line
+                })
+              } else {
+                PubSub.publish(PubSubConfig.liveScrollChannel, {
+                  line: lineDataSet.line
+                })
+              }
+              break
+            }
           }
         }
       }, 500)

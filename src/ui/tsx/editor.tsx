@@ -16,7 +16,7 @@ import {
 } from '../libs/generate-editor'
 import PubSubConfig from '../../config/frontend'
 import { formateContent } from '../../utils/frontend'
-import { IScrollPosInfo } from './types/render'
+import { IScrollPosInfo, IScrollInfo } from './types/render'
 import { concatHeadAndContent } from './libs/tools'
 const ipcChannels = require('../../config/backend')
 const { vimOption } = require('../../config/vim-option')
@@ -89,9 +89,9 @@ const Editor: React.FC<EditorProps> = props => {
 
     let liveToken = PubSub.subscribe(
       PubSubConfig.liveScrollChannel,
-      (_msg: string, data: string) => {
+      (_msg: string, data: IScrollInfo) => {
         if (cmRef.current) {
-          const lineObj = cmRef.current.state.doc.line(Number(data))
+          const lineObj = cmRef.current.state.doc.line(Number(data.line))
           cmRef.current.dispatch({
             effects: EditorView.scrollIntoView(lineObj.from, { y: 'start' })
           })
