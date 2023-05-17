@@ -16,3 +16,8 @@ export interface HeadInfo {
   desc?: string
   title?: string
 }
+
+export interface IScrollInfo {
+  line: string
+  percent?: number
+}
