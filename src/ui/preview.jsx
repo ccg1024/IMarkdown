@@ -1,8 +1,10 @@
 import _ from 'lodash'
+import PubSub from 'pubsub-js'
 import React, { useEffect } from 'react'
 import { Box } from '@chakra-ui/react'
 
 import MarkComponent from './components/mark-component'
+import PubSubConfig from '../config/frontend'
 
 import '../static/css/preview-scroll.css'
 
@@ -33,6 +35,7 @@ const Preview = ({ isVisible, scrollLine }) => {
       }, 500)
       return () => {
         previewBody.onscroll = null
+        PubSub.publish(PubSubConfig.scrollSyncChannel, 'editor')
       }
     }
   }, [isVisible])

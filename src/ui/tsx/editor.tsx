@@ -71,27 +71,40 @@ const Editor: React.FC<EditorProps> = props => {
       }
     )
 
+    let scrollToken = PubSub.subscribe(
+      PubSubConfig.scrollSyncChannel,
+      (_msg: string, data: string) => {
+        if (cmRef.current && data === 'editor') {
+          const lineObj = cmRef.current.state.doc.line(
+            props.scrollLine.editorScrollTo
+          )
+          cmRef.current.dispatch({
+            selection: { anchor: lineObj.from, head: lineObj.from },
+            effects: EditorView.scrollIntoView(lineObj.from, { y: 'start' }),
+            scrollIntoView: true
+          })
+        }
+      }
+    )
+
+    let liveToken = PubSub.subscribe(
+      PubSubConfig.liveScrollChannel,
+      (_msg: string, data: string) => {
+        if (cmRef.current) {
+          const lineObj = cmRef.current.state.doc.line(Number(data))
+          cmRef.current.dispatch({
+            effects: EditorView.scrollIntoView(lineObj.from, { y: 'start' })
+          })
+        }
+      }
+    )
+
     return () => {
       PubSub.unsubscribe(editorToken)
+      PubSub.unsubscribe(scrollToken)
+      PubSub.unsubscribe(liveToken)
     }
   }, [])
-
-  useEffect(() => {
-    if (cmRef.current && props.isVisible) {
-      const lineObj = cmRef.current.state.doc.line(
-        props.scrollLine.editorScrollTo
-      )
-      cmRef.current.dispatch({
-        selection: {
-          anchor: lineObj.from,
-          head: lineObj.from
-        },
-        effects: EditorView.scrollIntoView(lineObj.from, { y: 'start' }),
-        scrollIntoView: true
-      })
-      return () => {}
-    }
-  }, [cmRef, props.isVisible])
 
   useEffect(() => {
     window.electronAPI.saveFile(handleSaveFile)

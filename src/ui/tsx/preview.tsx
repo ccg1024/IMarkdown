@@ -1,3 +1,4 @@
+import _, { constant } from 'lodash'
 import PubSub from 'pubsub-js'
 import React, {
   useEffect,
@@ -44,9 +45,9 @@ interface Props {
   isVisible: boolean
 }
 
-interface LineDataSet {
-  line: number
-  endline: number
+interface LineDataSet extends DOMStringMap {
+  line: string
+  endline: string
 }
 
 interface TimeoutController {
@@ -98,7 +99,7 @@ function updatePreview(doc: string): React.ReactNode {
 }
 
 const NewPreview: React.FC<Props> = React.memo(props => {
-  const domRef: React.MutableRefObject<any> = useRef(null)
+  const domRef: React.MutableRefObject<HTMLDivElement> = useRef()
 
   useEffect(() => {
     if (props.isVisible) {
@@ -106,8 +107,13 @@ const NewPreview: React.FC<Props> = React.memo(props => {
         PubSubConfig.syncUpdateDocScroll,
         (_msg: string, cursorLine: number) => {
           let jumped = false
-          for (let childDom of domRef.current.children) {
-            let lineDataSet: LineDataSet = childDom.dataset
+          for (
+            let childDomIndx = 0;
+            childDomIndx < domRef.current.children.length;
+            childDomIndx++
+          ) {
+            let childDom = domRef.current.children[childDomIndx] as HTMLElement
+            let lineDataSet = childDom.dataset
             if (
               Number(lineDataSet.line) > cursorLine ||
               Number(lineDataSet.line) === cursorLine
@@ -121,9 +127,10 @@ const NewPreview: React.FC<Props> = React.memo(props => {
               Number(lineDataSet.endline) &&
               Number(lineDataSet.endline) >= cursorLine
             ) {
-              let totalRows = lineDataSet.endline - lineDataSet.line
+              let totalRows =
+                Number(lineDataSet.endline) - Number(lineDataSet.line)
               let elementHeight = childDom.offsetHeight
-              let offsetStart = cursorLine - lineDataSet.line
+              let offsetStart = cursorLine - Number(lineDataSet.line)
               let offsetFromTop = childDom.offsetTop
               let clientHeight = domRef.current.clientHeight
 
@@ -140,8 +147,35 @@ const NewPreview: React.FC<Props> = React.memo(props => {
           }
         }
       )
+
+      domRef.current.onscroll = _.throttle((event: Event) => {
+        let target = event.target as HTMLElement
+        let gap = target.getBoundingClientRect().top
+        for (
+          let childDomIndx = 0;
+          childDomIndx < domRef.current.children.length;
+          childDomIndx++
+        ) {
+          let childDom = domRef.current.children[childDomIndx] as HTMLElement
+          let nextDom = domRef.current.children[childDomIndx + 1] as HTMLElement
+          if (
+            childDom.offsetTop - gap <= target.scrollTop &&
+            nextDom.offsetTop - gap > target.scrollTop
+          ) {
+            let lineDataSet = childDom.dataset as LineDataSet
+            // console.log(childDom.offsetTop - gap - target.scrollTop)
+            // console.log(
+            //   childDom.getBoundingClientRect().bottom -
+            //     childDom.getBoundingClientRect().top
+            // )
+            PubSub.publish(PubSubConfig.liveScrollChannel, lineDataSet.line)
+            break
+          }
+        }
+      }, 500)
       return () => {
         PubSub.unsubscribe(token2)
+        domRef.current.onscroll = null
       }
     }
   }, [props.isVisible])
