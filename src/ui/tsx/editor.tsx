@@ -13,7 +13,7 @@ import { getCurrentMarkHead } from '../app/store'
 import {
   generateEditor,
   clear as clearGenerateEditor
-} from '../libs/generate-editor'
+} from './libs/generate-editor'
 import PubSubConfig from '../../config/frontend'
 import { formateContent } from '../../utils/frontend'
 import { IScrollPosInfo, IScrollInfo } from './types/render'

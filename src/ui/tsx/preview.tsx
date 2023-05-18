@@ -38,6 +38,7 @@ import RemarkCode from './components/remark-code'
 import { selectFileContent } from '../app/reducers/fileContentSlice'
 
 import PubSubConfig from '../../config/frontend'
+import { IScrollInfo } from './types/render'
 
 import '../../static/css/preview-scroll.css'
 
@@ -105,89 +106,53 @@ const NewPreview: React.FC<Props> = React.memo(props => {
     if (props.isVisible) {
       let token2 = PubSub.subscribe(
         PubSubConfig.syncUpdateDocScroll,
-        (_msg: string, cursorLine: number) => {
-          let jumped = false
-          for (
-            let childDomIndx = 0;
-            childDomIndx < domRef.current.children.length;
-            childDomIndx++
-          ) {
-            let childDom = domRef.current.children[childDomIndx] as HTMLElement
-            let lineDataSet = childDom.dataset
-            if (
-              Number(lineDataSet.line) > cursorLine ||
-              Number(lineDataSet.line) === cursorLine
+        (_msg: string, scrollInfo: IScrollInfo) => {
+          if (scrollInfo.line === -1) {
+            domRef.current.scrollTop = 0
+          } else {
+            const parentOffsetTop = domRef.current.getBoundingClientRect().top
+            for (
+              let childDomIndx = 0;
+              childDomIndx < domRef.current.children.length;
+              childDomIndx++
             ) {
-              let offsetFromTop = childDom.offsetTop
-              let clientHeight = domRef.current.clientHeight
-              domRef.current.scrollTop = offsetFromTop - clientHeight / 2
-              jumped = true
-              break
-            } else if (
-              Number(lineDataSet.endline) &&
-              Number(lineDataSet.endline) >= cursorLine
-            ) {
-              let totalRows =
-                Number(lineDataSet.endline) - Number(lineDataSet.line)
-              let elementHeight = childDom.offsetHeight
-              let offsetStart = cursorLine - Number(lineDataSet.line)
-              let offsetFromTop = childDom.offsetTop
-              let clientHeight = domRef.current.clientHeight
+              let childDom = domRef.current.children[
+                childDomIndx
+              ] as HTMLElement
+              let lineDataSet = childDom.dataset as LineDataSet
+              if (
+                Number(lineDataSet.line) > scrollInfo.line ||
+                Number(lineDataSet.line) === scrollInfo.line
+              ) {
+                let offsetFromTop = childDom.offsetTop
+                if (scrollInfo.percent && !lineDataSet.endline) {
+                  offsetFromTop += childDom.offsetHeight * scrollInfo.percent
+                }
+                domRef.current.scrollTop = offsetFromTop - parentOffsetTop
+                break
+              } else if (
+                Number(lineDataSet.endline) &&
+                Number(lineDataSet.endline) >= scrollInfo.line
+              ) {
+                let totalRows =
+                  Number(lineDataSet.endline) - Number(lineDataSet.line) + 1
+                let elementHeight = childDom.offsetHeight
+                let offsetStart = scrollInfo.line - Number(lineDataSet.line)
+                let offsetFromTop = childDom.offsetTop
 
-              domRef.current.scrollTop =
-                offsetFromTop -
-                clientHeight / 2 +
-                (elementHeight / totalRows) * offsetStart
-              jumped = true
-              break
+                domRef.current.scrollTop =
+                  offsetFromTop -
+                  parentOffsetTop +
+                  (elementHeight / totalRows) * offsetStart
+                break
+              }
             }
-          }
-          if (!jumped) {
-            domRef.current.scrollTop = domRef.current.scrollHeight
           }
         }
       )
 
-      domRef.current.onscroll = _.throttle((event: Event) => {
-        if (domRef.current.matches(':hover')) {
-          let target = event.target as HTMLElement
-          let gap = target.getBoundingClientRect().top
-          for (
-            let childDomIndx = 0;
-            childDomIndx < domRef.current.children.length;
-            childDomIndx++
-          ) {
-            let childDom = domRef.current.children[childDomIndx] as HTMLElement
-            let nextDom = domRef.current.children[
-              childDomIndx + 1
-            ] as HTMLElement
-            if (
-              childDom.offsetTop - gap <= target.scrollTop &&
-              nextDom.offsetTop - gap > target.scrollTop
-            ) {
-              let lineDataSet = childDom.dataset as LineDataSet
-              let nextLineDataSet = nextDom.dataset as LineDataSet
-              let childDomHeight = childDom.offsetHeight
-              if (
-                Math.abs(childDom.offsetTop - gap - target.scrollTop) >=
-                childDomHeight
-              ) {
-                PubSub.publish(PubSubConfig.liveScrollChannel, {
-                  line: nextLineDataSet.line
-                })
-              } else {
-                PubSub.publish(PubSubConfig.liveScrollChannel, {
-                  line: lineDataSet.line
-                })
-              }
-              break
-            }
-          }
-        }
-      }, 500)
       return () => {
         PubSub.unsubscribe(token2)
-        domRef.current.onscroll = null
       }
     }
   }, [props.isVisible])

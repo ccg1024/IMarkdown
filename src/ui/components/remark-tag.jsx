@@ -53,6 +53,7 @@ export function RemarkHeading(props) {
       as={tagName}
       fontSize={'1.' + (6 - tagName.replace('h', '')) + 'em'}
       fontFamily="inherit"
+      marginTop="1em"
       marginBottom="1em"
       textDecoration="underline"
       textUnderlineOffset="8px"
