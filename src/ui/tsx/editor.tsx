@@ -103,6 +103,7 @@ const Editor: React.FC<EditorProps> = props => {
       PubSub.unsubscribe(editorToken)
       PubSub.unsubscribe(scrollToken)
       PubSub.unsubscribe(liveToken)
+      cmRef.current?.destroy()
     }
   }, [])
 
