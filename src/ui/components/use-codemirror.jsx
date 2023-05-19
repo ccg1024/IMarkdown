@@ -4,7 +4,12 @@ import { useEffect, useState, useRef } from 'react'
 import { languages } from '@codemirror/language-data'
 import { tags, Tag, styleTags } from '@lezer/highlight'
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown'
-import { defaultKeymap, historyKeymap, history } from '@codemirror/commands'
+import {
+  defaultKeymap,
+  historyKeymap,
+  history,
+  indentWithTab
+} from '@codemirror/commands'
 import { searchKeymap, highlightSelectionMatches } from '@codemirror/search'
 import {
   EditorView,
@@ -328,6 +333,7 @@ export const Init_extends = () => {
     highlightActiveLine(),
     highlightSelectionMatches(),
     keymap.of([
+      indentWithTab,
       ...defaultKeymap,
       ...historyKeymap,
       ...foldKeymap,
