@@ -122,6 +122,12 @@ cm.dispatch({ changes: { from: 0, to: cm.state.doc.length, insert: text } })
 
 只需要将为颜色设置透明度即可正常显示`drawSelection`部分，应该是显示层级的原因，设置的颜色显示优先级大于`drawSelection`的部分。同理，当前高亮行的颜色也需要设置透明度。
 
+在格式化文档后，会出现不可预测的滚动，暂时找到的原因是`dispatch`方法中，使用`effects`对当前指针处的内容滚动与`selection`设置指针位置同步执行。设置指针位置时，会自动将设置后的指针内容滚动到视图中，猜测该滚动与`effects`滚动冲突。导致不可预计的跳动。
+
+**Fixed**
+
+将设置指针位置的代码提取出来，放到`setTimeou`函数中，异步执行。由于前面的同步代码已经将内容滚动到视图，后续设置指针时，不会再进行可视窗口跳动。
+
 ### prettier
 
 在浏览器中使用 prettier：https://prettier.io/docs/en/browser.html
