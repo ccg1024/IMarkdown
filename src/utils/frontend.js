@@ -21,9 +21,12 @@ export const formateContent = cm => {
         to: cm.state.doc.length,
         insert: formatedContent
       },
-      selection: { anchor: currentCursor, head: currentCursor },
-      effects: EditorView.scrollIntoView(currentCursor, { y: 'nearest' }),
-      scrollIntoView: true
+      effects: EditorView.scrollIntoView(currentCursor, { y: 'center' })
+    })
+    setTimeout(() => {
+      cm.dispatch({
+        selection: { anchor: currentCursor }
+      })
     })
   }
 
