@@ -8,7 +8,8 @@ const PubSubConfig = {
   syncUpdateDocScroll: 'sync-update-doc-scroll',
   ghostInfoChannel: 'ghost-info-channel',
   scrollSyncChannel: 'scroll-sync-channel',
-  liveScrollChannel: 'live-scroll-channel'
+  liveScrollChannel: 'live-scroll-channel',
+  updatePaddingChannel: 'update-padding-channel'
 }
 
 export default PubSubConfig

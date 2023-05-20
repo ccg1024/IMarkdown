@@ -7,6 +7,7 @@ import { Init_extends } from '../../components/use-codemirror'
 import PubSubConfig from '../../../config/frontend'
 import { IScrollPosInfo } from '../types/render'
 import { Dispatch } from '@reduxjs/toolkit'
+import paddingExtension from './paddingExtension'
 
 interface IController {
   closeChange: boolean
@@ -82,7 +83,8 @@ export function generateEditor(
           }
         }
       }),
-      ...Init_extends()
+      ...Init_extends(),
+      paddingExtension
     ]
   })
 

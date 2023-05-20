@@ -145,14 +145,29 @@ const NewPreview: React.FC<Props> = React.memo(props => {
                   parentOffsetTop +
                   (elementHeight / totalRows) * offsetStart
                 break
+              } else if (childDomIndx === domRef.current.children.length - 1) {
+                domRef.current.scrollTop = childDom.offsetTop - parentOffsetTop
               }
             }
           }
         }
       )
 
+      const paddingToken = PubSub.subscribe(
+        PubSubConfig.updatePaddingChannel,
+        (_mst: string, data: string) => {
+          if (data) {
+            const previewBottom = document.querySelector(
+              '#preview-bottom'
+            ) as HTMLDivElement
+            previewBottom.style.paddingBottom = data
+          }
+        }
+      )
+
       return () => {
         PubSub.unsubscribe(token2)
+        PubSub.unsubscribe(paddingToken)
       }
     }
   }, [props.isVisible])
@@ -167,6 +182,7 @@ const NewPreview: React.FC<Props> = React.memo(props => {
       display={props.isVisible ? 'block' : 'none'}
     >
       {props.isVisible && <PresentRehype />}
+      <Box id="preview-bottom"></Box>
     </Box>
   )
 })
