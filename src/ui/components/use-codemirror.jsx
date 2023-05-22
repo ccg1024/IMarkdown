@@ -38,7 +38,7 @@ import {
   closeBracketsKeymap
 } from '@codemirror/autocomplete'
 
-import { codeBlockExtension } from '../tsx/libs/code-block-extension'
+import { codeBlockHighlight } from '../tsx/libs/new-code-block-extensions'
 
 export const transparentTheme = EditorView.theme({
   '&': {
@@ -344,7 +344,7 @@ export const Init_extends = () => {
     // oneDark,
     transparentTheme,
     EditorView.lineWrapping,
-    codeBlockExtension(),
+    codeBlockHighlight(),
 
     markdown({
       base: markdownLanguage,

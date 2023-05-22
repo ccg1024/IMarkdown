@@ -1,10 +1,11 @@
 import PubSub from 'pubsub-js'
 import { Flex, Box } from '@chakra-ui/react'
 import React, {
-  useState,
+  FC,
   useRef,
-  useCallback,
+  useState,
   useEffect,
+  useCallback,
   useLayoutEffect
 } from 'react'
 import { useDispatch } from 'react-redux'
@@ -24,43 +25,41 @@ import MarkHeadInfo from './tsx/components/mark-head'
 import SideBar from './tsx/components/side-bar'
 import TitleBar from './tsx/components/title-bar'
 
+import { IScrollPosInfo, HeadInfo } from './tsx/types/render'
 import { formatedTime } from './tsx/libs/tools'
 
-const App = () => {
-  const [showPreview, setShowPreview] = useState(false)
-  const [showEditor, setShowEditor] = useState(false)
-  const [isLivePre, setIsLivePre] = useState(false)
-  const [showHeadInfo, setShowHeadInfo] = useState(false)
-  const uiControl = useRef(false)
-
-  const dispatch = useCallback(useDispatch(), [])
-
-  const scrollRef = useRef({
+const App: FC = (): JSX.Element => {
+  const [showEditor, setShowEditor] = useState<boolean>(false)
+  const [showPreview, setShowPreview] = useState<boolean>(false)
+  const [showLivePreview, setShowLivePreview] = useState<boolean>(false)
+  const [showHeadInfo, setShowHeadInfo] = useState<boolean>(false)
+  const uiControl = useRef<boolean>(false)
+  const scrollRef = useRef<IScrollPosInfo>({
     previewScrollTo: 1,
     previewScrollTop: 1,
     editorScrollTo: 1
   })
-  const sideBarRef = useRef(null)
-
+  const sideBarRef = useRef<HTMLDivElement>(null)
+  const dispatch = useCallback(useDispatch(), [])
   const handleFullScreen = useCallback(() => {
-    const sideBar = sideBarRef.current
-    if (sideBar) {
-      if (sideBar.style.display === 'none') {
-        sideBar.style.display = 'block'
+    const siderBar = sideBarRef.current
+    if (siderBar) {
+      if (siderBar.style.display === 'none') {
+        siderBar.style.display = 'block'
       } else {
-        sideBar.style.display = 'none'
+        siderBar.style.display = 'none'
       }
     }
   }, [])
-  const handleLivePreview = useCallback(() => {
+  const handleToggleLivePreview = useCallback(() => {
     setShowPreview(false)
     setShowEditor(true)
-    setIsLivePre(v => !v)
+    setShowLivePreview(v => !v)
   }, [])
   const handleJustPreview = useCallback(() => {
     setShowEditor(false)
     setShowPreview(true)
-    setIsLivePre(false)
+    setShowLivePreview(false)
   }, [])
   const handleJustEditor = useCallback(() => {
     const editorScrollLine = getScrollLine(scrollRef.current.previewScrollTop)
@@ -68,19 +67,18 @@ const App = () => {
     scrollRef.current.previewScrollTo = editorScrollLine
     setShowEditor(true)
     setShowPreview(false)
-    setIsLivePre(false)
+    setShowLivePreview(false)
   }, [])
-
-  const toggleView = (_event, value) => {
+  const toggleView = useCallback((_event: any, value: number) => {
     switch (value) {
-      case 1: // show preview
+      case 1:
         if (uiControl.current) {
           setShowEditor(false)
           setShowPreview(true)
-          setIsLivePre(false)
+          setShowLivePreview(false)
         }
         break
-      case 2: // show editor
+      case 2:
         if (uiControl.current) {
           const editorScrollLine = getScrollLine(
             scrollRef.current.previewScrollTop
@@ -89,21 +87,21 @@ const App = () => {
           scrollRef.current.previewScrollTo = editorScrollLine
           setShowEditor(true)
           setShowPreview(false)
-          setIsLivePre(false)
+          setShowLivePreview(false)
         }
         break
       case 3:
         if (uiControl.current) {
           setShowEditor(true)
           setShowPreview(false)
-          setIsLivePre(true)
+          setShowLivePreview(true)
         }
         break
       case 4:
         handleFullScreen()
         break
     }
-  }
+  }, [])
 
   useEffect(() => {
     window.electronAPI.initialedRender().then(result => {
@@ -135,15 +133,21 @@ const App = () => {
   useEffect(() => {
     window.electronAPI.openFile(handleOpenFile)
     window.electronAPI.toggleView(toggleView)
+
     return () => {
       window.electronAPI.removeOpenFile()
       window.electronAPI.removeToggleView()
     }
   }, [])
 
-  function handleOpenFile(_event, fullPath, fileContent, headInfo, isChange) {
+  const handleOpenFile = (
+    _event: any,
+    fullPath: string,
+    fileContent: string,
+    headInfo: HeadInfo,
+    isChange: boolean
+  ) => {
     scrollRef.current.editorScrollTo = 1
-
     dispatch(modifyContent(fileContent))
     dispatch(
       modifyRecentFiles({
@@ -165,37 +169,31 @@ const App = () => {
     PubSub.publish(PubSubConfig.statusLineModify, isChange)
   }
 
-  // setting config
   useLayoutEffect(() => {
-    window.electronAPI.getConfigPath().then(configJson => {
+    window.electronAPI.getConfigPath().then((configJson: string) => {
       try {
         const settings = JSON.parse(configJson)
-        const editor = document.querySelector('#editor_Box')
-        // const preview = document.querySelector('#preview-scroll')
-        // const live = document.querySelector('#live-preview')
-        // const sideBar = document.querySelector('#side-bar')
+        const editor = document.querySelector('#editor_Box') as HTMLDivElement
+        const root = document.querySelector('#content_root') as HTMLDivElement
 
         for (const name in settings) {
           switch (name) {
             case 'fontSize':
-              document.querySelector('#content_root').style.fontSize =
-                settings[name]
+              root.style.fontSize = settings[name]
               break
             case 'editorFontFamily':
               editor.style.fontFamily = settings[name]
               break
             case 'previewFontFamily':
-              document.querySelector('#content_root').style.fontFamily =
-                settings[name]
+              root.style.fontFamily = settings[name]
               break
           }
         }
-      } catch (e) {
-        console.log(e)
+      } catch (err) {
+        console.log(err)
       }
     })
   }, [])
-
   return (
     <>
       <Flex height="100%" width="100%" id="content_root">
@@ -215,9 +213,9 @@ const App = () => {
           {showHeadInfo ? (
             <MarkHeadInfo
               fullScreenCallback={handleFullScreen}
-              livePreviewCallback={handleLivePreview}
-              justPreviewCallback={handleJustPreview}
               justEditorCallback={handleJustEditor}
+              justPreviewCallback={handleJustPreview}
+              livePreviewCallback={handleToggleLivePreview}
             />
           ) : (
             <GhostInfo />
@@ -225,7 +223,7 @@ const App = () => {
           <Flex height="100%" width="100%" overflow="auto">
             <Editor isVisible={showEditor} scrollLine={scrollRef.current} />
             <Preview isVisible={showPreview} scrollLine={scrollRef.current} />
-            <NewPreview isVisible={isLivePre} />
+            <NewPreview isVisible={showLivePreview} />
           </Flex>
         </Box>
       </Flex>

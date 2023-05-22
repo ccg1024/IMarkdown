@@ -4,7 +4,7 @@ import { ChakraProvider } from '@chakra-ui/react'
 import { Provider } from 'react-redux'
 
 import './libs/shim'
-import App from './App.js'
+import App from './App'
 import theme from './libs/base-theme'
 
 import store from './app/store'

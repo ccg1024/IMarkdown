@@ -12,13 +12,13 @@ export interface IElectronAPI {
   removeSaveFile: () => Promise<void>
   removeOpenFile: () => Promise<void>
   removeToggleView: () => Promise<void>
-  getConfigPath: () => Promise<void>
+  getConfigPath: () => Promise<any>
   openRecentFile: (filePath: string) => Promise<void>
   sendSavedInfo: (callback: any) => Promise<void>
   removeSendSavedInfo: () => Promise<void>
   vimOption: (option: string) => Promise<void>
   updateCache: (cache: string) => Promise<void>
-  initialedRender: () => Promise<void>
+  initialedRender: () => Promise<any>
   updateHeadInfo: (headInfo: HeadInfo) => Promise<void>
   closeWindow: () => Promise<void>
   minWindow: () => Promise<void>
