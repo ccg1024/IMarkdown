@@ -9,13 +9,23 @@ import { mainConfig } from './webpack.main.config'
 import { rendererConfig } from './webpack.renderer.config'
 
 const config: ForgeConfig = {
-  packagerConfig: {},
+  packagerConfig: {
+    icon: './src/icons/markdown'
+  },
   rebuildConfig: {},
   makers: [
-    new MakerSquirrel({}),
+    new MakerSquirrel({
+      setupIcon: './src/icons/markdown.ico',
+      authors: 'crazycodegame',
+      description: 'A lightweight cross-platform markdown editor'
+    }),
     new MakerZIP({}, ['darwin']),
     new MakerRpm({}),
-    new MakerDeb({})
+    new MakerDeb({
+      options: {
+        icon: './src/icons/markdown.png'
+      }
+    })
   ],
   plugins: [
     new WebpackPlugin({

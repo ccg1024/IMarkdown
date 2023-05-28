@@ -254,7 +254,8 @@ const Preview: React.FC<Props> = React.memo(props => {
       ref={domRef}
       overflow="auto"
       width="100%"
-      paddingX={2}
+      paddingLeft={6}
+      paddingRight={2}
       display={props.isVisible ? 'block' : 'none'}
       onScroll={handleScroll}
     >

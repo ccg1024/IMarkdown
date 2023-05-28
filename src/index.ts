@@ -46,8 +46,9 @@ const createWindow = (): void => {
   currentFilePath = ''
 
   const mainWindow = new BrowserWindow({
+    icon: path.join(__dirname, './icons/markdown.ico'),
     width: 1280,
-    height: 800,
+    height: 700,
     minWidth: 800,
     minHeight: 400,
     frame: false,
