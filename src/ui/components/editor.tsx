@@ -2,7 +2,7 @@ import PubSub from 'pubsub-js'
 import { Box } from '@chakra-ui/react'
 import { useDispatch } from 'react-redux'
 import { EditorView } from '@codemirror/view'
-import { FC, useRef, useEffect, useCallback } from 'react'
+import { FC, useRef, useEffect, useCallback, UIEvent } from 'react'
 import { IpcRendererEvent } from 'electron'
 
 import StatusLine from './status-line'
@@ -22,15 +22,36 @@ import { vim } from '@replit/codemirror-vim'
 interface EditorProps {
   isVisible: boolean
 }
+interface Controller {
+  scrollBarTimer: NodeJS.Timeout | null
+}
 
 const dynamicPlugin: ImarkdownPlugin = {
   vim: false
+}
+const controller: Controller = {
+  scrollBarTimer: null
 }
 
 const Editor: FC<EditorProps> = ({ isVisible }): JSX.Element => {
   const containerRef = useRef<HTMLDivElement>(null)
   const editorRef = useRef<EditorView>(null)
   const reduxDispatch = useCallback(useDispatch(), [])
+
+  const handleEditorScroll = useCallback((e: UIEvent) => {
+    if (controller.scrollBarTimer) {
+      clearTimeout(controller.scrollBarTimer)
+    }
+    const target = e.target as HTMLDivElement
+    if (target && target.classList.contains('is-scroll') === false) {
+      target.classList.add('is-scroll')
+    }
+    controller.scrollBarTimer = setTimeout(() => {
+      if (target) {
+        target.classList.remove('is-scroll')
+      }
+    }, 1000)
+  }, [])
 
   // intialize editor
   useEffect(() => {
@@ -144,7 +165,13 @@ const Editor: FC<EditorProps> = ({ isVisible }): JSX.Element => {
       display={isVisible ? 'block' : 'none'}
     >
       <Box display="flex" flexDirection="column" height="100%" width="100%">
-        <Box ref={containerRef} flexGrow={1} overflow="auto" pl={4}></Box>
+        <Box
+          ref={containerRef}
+          flexGrow={1}
+          overflow="auto"
+          pl={4}
+          onScrollCapture={handleEditorScroll}
+        ></Box>
         <StatusLine />
       </Box>
     </Box>

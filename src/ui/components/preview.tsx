@@ -22,7 +22,7 @@ import RemarkCode from './remark-code'
 import pubsubConfig from '../../config/pubsub.config'
 import { LiveScroll } from '../../types/renderer'
 import { selectFileContent } from '../app/reducers/fileContentSlice'
-import '../css/preview.css'
+import '../css/scroll-style.css'
 
 interface Props {
   isVisible: boolean
@@ -36,10 +36,12 @@ interface LineDataSet extends DOMStringMap {
 interface TimeoutContronl {
   debounceTimer: NodeJS.Timeout | null
   throttleTimer: NodeJS.Timeout | null
+  scrollBarTimer: NodeJS.Timeout | null
 }
 const timeoutContronl: TimeoutContronl = {
   debounceTimer: null,
-  throttleTimer: null
+  throttleTimer: null,
+  scrollBarTimer: null
 }
 
 function updatePreview(doc: string): React.ReactNode {
@@ -173,6 +175,15 @@ const Preview: React.FC<Props> = React.memo(props => {
   }, [])
 
   const handleScroll: UIEventHandler<HTMLDivElement> = useCallback(() => {
+    if (timeoutContronl.scrollBarTimer) {
+      clearTimeout(timeoutContronl.scrollBarTimer)
+    }
+    if (domRef.current.classList.contains('is-scroll') === false) {
+      domRef.current.classList.add('is-scroll')
+    }
+    timeoutContronl.scrollBarTimer = setTimeout(() => {
+      domRef.current.classList.remove('is-scroll')
+    }, 1000)
     if (!timeoutContronl.throttleTimer && domRef.current.matches(':hover')) {
       timeoutContronl.throttleTimer = setTimeout(() => {
         const parentOffsetTop = domRef.current.getBoundingClientRect().top

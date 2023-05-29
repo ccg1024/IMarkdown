@@ -94,27 +94,27 @@ const defaultTheme = EditorView.theme({
     outline: 'solid 1px' + lightThemeColor.editor.fatCursor + '  !important',
     color: 'transparent !important'
   },
-  '.cm-scroller::-webkit-scrollbar': {
-    // the total scroll bar
-    width: '15px'
-  },
-  '.cm-scroller::-webkit-scrollbar-corner': {
-    // the corner of scrollbar when have horizontal and vertical scrollbar at same time
-    background: 'rgba(0, 0, 0, 0)'
-  },
-  '.cm-scroller::-webkit-scrollbar-thumb': {
-    // the block which can be scroll on the scroll bar
-    backgroundColor: '#ccc',
-    borderRadius: '10px',
-    border: '4px solid rgba(0, 0, 0, 0)',
-    backgroundClip: 'content-box',
-    minWidth: '15px',
-    minHeight: '32px'
-  },
-  '.cm-scroller::-webkit-scrollbar-track': {
-    // the track where the scroll-thumb scroll on
-    backgroundColor: 'rgba(0, 0, 0, 0)'
-  },
+  // '.cm-scroller::-webkit-scrollbar': {
+  //   // the total scroll bar
+  //   width: '15px'
+  // },
+  // '.cm-scroller::-webkit-scrollbar-corner': {
+  //   // the corner of scrollbar when have horizontal and vertical scrollbar at same time
+  //   background: 'rgba(0, 0, 0, 0)'
+  // },
+  // '.cm-scroller::-webkit-scrollbar-thumb': {
+  //   // the block which can be scroll on the scroll bar
+  //   backgroundColor: '#ccc',
+  //   borderRadius: '10px',
+  //   border: '4px solid rgba(0, 0, 0, 0)',
+  //   backgroundClip: 'content-box',
+  //   minWidth: '15px',
+  //   minHeight: '32px'
+  // },
+  // '.cm-scroller::-webkit-scrollbar-track': {
+  //   // the track where the scroll-thumb scroll on
+  //   backgroundColor: 'rgba(0, 0, 0, 0)'
+  // },
   '.cm-activeLine': {
     backgroundColor: lightThemeColor.editor.activeLine,
     borderTopRightRadius: '2px',
