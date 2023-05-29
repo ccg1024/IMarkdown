@@ -331,12 +331,11 @@ const imarkdownDefaultExtensions = [
   highlightSelectionMatches(),
   keymap.of([
     indentWithTab,
-    ...defaultKeymap,
-    ...historyKeymap,
-    ...foldKeymap,
-    ...searchKeymap,
     ...closeBracketsKeymap,
-    ...completionKeymap
+    ...defaultKeymap,
+    ...searchKeymap,
+    ...historyKeymap,
+    ...foldKeymap
   ]),
   defaultTheme,
   EditorView.lineWrapping,
