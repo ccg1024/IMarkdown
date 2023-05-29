@@ -10,12 +10,21 @@ import { getMarkHead } from '../app/store'
 import { LiveScroll } from '../../types/renderer'
 import pubsubConfig from '../../config/pubsub.config'
 import ipcConfig from '../../config/ipc.config'
-import generateState, { clearToken } from '../libs/generate-state'
+import imardownPlugins, {
+  ImarkdownPlugin
+} from '../../config/plugin-list.config'
+import generateState, { clearToken, vimPlugin } from '../libs/generate-state'
 import formatContent from '../libs/formate-content'
 import { concatHeaderAndContent } from '../libs/tools'
 
+import { vim } from '@replit/codemirror-vim'
+
 interface EditorProps {
   isVisible: boolean
+}
+
+const dynamicPlugin: ImarkdownPlugin = {
+  vim: false
 }
 
 const Editor: FC<EditorProps> = ({ isVisible }): JSX.Element => {
@@ -35,6 +44,12 @@ const Editor: FC<EditorProps> = ({ isVisible }): JSX.Element => {
 
         if (editorRef.current) {
           editorRef.current.destroy()
+        }
+
+        if (dynamicPlugin.vim) {
+          view.dispatch({
+            effects: vimPlugin.reconfigure(vim())
+          })
         }
 
         editorRef.current = view
@@ -99,6 +114,24 @@ const Editor: FC<EditorProps> = ({ isVisible }): JSX.Element => {
     return () => {
       window.ipcAPI.removeFileSaveListener()
       window.ipcAPI.removeFormatFileListener()
+    }
+  }, [])
+
+  // dynamic plugin
+  useEffect(() => {
+    const pluginToken = PubSub.subscribe(
+      pubsubConfig.UPDATE_DYNAMIC_PLUGINS,
+      (_, data: ImarkdownPlugin) => {
+        for (const key in data) {
+          if (key === imardownPlugins.VIM) {
+            dynamicPlugin[key as keyof ImarkdownPlugin] =
+              data[key as keyof ImarkdownPlugin]
+          }
+        }
+      }
+    )
+    return () => {
+      PubSub.unsubscribe(pluginToken)
     }
   }, [])
 

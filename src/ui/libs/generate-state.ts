@@ -1,5 +1,5 @@
 import PubSub from 'pubsub-js'
-import { EditorState } from '@codemirror/state'
+import { EditorState, Compartment } from '@codemirror/state'
 import { languages } from '@codemirror/language-data'
 import { tags, Tag, styleTags } from '@lezer/highlight'
 import { MarkdownConfig } from '@lezer/markdown'
@@ -309,7 +309,10 @@ const imarkdownSyntaxHighlighting = HighlightStyle.define([
   }
 ])
 
+export const vimPlugin = new Compartment()
+
 const imarkdownDefaultExtensions = [
+  vimPlugin.of([]),
   lineNumbers(),
   highlightActiveLineGutter(),
   highlightSpecialChars(),

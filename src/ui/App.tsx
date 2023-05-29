@@ -17,6 +17,7 @@ import TitleBar from './components/title-bar'
 import GhostInfo from './components/ghost-info'
 import MarkHeadInfo from './components/mark-head'
 import pubsubConfig from '../config/pubsub.config'
+import imardownPlugins from '../config/plugin-list.config'
 import { formateDate } from './libs/tools'
 import { HeadInfo } from '../types/main'
 import { updateFileContent } from './app/reducers/fileContentSlice'
@@ -170,6 +171,11 @@ const App: FC = (): JSX.Element => {
               break
             case 'previewFontFamily':
               root.style.fontFamily = settings[name]
+              break
+            case 'vimSupport':
+              PubSub.publish(pubsubConfig.UPDATE_DYNAMIC_PLUGINS, {
+                [imardownPlugins.VIM]: settings[name]
+              })
               break
           }
         }

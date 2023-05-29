@@ -8,6 +8,7 @@ const pubsubConfig = {
   STATUS_LINE_INFO: 'status_line_info',
   UPDATE_STATUS_LINE: 'update_status_line',
   CLEAR_STATUS_LINE: 'clear_status_line',
+  UPDATE_DYNAMIC_PLUGINS: 'update_dynamic_plugins',
 
   // for sync scroll between editor and preview
   SYNC_SCROLL_TO_LIVE_PREVIEW: 'sync_scroll_to_live_preview',
