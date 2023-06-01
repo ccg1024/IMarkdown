@@ -8,7 +8,8 @@ import React, {
   useCallback,
   createElement,
   Fragment,
-  UIEventHandler
+  UIEventHandler,
+  useTransition
 } from 'react'
 import { unified } from 'unified'
 import remarkGfm from 'remark-gfm'
@@ -278,6 +279,7 @@ const Preview: React.FC<Props> = React.memo(props => {
 
 const PresentRehype: React.FC = React.memo(() => {
   const [content, setContent] = useState<React.ReactNode>()
+  const [_, startTransition] = useTransition()
   const doc = useSelector(selectFileContent)
 
   // update preview
@@ -288,7 +290,9 @@ const PresentRehype: React.FC = React.memo(() => {
 
     timeoutContronl.debounceTimer = setTimeout(() => {
       const md = updatePreview(doc)
-      setContent(md)
+      startTransition(() => {
+        setContent(md)
+      })
     }, 300)
   }, [doc])
 

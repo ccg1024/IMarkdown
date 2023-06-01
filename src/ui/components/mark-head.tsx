@@ -139,9 +139,10 @@ const MarkHeadInfo: FC<MarkHeadInfoProps> = (props): JSX.Element => {
           placeholder="Unname title"
           onChange={onChangeTitle}
           flexGrow={1}
+          selectAllOnFocus={false}
         >
           <EditablePreview paddingLeft={2} />
-          <EditableInput paddingLeft={2} />
+          <EditableInput spellCheck={false} paddingLeft={2} />
         </Editable>
         <MarkHeadInfoStyle />
         <Box display="flex" gap={2} alignItems="center" marginRight={2}>
@@ -186,9 +187,10 @@ const MarkHeadInfo: FC<MarkHeadInfoProps> = (props): JSX.Element => {
         placeholder="no file description"
         onChange={onChangeDesc}
         color={useColorModeValue('gray.500', 'gray.500')}
+        selectAllOnFocus={false}
       >
         <EditablePreview paddingLeft={2} />
-        <EditableInput paddingLeft={2} />
+        <EditableInput spellCheck={false} paddingLeft={2} />
       </Editable>
     </Box>
   )
