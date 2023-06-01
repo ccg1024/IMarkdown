@@ -6,6 +6,7 @@ export interface RecentFilesPayload {
   date?: string
   desc?: string
   title?: string
+  isChange?: boolean
 }
 
 export interface RecentFilesStateItem {
@@ -30,7 +31,8 @@ export const recentFilesSlice = createSlice({
           id: action.payload.id,
           date: action.payload.date,
           desc: action.payload.desc,
-          title: action.payload.title
+          title: action.payload.title,
+          isChange: action.payload.isChange
         }
       }
     },
@@ -43,13 +45,22 @@ export const recentFilesSlice = createSlice({
       if (action.payload.id) {
         state.value[action.payload.id].desc = action.payload.desc
       }
+    },
+    updateFileIsChange: (state, action: PayloadAction<RecentFilesPayload>) => {
+      if (action.payload.id) {
+        state.value[action.payload.id].isChange = action.payload.isChange
+      }
     }
   }
 })
 
 export const selectRecentFiles = (state: RootState) => state.recentFiles.value
 
-export const { updateRecentFiles, updateFileTitle, updateFileDesc } =
-  recentFilesSlice.actions
+export const {
+  updateRecentFiles,
+  updateFileTitle,
+  updateFileDesc,
+  updateFileIsChange
+} = recentFilesSlice.actions
 
 export default recentFilesSlice.reducer

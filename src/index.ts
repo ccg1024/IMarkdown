@@ -117,7 +117,7 @@ app.whenReady().then(() => {
       fileCache[filepath].isChange = false
 
       // sent message to renderer process
-      win?.webContents.send(ipcConfig.SEND_SAVE_INFO, `${filepath} written\n`)
+      // win?.webContents.send(ipcConfig.SEND_SAVE_INFO, `${filepath} written\n`)
     }
   )
 

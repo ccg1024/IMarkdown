@@ -13,6 +13,7 @@ import {
   ListItem,
   Heading,
   Input,
+  Badge,
   useColorModeValue
 } from '@chakra-ui/react'
 import { useSelector } from 'react-redux'
@@ -72,9 +73,16 @@ const SideBarDetailItem: FC<SideBarDetailItemProps> = (props): JSX.Element => {
         >
           {props.detail.title ? props.detail.title : 'Unname title'}
         </Heading>
-        <Text fontSize="0.8em" color={props.isActive ? 'white' : 'black'}>
-          {props.detail.date ? props.detail.date : 'Unknow time'}
-        </Text>
+        <Flex gap={2} alignItems="center">
+          <Text fontSize="0.8em" color={props.isActive ? 'white' : 'black'}>
+            {props.detail.date ? props.detail.date : 'Unknow time'}
+          </Text>
+          {props.detail.isChange && (
+            <Badge borderRadius="md" colorScheme="red">
+              changed
+            </Badge>
+          )}
+        </Flex>
         <Text
           width="100%"
           overflow="hidden"

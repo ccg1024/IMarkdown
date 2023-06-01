@@ -16,6 +16,7 @@ import imardownPlugins, {
 import generateState, { clearToken, vimPlugin } from '../libs/generate-state'
 import formatContent from '../libs/formate-content'
 import { concatHeaderAndContent } from '../libs/tools'
+import { updateFileIsChange } from '../app/reducers/recentFilesSlice'
 
 import { vim } from '@replit/codemirror-vim'
 
@@ -74,7 +75,7 @@ const Editor: FC<EditorProps> = ({ isVisible }): JSX.Element => {
         }
 
         editorRef.current = view
-        clearToken(pubsubConfig.CLEAR_STATUS_LINE)
+        clearToken('')
       }
     )
 
@@ -123,8 +124,14 @@ const Editor: FC<EditorProps> = ({ isVisible }): JSX.Element => {
         if (doc && markHead) {
           const content = concatHeaderAndContent(markHead, doc)
           event.sender.send(ipcConfig.SAVE_CONTENT, content, doc, path)
+          reduxDispatch(
+            updateFileIsChange({
+              id: path,
+              isChange: false
+            })
+          )
         }
-        clearToken(pubsubConfig.UPDATE_STATUS_LINE)
+        clearToken('')
       } catch (err) {}
     })
     window.ipcAPI.listenFormatFile(() => {
@@ -172,7 +179,6 @@ const Editor: FC<EditorProps> = ({ isVisible }): JSX.Element => {
           pl={4}
           onScrollCapture={handleEditorScroll}
         ></Box>
-        <StatusLine />
       </Box>
     </Box>
   )

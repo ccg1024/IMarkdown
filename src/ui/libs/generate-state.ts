@@ -37,9 +37,10 @@ import {
   closeBracketsKeymap
 } from '@codemirror/autocomplete'
 
-import { AppDispatch } from '../app/store'
+import { AppDispatch, getCurrentFile } from '../app/store'
 import pubsubConfig from '../../config/pubsub.config'
 import { updateFileContent } from '../app/reducers/fileContentSlice'
+import { updateFileIsChange } from '../app/reducers/recentFilesSlice'
 import { LineOfStatusLine } from '../../types/renderer'
 
 import { lightThemeColor } from './themes'
@@ -372,7 +373,13 @@ const generateState = (doc: string, reduxDispath: AppDispatch): EditorState => {
       EditorView.updateListener.of(update => {
         if (update.docChanged) {
           if (!controller.closeChange) {
-            PubSub.publish(pubsubConfig.UPDATE_STATUS_LINE, true)
+            // PubSub.publish(pubsubConfig.UPDATE_STATUS_LINE, true)
+            reduxDispath(
+              updateFileIsChange({
+                id: getCurrentFile(),
+                isChange: true
+              })
+            )
             controller.closeChange = true
           }
 
@@ -380,22 +387,22 @@ const generateState = (doc: string, reduxDispath: AppDispatch): EditorState => {
           updateMainDocCache(update.state.doc.toString())
         }
 
-        if (update.selectionSet) {
-          if (controller.cursorTimer) {
-            window.clearTimeout(controller.cursorTimer)
-          }
+        // if (update.selectionSet) {
+        //   if (controller.cursorTimer) {
+        //     window.clearTimeout(controller.cursorTimer)
+        //   }
 
-          controller.cursorTimer = window.setTimeout(() => {
-            const cursor = update.state.selection.main.head
-            const line = update.state.doc.lineAt(cursor).number
-            const totalLine = update.state.doc.lines
-            const lineOfStatusLine: LineOfStatusLine = {
-              current: line,
-              total: totalLine
-            }
-            PubSub.publish(pubsubConfig.STATUS_LINE_INFO, lineOfStatusLine)
-          }, 100)
-        }
+        //   controller.cursorTimer = window.setTimeout(() => {
+        //     const cursor = update.state.selection.main.head
+        //     const line = update.state.doc.lineAt(cursor).number
+        //     const totalLine = update.state.doc.lines
+        //     const lineOfStatusLine: LineOfStatusLine = {
+        //       current: line,
+        //       total: totalLine
+        //     }
+        //     PubSub.publish(pubsubConfig.STATUS_LINE_INFO, lineOfStatusLine)
+        //   }, 100)
+        // }
       }),
 
       EditorView.domEventHandlers({
@@ -430,10 +437,10 @@ const generateState = (doc: string, reduxDispath: AppDispatch): EditorState => {
   })
 
   PubSub.publish(pubsubConfig.SYNC_SCROLL_TO_LIVE_PREVIEW, { line: -1 })
-  PubSub.publish(pubsubConfig.STATUS_LINE_INFO, {
-    current: 1,
-    total: state.doc.lines
-  })
+  // PubSub.publish(pubsubConfig.STATUS_LINE_INFO, {
+  //   current: 1,
+  //   total: state.doc.lines
+  // })
 
   return state
 }

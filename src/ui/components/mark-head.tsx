@@ -1,4 +1,3 @@
-import PubSub from 'pubsub-js'
 import { FC, MouseEventHandler, MouseEvent, useCallback } from 'react'
 import {
   Text,
@@ -15,22 +14,14 @@ import {
 import { useSelector, useDispatch } from 'react-redux'
 import { BsChevronRight } from 'react-icons/bs'
 
-import pubsubConfig from '../../config/pubsub.config'
 import { selectCurrentFile } from '../app/reducers/currentFileSlice'
 import {
   selectRecentFiles,
   updateFileTitle,
   updateFileDesc,
+  updateFileIsChange,
   RecentFilesStateItem
 } from '../app/reducers/recentFilesSlice'
-
-interface MarkHeadInfoControlGate {
-  statuslineGate: number | null
-}
-
-const controlGate: MarkHeadInfoControlGate = {
-  statuslineGate: null
-}
 
 const MarkHeadInfo: FC = (): JSX.Element => {
   const currentFile: string = useSelector(selectCurrentFile)
@@ -50,12 +41,9 @@ const MarkHeadInfo: FC = (): JSX.Element => {
       )
       window.ipcAPI.updateHeader({ title: nextValue })
 
-      if (controlGate.statuslineGate) {
-        window.clearTimeout(controlGate.statuslineGate)
+      if (!recentFiles[currentFile].isChange) {
+        reduxDispatch(updateFileIsChange({ id: currentFile, isChange: true }))
       }
-      controlGate.statuslineGate = window.setTimeout(() => {
-        PubSub.publish(pubsubConfig.UPDATE_STATUS_LINE, true)
-      }, 500)
     }
   }
   const onChangeDesc = (nextValue: string) => {
@@ -67,12 +55,14 @@ const MarkHeadInfo: FC = (): JSX.Element => {
         })
       )
       window.ipcAPI.updateHeader({ desc: nextValue })
-      if (controlGate.statuslineGate) {
-        window.clearTimeout(controlGate.statuslineGate)
+      if (!recentFiles[currentFile].isChange) {
+        reduxDispatch(
+          updateFileIsChange({
+            id: currentFile,
+            isChange: true
+          })
+        )
       }
-      controlGate.statuslineGate = window.setTimeout(() => {
-        PubSub.publish(pubsubConfig.UPDATE_STATUS_LINE, true)
-      }, 500)
     }
   }
   const clickMenu: MouseEventHandler<HTMLDivElement> = (

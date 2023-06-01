@@ -99,7 +99,8 @@ const App: FC = (): JSX.Element => {
           id: fullpath,
           date: formateDate(headInfo.date),
           desc: headInfo.desc,
-          title: headInfo.title
+          title: headInfo.title,
+          isChange: isChange
         })
       )
       dispatch(updateCurrentFile(fullpath))
@@ -110,7 +111,7 @@ const App: FC = (): JSX.Element => {
       }
 
       PubSub.publish(pubsubConfig.UPDATE_EDITOR_STATE, fileContent)
-      PubSub.publish(pubsubConfig.UPDATE_STATUS_LINE, isChange)
+      // PubSub.publish(pubsubConfig.UPDATE_STATUS_LINE, isChange)
     },
     []
   )
@@ -126,7 +127,8 @@ const App: FC = (): JSX.Element => {
             id: initialFile.fullpath,
             date: formateDate(initialFile.headInfo.date),
             desc: initialFile.headInfo.desc,
-            title: initialFile.headInfo.title
+            title: initialFile.headInfo.title,
+            isChange: false
           })
         )
         dispatch(updateCurrentFile(initialFile.fullpath))
@@ -180,7 +182,7 @@ const App: FC = (): JSX.Element => {
               break
           }
         }
-      } catch (err) { }
+      } catch (err) {}
     })
   }, [])
 

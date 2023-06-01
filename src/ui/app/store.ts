@@ -20,4 +20,9 @@ export const getMarkHead = (): RecentFilesPayload => {
   return recentFiles.value[currentFile.value]
 }
 
+export const getCurrentFile = (): string => {
+  const { currentFile } = store.getState()
+  return currentFile.value
+}
+
 export default store
