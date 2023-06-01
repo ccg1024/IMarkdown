@@ -23,7 +23,8 @@ const TitleBarStyle: FC = (): JSX.Element => {
             'var(--chakra-colors-gray-800)',
             'var(--chakra-colors-gray-800)'
           ),
-          cursor: 'pointer'
+          cursor: 'pointer',
+          transform: 'scale(1.2, 1.2)'
         }
       }}
     />
