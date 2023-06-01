@@ -139,8 +139,6 @@ const App: FC = (): JSX.Element => {
         setShowEditor(true)
         setShowHeadInfo(true)
         uiControl.current = true
-      } else {
-        PubSub.publish(pubsubConfig.UPDATE_EDITOR_STATE, '')
       }
     })
   }, [])
@@ -182,7 +180,9 @@ const App: FC = (): JSX.Element => {
               break
           }
         }
-      } catch (err) { }
+      } catch (err) {
+        throw err
+      }
     })
   }, [])
 

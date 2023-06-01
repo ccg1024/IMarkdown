@@ -158,7 +158,7 @@ app.whenReady().then(() => {
 
   // listen to open app by file
   ipcMain.handle(ipcConfig.INIT_RENDERER, async () => {
-    if (process.argv.length > 2 && process.argv[1] !== '.') {
+    if (process.argv.length > 1 && process.argv[1] !== '.') {
       currentFilePath = convertWindowsPathToUnixPath(process.argv[1])
       win?.setTitle(formatWin32Title(currentFilePath))
       try {
