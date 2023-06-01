@@ -42,7 +42,7 @@ const App: FC = (): JSX.Element => {
     const siderBar = sideBarRef.current
     if (siderBar) {
       if (siderBar.style.display === 'none') {
-        siderBar.style.display = 'block'
+        siderBar.style.display = 'flex'
       } else {
         siderBar.style.display = 'none'
       }
@@ -182,21 +182,19 @@ const App: FC = (): JSX.Element => {
               break
           }
         }
-      } catch (err) {}
+      } catch (err) { }
     })
   }, [])
 
   return (
     <>
       <Flex height="100%" width="100%" id="content_root">
-        <Box ref={sideBarRef} width="35%" height="100%" flexShrink={0}>
+        <Box ref={sideBarRef} height="100%" flexShrink={0} display="flex">
           <SideBar />
         </Box>
         <Box
           display="flex"
-          flexShrink={0}
           flexGrow={1}
-          width="65%"
           height="100%"
           flexDirection="column"
           position="relative"

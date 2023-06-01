@@ -47,7 +47,7 @@ const SideBarDetailItem: FC<SideBarDetailItemProps> = (props): JSX.Element => {
       borderColor={useColorModeValue('gray.300', 'gray.300')}
       backgroundColor={props.isActive ? 'blue.500' : 'unset'}
       onClick={
-        props.isActive ? () => {} : e => props.clickCallback(e.currentTarget.id)
+        props.isActive ? () => { } : e => props.clickCallback(e.currentTarget.id)
       }
       _hover={{
         backgroundColor: props.isActive ? 'blue.500' : 'blue.50',
@@ -102,7 +102,7 @@ const SideBarDetail: FC<SideBarDetailProps> = (props): JSX.Element => {
   return (
     <Box
       id="menu-content"
-      width="55%"
+      width="300px"
       height="100%"
       backdropBlur="8px"
       backdropFilter="auto"
@@ -149,10 +149,9 @@ const FixedLeftBar: FC = (): JSX.Element => {
   return (
     <Box
       id="fixed-side-bar"
-      boxShadow="lg"
       backgroundColor={useColorModeValue('#171920', '#171920')}
       color={useColorModeValue('gray.300', 'gray.300')}
-      width="45%"
+      width="220px"
     >
       <Flex
         alignItems="center"
@@ -175,7 +174,6 @@ const FixedLeftBar: FC = (): JSX.Element => {
             fontSize="1.1em"
             textAlign="left"
             userSelect="none"
-            display={{ base: 'none', xl: 'block' }}
           >
             Imarkdown
           </Text>
@@ -213,7 +211,7 @@ const SideBar: FC = (): JSX.Element => {
   const recentPaths: string[] = Object.keys(recentFiles)
 
   return (
-    <Box id="side-bar" display="flex" flexShrink={0} height="100%">
+    <>
       <FixedLeftBar />
       <SideBarDetail>
         {recentPaths.map(item => {
@@ -227,7 +225,7 @@ const SideBar: FC = (): JSX.Element => {
           )
         })}
       </SideBarDetail>
-    </Box>
+    </>
   )
 }
 
