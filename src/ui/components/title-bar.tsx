@@ -11,10 +11,11 @@ const TitleBarStyle: FC = (): JSX.Element => {
           WebkitAppRegion: 'drag'
         },
         '.title-icon': {
+          marginLeft: 'var(--chakra-space-2)',
           WebkitAppRegion: 'no-drag',
           color: useColorModeValue(
-            'var(--chakra-colors-gray-400)',
-            'var(--chakra-colors-gray-400)'
+            'var(--chakra-colors-gray-500)',
+            'var(--chakra-colors-gray-500)'
           )
         },
         '.title-icon:hover': {

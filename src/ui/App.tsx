@@ -23,6 +23,7 @@ import { HeadInfo } from '../types/main'
 import { updateFileContent } from './app/reducers/fileContentSlice'
 import { updateRecentFiles } from './app/reducers/recentFilesSlice'
 import { updateCurrentFile } from './app/reducers/currentFileSlice'
+import InterIcon from './components/interIcon'
 
 interface FileToken {
   fullpath: string
@@ -179,7 +180,7 @@ const App: FC = (): JSX.Element => {
               break
           }
         }
-      } catch (err) {}
+      } catch (err) { }
     })
   }, [])
 
@@ -199,20 +200,18 @@ const App: FC = (): JSX.Element => {
           position="relative"
         >
           <TitleBar />
-          {showHeadInfo ? (
-            <MarkHeadInfo
-              fullScreenCallback={handleFullScreen}
-              justEditorCallback={handleJustEditor}
-              justPreviewCallback={handleJustPreview}
-              livePreviewCallback={handleToggleLivePreview}
-            />
-          ) : (
-            <GhostInfo />
-          )}
+          {showHeadInfo ? <MarkHeadInfo /> : <GhostInfo />}
           <Flex height="100%" width="100%" overflow="auto">
             <Editor isVisible={showEditor} />
             <Preview isVisible={showPreview} />
           </Flex>
+          {showHeadInfo && (
+            <InterIcon
+              justEditorCallback={handleJustEditor}
+              justPreviewCallback={handleJustPreview}
+              livePreviewCallback={handleToggleLivePreview}
+            />
+          )}
         </Box>
       </Flex>
     </>

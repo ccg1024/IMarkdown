@@ -13,14 +13,7 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 import { useSelector, useDispatch } from 'react-redux'
-import {
-  BsEye,
-  BsPencil,
-  BsFullscreen,
-  BsLayoutSplit,
-  BsChevronRight
-} from 'react-icons/bs'
-import { Global } from '@emotion/react'
+import { BsChevronRight } from 'react-icons/bs'
 
 import pubsubConfig from '../../config/pubsub.config'
 import { selectCurrentFile } from '../app/reducers/currentFileSlice'
@@ -31,35 +24,6 @@ import {
   RecentFilesStateItem
 } from '../app/reducers/recentFilesSlice'
 
-const MarkHeadInfoStyle: FC = (): JSX.Element => {
-  return (
-    <Global
-      styles={{
-        '.toggle-icon': {
-          color: useColorModeValue(
-            'var(--chakra-colors-gray-200)',
-            'var(--chakra-colors-gray-200)'
-          )
-        },
-        '.toggle-icon:hover': {
-          cursor: 'pointer',
-          color: useColorModeValue(
-            'var(--chakra-colors-gray-500)',
-            'var(--chakra-colors-gray-500)'
-          )
-        }
-      }}
-    />
-  )
-}
-
-interface MarkHeadInfoProps {
-  fullScreenCallback: MouseEventHandler<SVGElement>
-  livePreviewCallback: MouseEventHandler<SVGElement>
-  justPreviewCallback: MouseEventHandler<SVGElement>
-  justEditorCallback: MouseEventHandler<SVGElement>
-}
-
 interface MarkHeadInfoControlGate {
   statuslineGate: number | null
 }
@@ -68,7 +32,7 @@ const controlGate: MarkHeadInfoControlGate = {
   statuslineGate: null
 }
 
-const MarkHeadInfo: FC<MarkHeadInfoProps> = (props): JSX.Element => {
+const MarkHeadInfo: FC = (): JSX.Element => {
   const currentFile: string = useSelector(selectCurrentFile)
   const recentFiles: RecentFilesStateItem = useSelector(selectRecentFiles)
   const reduxDispatch = useCallback(useDispatch(), [])
@@ -125,44 +89,21 @@ const MarkHeadInfo: FC<MarkHeadInfoProps> = (props): JSX.Element => {
   }
 
   return (
-    <Box padding={4} marginBottom={2}>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        gap={2}
-        alignItems="center"
+    <Box padding={4} marginY={2}>
+      <Editable
+        value={noteTitle}
+        fontSize="1.2em"
+        marginY={2}
+        placeholder="Unname title"
+        onChange={onChangeTitle}
+        flexGrow={1}
+        selectAllOnFocus={false}
+        fontWeight="bold"
       >
-        <Editable
-          value={noteTitle}
-          fontSize="1.2em"
-          marginY={2}
-          placeholder="Unname title"
-          onChange={onChangeTitle}
-          flexGrow={1}
-          selectAllOnFocus={false}
-        >
-          <EditablePreview paddingLeft={2} />
-          <EditableInput spellCheck={false} paddingLeft={2} />
-        </Editable>
-        <MarkHeadInfoStyle />
-        <Box display="flex" gap={2} alignItems="center" marginRight={2}>
-          <BsFullscreen
-            className="toggle-icon"
-            onClick={props.fullScreenCallback}
-          />
-          <BsLayoutSplit
-            className="toggle-icon"
-            onClick={props.livePreviewCallback}
-          />
-          <BsEye className="toggle-icon" onClick={props.justPreviewCallback} />
-          <BsPencil
-            className="toggle-icon"
-            onClick={props.justEditorCallback}
-          />
-        </Box>
-      </Box>
+        <EditablePreview />
+        <EditableInput spellCheck={false} _focus={{ boxShadow: 'none' }} />
+      </Editable>
       <Box
-        paddingLeft={2}
         gap={2}
         display="flex"
         fontSize="0.8em"
@@ -189,8 +130,8 @@ const MarkHeadInfo: FC<MarkHeadInfoProps> = (props): JSX.Element => {
         color={useColorModeValue('gray.500', 'gray.500')}
         selectAllOnFocus={false}
       >
-        <EditablePreview paddingLeft={2} />
-        <EditableInput spellCheck={false} paddingLeft={2} />
+        <EditablePreview />
+        <EditableInput spellCheck={false} _focus={{ boxShadow: 'none' }} />
       </Editable>
     </Box>
   )
