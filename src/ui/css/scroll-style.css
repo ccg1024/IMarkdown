@@ -26,3 +26,6 @@ pre:hover::-webkit-scrollbar-thumb {
 .is-scroll::-webkit-scrollbar-thumb {
   visibility: visible;
 }
+.katex-mathml {
+  display: none;
+}

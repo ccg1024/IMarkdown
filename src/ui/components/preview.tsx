@@ -16,6 +16,9 @@ import remarkGfm from 'remark-gfm'
 import remarkParse from 'remark-parse'
 import remarkRehype from 'remark-rehype'
 import rehypeReact from 'rehype-react'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
+import 'katex/dist/katex.css'
 import { useSelector } from 'react-redux'
 
 import * as remarkTags from './remark-tags'
@@ -49,7 +52,9 @@ function updatePreview(doc: string): React.ReactNode {
   return unified()
     .use(remarkParse)
     .use(remarkGfm)
+    .use(remarkMath)
     .use(remarkRehype)
+    .use(rehypeKatex)
     .use(rehypeReact, {
       createElement,
       Fragment,
@@ -76,7 +81,8 @@ function updatePreview(doc: string): React.ReactNode {
         code: RemarkCode,
         pre: remarkTags.RemarkCodePre,
         img: remarkTags.RemarkImg,
-        hr: remarkTags.RemarkHr
+        hr: remarkTags.RemarkHr,
+        div: remarkTags.RemarkDiv
       }
     })
     .processSync(doc).result

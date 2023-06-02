@@ -181,3 +181,19 @@ export function RemarkCodePre(props: any): JSX.Element {
     </Box>
   )
 }
+
+export function RemarkDiv(props: any): JSX.Element {
+  if (props.node && props.node.position) {
+    return (
+      <Box
+        data-line={props.node && getStartLine(props.node)}
+        data-endline={props.node && getEndLine(props.node)}
+        className={props.className}
+      >
+        {props.children}
+      </Box>
+    )
+  }
+
+  return <>{props.children}</>
+}
