@@ -198,6 +198,7 @@ const App: FC = (): JSX.Element => {
           height="100%"
           flexDirection="column"
           position="relative"
+          overflow="auto"
         >
           <TitleBar />
           {showHeadInfo ? <MarkHeadInfo /> : <GhostInfo />}
