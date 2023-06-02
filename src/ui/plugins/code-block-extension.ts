@@ -2,6 +2,7 @@
 // the code is not optimized, just for demo
 // any update will rebuild the whole decorations and code block items
 // just deal with the flaw for `code-block-extension`
+// @2023-06-02 optimization extension, just update the visibleRanges.
 // author: crazycodegame
 import {
   Decoration,
@@ -14,11 +15,6 @@ import { RangeSetBuilder, Extension } from '@codemirror/state'
 import { syntaxTree } from '@codemirror/language'
 
 import { lightThemeColor, darkThemeColor } from '../libs/themes'
-
-interface CodeBlockItem {
-  from: number
-  to: number
-}
 
 const baseTheme = EditorView.baseTheme({
   '&light .cm-code-block': {
@@ -36,23 +32,19 @@ export function codeBlockHighlight(): Extension {
 const codeBlockHighlightPlugin = ViewPlugin.fromClass(
   class {
     decorations: DecorationSet
-    codeBlockItems: CodeBlockItem[] = []
 
     constructor(view: EditorView) {
-      this.codeBlockItems = getCodeBlockItems(view)
-      this.decorations = getDecorations(view, this.codeBlockItems)
+      this.decorations = newDeco(view)
     }
 
     update(update: ViewUpdate) {
       if (update.docChanged || update.viewportChanged) {
-        this.codeBlockItems = getCodeBlockItems(update.view)
-        this.decorations = getDecorations(update.view, this.codeBlockItems)
+        this.decorations = newDeco(update.view)
       }
     }
 
     destroy() {
       this.decorations = null
-      this.codeBlockItems = null
     }
   },
   {
@@ -60,49 +52,27 @@ const codeBlockHighlightPlugin = ViewPlugin.fromClass(
   }
 )
 
-const codeBlockDeco = Decoration.line({
-  attributes: { class: 'cm-code-block' }
-})
-
-function isCodeBlock(line: any, codeBlockItems: CodeBlockItem[]): boolean {
-  return codeBlockItems.some(
-    item => item.from <= line.from && item.to >= line.to
-  )
-}
-
-function getDecorations(
-  view: EditorView,
-  codeBlockItems: CodeBlockItem[]
-): DecorationSet {
+function newDeco(view: EditorView): DecorationSet {
   let builder = new RangeSetBuilder<Decoration>()
 
   for (let { from, to } of view.visibleRanges) {
-    for (let pos = from; pos <= to; ) {
-      let line = view.state.doc.lineAt(pos)
-      if (isCodeBlock(line, codeBlockItems)) {
-        builder.add(line.from, line.from, codeBlockDeco)
+    syntaxTree(view.state).iterate({
+      from,
+      to,
+      enter: node => {
+        if (node.name == 'FencedCode') {
+          for (let pos = node.from; pos <= node.to; ) {
+            let line = view.state.doc.lineAt(pos)
+            builder.add(line.from, line.from, codeBlockDeco)
+            pos = line.to + 1
+          }
+        }
       }
-      pos = line.to + 1
-    }
+    })
   }
-
   return builder.finish()
 }
 
-function getCodeBlockItems(view: EditorView): CodeBlockItem[] {
-  const tree = syntaxTree(view.state)
-  const codeBlockItems: CodeBlockItem[] = []
-
-  tree.iterate({
-    enter: node => {
-      if (node.type.name === 'FencedCode') {
-        codeBlockItems.push({
-          from: node.from,
-          to: node.to
-        })
-      }
-    }
-  })
-
-  return codeBlockItems
-}
+const codeBlockDeco = Decoration.line({
+  attributes: { class: 'cm-code-block' }
+})
