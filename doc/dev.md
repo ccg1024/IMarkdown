@@ -1,7 +1,7 @@
 ---
 title: 开发文档
 desc: imarkdown项目使用typescript重构后的开发文档
-date: 2023-05-23
+date: 2023-5-23
 ---
 # electron
 
@@ -65,3 +65,17 @@ markdown 语法转换工具：`remark`，`unified`
 ```shell
 npm i rehype-react remark-gfm remark-math remark-parse remark-rehype unified
 ```
+
+# 日志
+
+## before
+
+在实时预览时，使用`useTransition`设置低优先级事件，这样可以结局在长文件上，输入卡顿问题。当前测试在2000多行的文件上，依旧是没有什么卡顿的，当处理5000行左右的文件时，则会存在输入卡顿现象了。
+
+## 2023-06-02
+
+优化插件`code-block-highlight`，直接使用`syntaxTree`对可视迭代可视区域内的内容即可，无需对整个文档内容进行处理。
+
+使用`Decoration.widget`添加图片预览功能，但使用图片预览后，图片后续的内容需要空一行来纠正实时预览的同步滚动问题：
+
+> 未空行的内容会被当做图片内容，滚动时，在预览界面会被当做图片部分进行处理。
