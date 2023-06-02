@@ -17,7 +17,7 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 import { useSelector } from 'react-redux'
-import { BsMarkdown, BsThreeDotsVertical } from 'react-icons/bs'
+import { BsMarkdown, BsList } from 'react-icons/bs'
 
 import {
   RecentFilesPayload,
@@ -47,7 +47,7 @@ const SideBarDetailItem: FC<SideBarDetailItemProps> = (props): JSX.Element => {
       borderColor={useColorModeValue('gray.300', 'gray.300')}
       backgroundColor={props.isActive ? 'blue.500' : 'unset'}
       onClick={
-        props.isActive ? () => { } : e => props.clickCallback(e.currentTarget.id)
+        props.isActive ? () => {} : e => props.clickCallback(e.currentTarget.id)
       }
       _hover={{
         backgroundColor: props.isActive ? 'blue.500' : 'blue.50',
@@ -179,8 +179,12 @@ const FixedLeftBar: FC = (): JSX.Element => {
           </Text>
         </Box>
 
-        <Box onClick={clickMenu} _hover={{ cursor: 'pointer' }} flexShrink={0}>
-          <BsThreeDotsVertical />
+        <Box
+          onClick={clickMenu}
+          _hover={{ cursor: 'pointer', transform: 'scale(1.2, 1.2)' }}
+          flexShrink={0}
+        >
+          <BsList />
         </Box>
       </Flex>
       <List>

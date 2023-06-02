@@ -46,6 +46,7 @@ import { LineOfStatusLine } from '../../types/renderer'
 import { lightThemeColor } from './themes'
 import paddingExtension from '../plugins/padding-extension'
 import { codeBlockHighlight } from '../plugins/code-block-extension'
+import { imgPreview } from '../plugins/img-extension'
 
 const defaultTheme = EditorView.theme({
   '&': {
@@ -347,7 +348,8 @@ const imarkdownDefaultExtensions = [
     extensions: [markStylingExtension]
   }),
   codeBlockHighlight(),
-  paddingExtension
+  paddingExtension,
+  imgPreview()
 ]
 
 interface Controller {
