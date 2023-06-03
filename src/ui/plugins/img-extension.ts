@@ -42,24 +42,26 @@ class ImgWidget extends WidgetType {
 function imgBlock(view: EditorView) {
   let widgets: any[] = []
   for (let { from, to } of view.visibleRanges) {
-    syntaxTree(view.state).iterate({
-      from,
-      to,
-      enter: node => {
-        if (node.name == 'Image') {
-          let imgText = view.state.doc.sliceString(node.from, node.to)
-          let regRsult = /^!\[.*?\]\((.*?)\)$/.exec(imgText)
-          if (regRsult.length > 1) {
-            let src = regRsult[1]
-            let deco = Decoration.widget({
-              widget: new ImgWidget(src),
-              side: 2
-            })
-            widgets.push(deco.range(node.to))
+    try {
+      syntaxTree(view.state).iterate({
+        from,
+        to,
+        enter: node => {
+          if (node.name == 'Image') {
+            let imgText = view.state.doc.sliceString(node.from, node.to)
+            let regRsult = /^!\[.*?\]\((.*?)\)$/.exec(imgText)
+            if (regRsult.length > 1) {
+              let src = regRsult[1]
+              let deco = Decoration.widget({
+                widget: new ImgWidget(src),
+                side: 2
+              })
+              widgets.push(deco.range(node.to))
+            }
           }
         }
-      }
-    })
+      })
+    } catch (error) {}
   }
 
   return Decoration.set(widgets)
