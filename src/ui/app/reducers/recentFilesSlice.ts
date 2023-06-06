@@ -7,6 +7,7 @@ export interface RecentFilesPayload {
   desc?: string
   title?: string
   isChange?: boolean
+  tag?: string
 }
 
 export interface RecentFilesStateItem {
@@ -32,7 +33,8 @@ export const recentFilesSlice = createSlice({
           date: action.payload.date,
           desc: action.payload.desc,
           title: action.payload.title,
-          isChange: action.payload.isChange
+          isChange: action.payload.isChange,
+          tag: action.payload.tag
         }
       }
     },
@@ -50,6 +52,11 @@ export const recentFilesSlice = createSlice({
       if (action.payload.id) {
         state.value[action.payload.id].isChange = action.payload.isChange
       }
+    },
+    updateFileTag: (state, action: PayloadAction<RecentFilesPayload>) => {
+      if (action.payload.id) {
+        state.value[action.payload.id].tag = action.payload.tag
+      }
     }
   }
 })
@@ -60,7 +67,8 @@ export const {
   updateRecentFiles,
   updateFileTitle,
   updateFileDesc,
-  updateFileIsChange
+  updateFileIsChange,
+  updateFileTag
 } = recentFilesSlice.actions
 
 export default recentFilesSlice.reducer

@@ -24,7 +24,8 @@ export function concatHeaderAndContent(
   const subHeader: any = {
     title: header.title,
     desc: header.desc,
-    date: header.date
+    date: header.date,
+    tag: header.tag
   }
   let result = '---\n'
   for (const key in subHeader) {

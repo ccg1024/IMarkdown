@@ -26,6 +26,7 @@ import {
 
 import { selectRecentFiles } from '../app/reducers/recentFilesSlice'
 import { selectCurrentFile } from '../app/reducers/currentFileSlice'
+import { MarkTag } from './mark-head'
 
 interface SideBarDetailItemProps {
   detail: RecentFilesPayload
@@ -77,11 +78,7 @@ const SideBarDetailItem: FC<SideBarDetailItemProps> = (props): JSX.Element => {
           <Text fontSize="0.8em" color={props.isActive ? 'white' : 'black'}>
             {props.detail.date ? props.detail.date : 'Unknow time'}
           </Text>
-          {props.detail.isChange && (
-            <Badge borderRadius="md" colorScheme="red">
-              changed
-            </Badge>
-          )}
+          {props.detail.tag && <MarkTag tag={props.detail.tag} />}
         </Flex>
         <Text
           width="100%"
@@ -93,6 +90,12 @@ const SideBarDetailItem: FC<SideBarDetailItemProps> = (props): JSX.Element => {
         >
           {props.detail.desc ? props.detail.desc : 'no description'}
         </Text>
+
+        {props.detail.isChange && (
+          <Badge fontSize="0.8em" borderRadius="md" colorScheme="red">
+            changed
+          </Badge>
+        )}
       </Flex>
     </ListItem>
   )

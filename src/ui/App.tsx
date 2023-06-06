@@ -100,7 +100,8 @@ const App: FC = (): JSX.Element => {
           date: formateDate(headInfo.date),
           desc: headInfo.desc,
           title: headInfo.title,
-          isChange: isChange
+          isChange: isChange,
+          tag: headInfo.tag
         })
       )
       dispatch(updateCurrentFile(fullpath))
@@ -128,7 +129,8 @@ const App: FC = (): JSX.Element => {
             date: formateDate(initialFile.headInfo.date),
             desc: initialFile.headInfo.desc,
             title: initialFile.headInfo.title,
-            isChange: false
+            isChange: false,
+            tag: initialFile.headInfo.tag
           })
         )
         dispatch(updateCurrentFile(initialFile.fullpath))
