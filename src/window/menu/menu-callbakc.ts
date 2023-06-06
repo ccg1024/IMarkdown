@@ -17,7 +17,8 @@ export async function fileOpenCallback(fileCache: FileCache) {
         filePath,
         fileCache[filePath].fileContent,
         fileCache[filePath].headInfo,
-        fileCache[filePath].isChange
+        fileCache[filePath].isChange,
+        fileCache[filePath].scrollPos
       )
 
       return { filePath }

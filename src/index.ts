@@ -129,7 +129,8 @@ app.whenReady().then(() => {
         filepath,
         fileCache[filepath].fileContent,
         fileCache[filepath].headInfo,
-        fileCache[filepath].isChange
+        fileCache[filepath].isChange,
+        fileCache[filepath].scrollPos
       )
       currentFilePath = filepath
       win?.setTitle(formatWin32Title(currentFilePath))
@@ -155,6 +156,15 @@ app.whenReady().then(() => {
       fileCache[currentFilePath].isChange = true
     }
   })
+  // listen to update file scroll position
+  ipcMain.on(
+    ipcConfig.UPDATE_SCROLL_POS,
+    async (_, pos: number, file: string) => {
+      if (fileCache.hasOwnProperty(file)) {
+        fileCache[file].scrollPos = pos
+      }
+    }
+  )
 
   // listen to open app by file
   ipcMain.handle(ipcConfig.INIT_RENDERER, async () => {

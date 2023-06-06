@@ -17,7 +17,8 @@ const ipcConfig = {
   CLOSE_WINDOW: 'close_window', //closeWindowFromReact
   MINIMIZE_WINDOW: 'minimize_window', //minimizeWindowFromReact
   MAXIMIZE_WINDOW: 'maximize_window', //maximizeWindowFromReact
-  SHOW_MENU: 'show_menu'
+  SHOW_MENU: 'show_menu',
+  UPDATE_SCROLL_POS: 'update_scroll_pos'
 }
 
 export default ipcConfig

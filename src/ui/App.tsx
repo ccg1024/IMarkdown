@@ -91,7 +91,8 @@ const App: FC = (): JSX.Element => {
       fullpath: string,
       fileContent: string,
       headInfo: HeadInfo,
-      isChange: boolean
+      isChange: boolean,
+      scrollPos: number
     ) => {
       dispatch(updateFileContent(fileContent))
       dispatch(
@@ -111,7 +112,11 @@ const App: FC = (): JSX.Element => {
         uiControl.current = true
       }
 
-      PubSub.publish(pubsubConfig.UPDATE_EDITOR_STATE, fileContent)
+      PubSub.publish(pubsubConfig.UPDATE_EDITOR_STATE, {
+        doc: fileContent,
+        file: fullpath,
+        scrollPos: scrollPos && scrollPos
+      })
       // PubSub.publish(pubsubConfig.UPDATE_STATUS_LINE, isChange)
     },
     []
@@ -134,10 +139,10 @@ const App: FC = (): JSX.Element => {
           })
         )
         dispatch(updateCurrentFile(initialFile.fullpath))
-        PubSub.publish(
-          pubsubConfig.UPDATE_EDITOR_STATE,
-          initialFile.fileContent
-        )
+        PubSub.publish(pubsubConfig.UPDATE_EDITOR_STATE, {
+          doc: initialFile.fileContent,
+          file: initialFile.fullpath
+        })
         setShowEditor(true)
         setShowHeadInfo(true)
         uiControl.current = true

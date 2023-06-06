@@ -10,5 +10,6 @@ export interface FileCache extends Object {
     fileContent: string
     headInfo: HeadInfo
     isChange: boolean
+    scrollPos?: number
   }
 }

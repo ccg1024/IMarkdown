@@ -7,7 +7,7 @@ import { IpcRendererEvent } from 'electron'
 
 import StatusLine from './status-line'
 import { getMarkHead } from '../app/store'
-import { LiveScroll } from '../../types/renderer'
+import { LiveScroll, EditorConfig } from '../../types/renderer'
 import pubsubConfig from '../../config/pubsub.config'
 import ipcConfig from '../../config/ipc.config'
 import imardownPlugins, {
@@ -37,6 +37,7 @@ const controller: Controller = {
 const Editor: FC<EditorProps> = ({ isVisible }): JSX.Element => {
   const containerRef = useRef<HTMLDivElement>(null)
   const editorRef = useRef<EditorView>(null)
+  const currentFile = useRef<string>('')
   const reduxDispatch = useCallback(useDispatch(), [])
 
   const handleEditorScroll = useCallback((e: UIEvent) => {
@@ -58,9 +59,16 @@ const Editor: FC<EditorProps> = ({ isVisible }): JSX.Element => {
   useEffect(() => {
     const editorToken = PubSub.subscribe(
       pubsubConfig.UPDATE_EDITOR_STATE,
-      (_, data: string) => {
+      (_, data: EditorConfig) => {
+        if (currentFile.current && editorRef.current) {
+          // update scroll pos to main process
+          const scrollTop = editorRef.current.scrollDOM.scrollTop
+          const blockInfo = editorRef.current.elementAtHeight(scrollTop)
+          window.ipcAPI.updateScrollPos(blockInfo.from, currentFile.current)
+        }
+        currentFile.current = data.file
         const view = new EditorView({
-          state: generateState(data, reduxDispatch),
+          state: generateState(data.doc, reduxDispatch),
           parent: containerRef.current
         })
 
@@ -71,6 +79,12 @@ const Editor: FC<EditorProps> = ({ isVisible }): JSX.Element => {
         if (dynamicPlugin.vim) {
           view.dispatch({
             effects: vimPlugin.reconfigure(vim())
+          })
+        }
+
+        if (data.scrollPos) {
+          view.dispatch({
+            effects: EditorView.scrollIntoView(data.scrollPos, { y: 'start' })
           })
         }
 

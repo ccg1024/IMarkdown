@@ -16,6 +16,7 @@ export interface IElectronIPC {
   updateHeader: (header: HeadInfo) => Promise<void>
   openRecentFile: (path: string) => Promise<void>
   openMenu: (x: number, y: number) => Promise<void>
+  updateScrollPos: (scrollPos: number, file: string) => Promise<void>
 
   closeWindow: () => Promise<void>
   minimizeWindow: () => Promise<void>
@@ -48,4 +49,10 @@ export interface LineOfStatusLine {
 export interface LiveScroll {
   line: number
   percent: number
+}
+
+export interface EditorConfig {
+  doc: string
+  file: string
+  scrollPos?: number
 }
