@@ -79,3 +79,9 @@ npm i rehype-react remark-gfm remark-math remark-parse remark-rehype unified
 使用`Decoration.widget`添加图片预览功能，但使用图片预览后，图片后续的内容需要空一行来纠正实时预览的同步滚动问题：
 
 > 未空行的内容会被当做图片内容，滚动时，在预览界面会被当做图片部分进行处理。
+
+## 2023-06-07
+
+修改`SideBar`组件，为其添加路由功能，方便侧边栏右侧内容的分类渲染。使用的路由组件为`HashRouter`，如果使用`BrowserRouter`，会出现一些错误。在stackoverflow上一则帖子说前者是基于文件环境，后者基于请求环境。[How to use React Router with Electron?](https://stackoverflow.com/questions/36505404/how-to-use-react-router-with-electron)
+
+

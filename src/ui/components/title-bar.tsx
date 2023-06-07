@@ -1,5 +1,5 @@
-import { FC } from 'react'
-import { Box, useColorModeValue } from '@chakra-ui/react'
+import { FC, MouseEventHandler, ReactElement } from 'react'
+import { Box, IconButton, useColorModeValue } from '@chakra-ui/react'
 import { Global } from '@emotion/react'
 import { BsX, BsDash, BsSquare } from 'react-icons/bs'
 
@@ -11,20 +11,13 @@ const TitleBarStyle: FC = (): JSX.Element => {
           WebkitAppRegion: 'drag'
         },
         '.title-icon': {
-          marginLeft: 'var(--chakra-space-2)',
-          WebkitAppRegion: 'no-drag',
-          color: useColorModeValue(
-            'var(--chakra-colors-gray-500)',
-            'var(--chakra-colors-gray-500)'
-          )
+          WebkitAppRegion: 'no-drag'
         },
         '.title-icon:hover': {
-          color: useColorModeValue(
+          backgroundColor: useColorModeValue(
             'var(--chakra-colors-gray-800)',
             'var(--chakra-colors-gray-800)'
-          ),
-          cursor: 'pointer',
-          transform: 'scale(1.2, 1.2)'
+          )
         }
       }}
     />
@@ -46,20 +39,60 @@ const TitleBar: FC = (): JSX.Element => {
     <>
       <TitleBarStyle />
       <Box
-        position="absolute"
         width="100%"
         className="title-bar"
         display="flex"
         gap={2}
         justifyContent="right"
-        paddingX={4}
         alignItems="center"
       >
-        <BsDash fontSize="30px" className="title-icon" onClick={minWindow} />
-        <BsSquare fontSize="15px" className="title-icon" onClick={maxWindow} />
-        <BsX fontSize="30px" className="title-icon" onClick={closeWindow} />
+        <TitleBtn
+          icon={<BsDash />}
+          ariaLabel="min window"
+          fontSize="25px"
+          onClick={minWindow}
+        />
+        <TitleBtn
+          icon={<BsSquare />}
+          ariaLabel="max window"
+          fontSize="12px"
+          onClick={maxWindow}
+        />
+        <TitleBtn
+          icon={<BsX />}
+          ariaLabel="close window"
+          fontSize="25px"
+          onClick={closeWindow}
+        />
       </Box>
     </>
+  )
+}
+
+interface TitleBtnProps {
+  icon: ReactElement
+  ariaLabel: string
+  fontSize: string
+  onClick: MouseEventHandler
+}
+
+const TitleBtn: FC<TitleBtnProps> = ({
+  icon,
+  ariaLabel,
+  fontSize,
+  onClick
+}): JSX.Element => {
+  return (
+    <IconButton
+      onClick={onClick}
+      icon={icon}
+      aria-label={ariaLabel}
+      size="sm"
+      fontSize={fontSize}
+      borderRadius="unset"
+      backgroundColor="unset"
+      className="title-icon"
+    />
   )
 }
 

@@ -29,3 +29,7 @@ pre:hover::-webkit-scrollbar-thumb {
 .katex-mathml {
   display: none;
 }
+
+.hidde-scroll-bar::-webkit-scrollbar {
+  display: none;
+}

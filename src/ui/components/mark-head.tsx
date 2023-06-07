@@ -102,7 +102,7 @@ const MarkHeadInfo: FC = (): JSX.Element => {
   )
 
   return (
-    <Box padding={4} marginY={2}>
+    <Box padding={4}>
       <Editable
         value={noteTitle}
         fontSize="1.2em"

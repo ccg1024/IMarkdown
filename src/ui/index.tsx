@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import { ChakraProvider } from '@chakra-ui/react'
 import { Provider } from 'react-redux'
+import { HashRouter } from 'react-router-dom'
 
 import App from './App'
 import store from './app/store'
@@ -12,7 +13,9 @@ root.render(
   <ChakraProvider theme={theme}>
     <Provider store={store}>
       <StrictMode>
-        <App />
+        <HashRouter>
+          <App />
+        </HashRouter>
       </StrictMode>
     </Provider>
   </ChakraProvider>

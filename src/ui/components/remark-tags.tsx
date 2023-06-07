@@ -71,7 +71,11 @@ export function RemarkQuote(props: any): JSX.Element {
 
 export function RemarkLink(props: any): JSX.Element {
   return (
-    <Link data-line={props.node && getStartLine(props.node)}>
+    <Link
+      data-line={props.node && getStartLine(props.node)}
+      href={props.href}
+      target="_blank"
+    >
       {props.children}
     </Link>
   )

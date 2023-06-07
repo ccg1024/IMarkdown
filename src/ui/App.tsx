@@ -12,7 +12,6 @@ import { useDispatch } from 'react-redux'
 
 import Editor from './components/editor'
 import Preview from './components/preview'
-import SideBar from './components/side-bar'
 import TitleBar from './components/title-bar'
 import GhostInfo from './components/ghost-info'
 import MarkHeadInfo from './components/mark-head'
@@ -24,6 +23,7 @@ import { updateFileContent } from './app/reducers/fileContentSlice'
 import { updateRecentFiles } from './app/reducers/recentFilesSlice'
 import { updateCurrentFile } from './app/reducers/currentFileSlice'
 import InterIcon from './components/interIcon'
+import Sidebar from './components/sidebar'
 
 interface FileToken {
   fullpath: string
@@ -197,7 +197,7 @@ const App: FC = (): JSX.Element => {
     <>
       <Flex height="100%" width="100%" id="content_root">
         <Box ref={sideBarRef} height="100%" flexShrink={0} display="flex">
-          <SideBar />
+          <Sidebar />
         </Box>
         <Box
           display="flex"
