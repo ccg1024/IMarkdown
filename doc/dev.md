@@ -38,6 +38,48 @@ npm install @codemirror/language-data @codemirror/search
 npm install @codemirror/state @codemirror/view
 ```
 
+## 简述
+
+codemirror是被设计成一系列功能的集合，方便开发者能够自定义添加或删除特定的功能，而不变之处在于初始化视图时较为复杂。
+
+视图状态的更行受到`redux`，`Elm`的启发，除了少部分特殊情况除外，视图的状态由自身属性`state`决定。同时，要避免直接与该属性进行写操作。而是通过`dispatch`方法，配合`transaction`进行操作。
+
+数据流通常为：
+
+1. 视图设计事件监听
+
+2. 触发DOM事件
+
+3. 将DOM事件转化成事务`transaction`，并执行
+
+4. 得到新状态，更新视图
+
+## 文档偏移
+
+codemirror通过平面字符串的偏移来确定文档的位置，同时，字符串是存储在树形结构中，方便使用较小的开销来更新文档。同时，数据结构是通过行号来定义下标的，同样可以非常方便的获取每行的信息。
+
+## 文档改变
+
+文档的变化会非常准确的描述旧文档的哪些位置被新的内容所替代，方便扩展能够准确的追踪文档的行为，同时实现诸如撤销，协同操作等功能。
+
+## 选择
+
+与文档一样，视图的状态属性中还存储着当前的选择内容。选择可以由多个范围组成，每个范围可以是一个光标或从`anchor`到`head`之间的内容。
+
+重叠的范围会被自动合并，范围集合会被排序——`state.selection`属性总是存储一个有序，不重叠的范围阵列。
+
+这些范围集合中，只有一个会被浏览器选中，其他的被codemirror维护。通常，一个视图只支持一个选中的范围。多范围选中需要配置额外的扩展。
+
+## 事务
+
+由状态的更新方法创造。
+
+## cursor
+
+自定义一个光标元素的原因：在一个codemiror作者分享新编辑器`prosemirror`的视频上提到，不同的浏览器对于`contentEditable`的规则会有所差异，同时，当图片插入到文档中时，如何定位光标比较困难。所以在`prosemirror`中是启用`contentEditable`，但设置监听，事务的更新由作者来控制。或许codemirror6中也是类似的方式。
+
+codemirror6本身是使用一个`mutation observer`来监听文档的所有改变，通过编辑器自身方法进行重绘受影响的节点，而不是通过浏览器原生编辑事件修改内容。
+
 # main process
 
 解析 yaml 头部格式：`npm i gray-matter`
@@ -84,4 +126,18 @@ npm i rehype-react remark-gfm remark-math remark-parse remark-rehype unified
 
 修改`SideBar`组件，为其添加路由功能，方便侧边栏右侧内容的分类渲染。使用的路由组件为`HashRouter`，如果使用`BrowserRouter`，会出现一些错误。在stackoverflow上一则帖子说前者是基于文件环境，后者基于请求环境。[How to use React Router with Electron?](https://stackoverflow.com/questions/36505404/how-to-use-react-router-with-electron)
 
+## 2023-06-12
 
+修复插件`code-block-extension`特定情况下未更新问题：
+
+**问题**
+
+当打开存在历史定位的文档时，编辑器会使用`EditorView.scrollIntoView`定位历史位置，但定位后，代码块未被插件高亮。
+
+**原因**
+
+为了减少无用渲染，插件使用`syntaxTree`来解析文档，并在视图区进行语法树迭代，但当历史定位距离文档顶部超过一定距离后，虽然编辑器的视图区域时正常定位的，但语法树的解析并没有到达预期的位置。使得后续的渲染装饰器没有被运行。
+
+**解决**
+
+使用`ensureSyntaxTree`方法替换`syntaxTree`方法，前者在将在提供的延迟时间内竟可能获取到目标位置的语法树。

@@ -12,7 +12,7 @@ import {
   ViewUpdate
 } from '@codemirror/view'
 import { RangeSetBuilder, Extension } from '@codemirror/state'
-import { syntaxTree } from '@codemirror/language'
+import { ensureSyntaxTree } from '@codemirror/language'
 
 import { lightThemeColor, darkThemeColor } from '../libs/themes'
 
@@ -56,19 +56,22 @@ function newDeco(view: EditorView): DecorationSet {
   let builder = new RangeSetBuilder<Decoration>()
 
   for (let { from, to } of view.visibleRanges) {
-    syntaxTree(view.state).iterate({
-      from,
-      to,
-      enter: node => {
-        if (node.name == 'FencedCode') {
-          for (let pos = node.from; pos <= node.to; ) {
-            let line = view.state.doc.lineAt(pos)
-            builder.add(line.from, line.from, codeBlockDeco)
-            pos = line.to + 1
+    const tree = ensureSyntaxTree(view.state, to, 200)
+    if (tree) {
+      tree.iterate({
+        from,
+        to,
+        enter: node => {
+          if (node.name == 'FencedCode') {
+            for (let pos = node.from; pos <= node.to; ) {
+              let line = view.state.doc.lineAt(pos)
+              builder.add(line.from, line.from, codeBlockDeco)
+              pos = line.to + 1
+            }
           }
         }
-      }
-    })
+      })
+    }
   }
   return builder.finish()
 }
