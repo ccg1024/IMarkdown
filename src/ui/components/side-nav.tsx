@@ -1,12 +1,34 @@
-import { FC, MouseEvent, MouseEventHandler, useCallback } from 'react'
-import { Box, Flex, Text, useColorModeValue } from '@chakra-ui/react'
+import {
+  FC,
+  MouseEvent,
+  MouseEventHandler,
+  useCallback,
+  useLayoutEffect,
+  useState
+} from 'react'
+import {
+  Box,
+  Flex,
+  IconButton,
+  Text,
+  useColorModeValue
+} from '@chakra-ui/react'
 import { BsList, BsMarkdown } from 'react-icons/bs'
 import { NavLink } from 'react-router-dom'
 import { Global } from '@emotion/react'
 
 const SideNav: FC = (): JSX.Element => {
+  const [isMac, setIsMac] = useState<boolean>(true)
   const clickMenu: MouseEventHandler = useCallback((event: MouseEvent) => {
     window.ipcAPI.openMenu(event.clientX, event.clientY)
+  }, [])
+
+  useLayoutEffect(() => {
+    window.ipcAPI.getPlatform().then((plat: string) => {
+      if (plat !== 'darwin') {
+        setIsMac(false)
+      }
+    })
   }, [])
 
   return (
@@ -15,39 +37,62 @@ const SideNav: FC = (): JSX.Element => {
       color={useColorModeValue('gray.300', 'gray.300')}
       width="220px"
     >
+      <Global
+        styles={{
+          '.draggable': {
+            WebkitAppRegion: 'drag'
+          },
+          '.no-draggable': {
+            WebkitAppRegion: 'no-drag'
+          }
+        }}
+      />
       <Flex
         alignItems="center"
         paddingY={2}
         paddingX={4}
         justifyContent="space-between"
+        className="draggable"
       >
         <Box alignItems="center" display="flex">
-          <BsMarkdown
-            style={{
-              fontSize: '1.5em',
-              color: useColorModeValue(
-                'var(--chakra-colors-blue-600)',
-                'var(--chakra-colors-blue-600)'
-              )
-            }}
-          />
-          <Text
-            marginLeft={2}
-            fontSize="1.1em"
-            textAlign="left"
-            userSelect="none"
-          >
-            imarkdown
-          </Text>
+          {!isMac && (
+            <>
+              <BsMarkdown
+                style={{
+                  fontSize: '1.5em',
+                  color: useColorModeValue(
+                    'var(--chakra-colors-blue-600)',
+                    'var(--chakra-colors-blue-600)'
+                  )
+                }}
+              />
+              <Text
+                marginLeft={2}
+                fontSize="1.1em"
+                textAlign="left"
+                userSelect="none"
+              >
+                imarkdown
+              </Text>
+            </>
+          )}
         </Box>
 
-        <Box
+        <IconButton
+          className="no-draggable"
+          aria-label="menu"
           onClick={clickMenu}
-          _hover={{ cursor: 'pointer', transform: 'scale(1.2, 1.2)' }}
-          flexShrink={0}
-        >
-          <BsList />
-        </Box>
+          icon={<BsList />}
+          size="sm"
+          variant="ghost"
+          fontSize="20px"
+          _hover={{
+            backgroundColor: useColorModeValue(
+              'whiteAlpha.400',
+              'whiteAlpha.200'
+            )
+          }}
+        />
       </Flex>
 
       {/*<NavItem path="main_window/recent_file">Recent Files</NavItem>*/}

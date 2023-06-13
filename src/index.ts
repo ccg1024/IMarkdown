@@ -191,6 +191,10 @@ app.whenReady().then(() => {
       }
     }
   })
+  // return current platform env
+  ipcMain.handle(ipcConfig.GET_PLATFORM, async () => {
+    return process.platform
+  })
 
   // close, min, max window
   ipcMain.on(ipcConfig.CLOSE_WINDOW, async () => {

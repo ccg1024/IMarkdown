@@ -8,6 +8,8 @@ import App from './App'
 import store from './app/store'
 import theme from './libs/global'
 
+import '@fontsource/m-plus-rounded-1c'
+
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
   <ChakraProvider theme={theme}>

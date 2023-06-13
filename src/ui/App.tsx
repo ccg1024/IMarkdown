@@ -35,6 +35,7 @@ const App: FC = (): JSX.Element => {
   const [showEditor, setShowEditor] = useState<boolean>(false)
   const [showPreview, setShowPreview] = useState<boolean>(false)
   const [showHeadInfo, setShowHeadInfo] = useState<boolean>(false)
+  const [showTitleBar, setShowTitleBar] = useState<boolean>(false)
   const uiControl = useRef<boolean>(false)
   const sideBarRef = useRef<HTMLDivElement>(null)
   const dispatch = useCallback(useDispatch(), [])
@@ -192,6 +193,13 @@ const App: FC = (): JSX.Element => {
       }
     })
   }, [])
+  useLayoutEffect(() => {
+    window.ipcAPI.getPlatform().then((platform: string) => {
+      if (platform !== 'darwin') {
+        setShowTitleBar(true)
+      }
+    })
+  }, [])
 
   return (
     <>
@@ -207,7 +215,7 @@ const App: FC = (): JSX.Element => {
           position="relative"
           overflow="auto"
         >
-          <TitleBar />
+          {showTitleBar && <TitleBar />}
           {showHeadInfo ? <MarkHeadInfo /> : <GhostInfo />}
           <Flex height="100%" width="100%" overflow="auto">
             <Editor isVisible={showEditor} />
