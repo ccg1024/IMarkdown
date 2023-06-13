@@ -1,4 +1,10 @@
-import { FC, MouseEventHandler, ReactElement } from 'react'
+import {
+  FC,
+  MouseEventHandler,
+  ReactElement,
+  useLayoutEffect,
+  useState
+} from 'react'
 import { Box, IconButton, useColorModeValue } from '@chakra-ui/react'
 import { Global } from '@emotion/react'
 import { BsX, BsDash, BsSquare } from 'react-icons/bs'
@@ -35,6 +41,16 @@ function maxWindow(): void {
 }
 
 const TitleBar: FC = (): JSX.Element => {
+  const [showWinIcon, setShowWinIcon] = useState<boolean>(false)
+
+  useLayoutEffect(() => {
+    window.ipcAPI.getPlatform().then((plat: string) => {
+      if (plat !== 'darwin') {
+        setShowWinIcon(true)
+      }
+    })
+  }, [])
+
   return (
     <>
       <TitleBarStyle />
@@ -45,25 +61,30 @@ const TitleBar: FC = (): JSX.Element => {
         gap={2}
         justifyContent="right"
         alignItems="center"
+        minHeight={4}
       >
-        <TitleBtn
-          icon={<BsDash />}
-          ariaLabel="min window"
-          fontSize="25px"
-          onClick={minWindow}
-        />
-        <TitleBtn
-          icon={<BsSquare />}
-          ariaLabel="max window"
-          fontSize="12px"
-          onClick={maxWindow}
-        />
-        <TitleBtn
-          icon={<BsX />}
-          ariaLabel="close window"
-          fontSize="25px"
-          onClick={closeWindow}
-        />
+        {showWinIcon && (
+          <>
+            <TitleBtn
+              icon={<BsDash />}
+              ariaLabel="min window"
+              fontSize="25px"
+              onClick={minWindow}
+            />
+            <TitleBtn
+              icon={<BsSquare />}
+              ariaLabel="max window"
+              fontSize="12px"
+              onClick={maxWindow}
+            />
+            <TitleBtn
+              icon={<BsX />}
+              ariaLabel="close window"
+              fontSize="25px"
+              onClick={closeWindow}
+            />
+          </>
+        )}
       </Box>
     </>
   )
