@@ -1,4 +1,4 @@
-// import { app } from 'electron'
+import { app } from 'electron'
 import type { MenuItemConstructorOptions } from 'electron'
 
 export default function createMenus(
@@ -15,23 +15,37 @@ export default function createMenus(
   const isMac = process.platform === 'darwin'
 
   return [
+    ...(isMac
+      ? [
+          {
+            label: app.name,
+            submenu: [
+              { role: 'about' },
+              { type: 'separator' },
+              { role: 'services' },
+              { type: 'separator' },
+              { role: 'quit' }
+            ] as MenuItemConstructorOptions[]
+          }
+        ]
+      : []),
     {
       label: 'File',
       submenu: [
         {
           label: 'open file',
           click: openFileCallback,
-          accelerator: process.platform === 'darwin' ? 'Cmd+o' : 'Ctrl+o'
+          accelerator: isMac ? 'Cmd+o' : 'Ctrl+o'
         },
         {
           label: 'save file',
           click: saveFileCallback,
-          accelerator: process.platform === 'darwin' ? 'Cmd+s' : 'Ctrl+s'
+          accelerator: isMac ? 'Cmd+s' : 'Ctrl+s'
         },
         {
           label: 'create file',
           click: createFileCallback,
-          accelerator: process.platform === 'darwin' ? 'Cmd+n' : 'Ctrl+n'
+          accelerator: isMac ? 'Cmd+n' : 'Ctrl+n'
         },
         { type: 'separator' },
         isMac ? { role: 'close' } : { role: 'quit' }
@@ -45,33 +59,28 @@ export default function createMenus(
         {
           label: 'Just Preview',
           click: justPreviewCallback,
-          accelerator:
-            process.platform === 'darwin' ? 'Cmd+Shift+p' : 'Ctrl+Shift+p'
+          accelerator: isMac ? 'Cmd+Shift+p' : 'Ctrl+Shift+p'
         },
         {
           label: 'Just Editor',
           click: justEditCallback,
-          accelerator:
-            process.platform === 'darwin' ? 'Cmd+Shift+e' : 'Ctrl+Shift+e'
+          accelerator: isMac ? 'Cmd+Shift+e' : 'Ctrl+Shift+e'
         },
         {
           label: 'Live Preview',
           click: livePreviewCallback,
-          accelerator:
-            process.platform === 'darwin' ? 'Cmd+Shift+l' : 'Ctrl+Shift+l'
+          accelerator: isMac ? 'Cmd+Shift+l' : 'Ctrl+Shift+l'
         },
         {
           label: 'Toggle Sidebar',
           click: toggleSideBarCallback,
-          accelerator:
-            process.platform === 'darwin' ? 'Cmd+Shift+s' : 'Ctrl+Shift+s'
+          accelerator: isMac ? 'Cmd+Shift+s' : 'Ctrl+Shift+s'
         },
         { type: 'separator' },
         {
           label: 'Format File',
           click: formatFileCallback,
-          accelerator:
-            process.platform === 'darwin' ? 'Cmd+Shift+f' : 'Ctrl+Shift+f'
+          accelerator: isMac ? 'Cmd+Shift+f' : 'Ctrl+Shift+f'
         }
       ]
     },
