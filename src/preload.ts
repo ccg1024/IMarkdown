@@ -34,9 +34,7 @@ contextBridge.exposeInMainWorld('ipcAPI', {
   initRenderer: (): Promise<any> => {
     return ipcRenderer.invoke(ipcConfig.INIT_RENDERER)
   },
-  getPlatform: (): Promise<any> => {
-    return ipcRenderer.invoke(ipcConfig.GET_PLATFORM)
-  },
+  getPlatform: (): string => process.platform,
 
   updateDocCache: (content: string) => {
     ipcRenderer.send(ipcConfig.UPDATE_DOC_CACHE, content)

@@ -44,11 +44,9 @@ const TitleBar: FC = (): JSX.Element => {
   const [showWinIcon, setShowWinIcon] = useState<boolean>(false)
 
   useLayoutEffect(() => {
-    window.ipcAPI.getPlatform().then((plat: string) => {
-      if (plat !== 'darwin') {
-        setShowWinIcon(true)
-      }
-    })
+    if (window.ipcAPI.getPlatform() !== 'darwin') {
+      setShowWinIcon(true)
+    }
   }, [])
 
   return (

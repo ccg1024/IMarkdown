@@ -24,11 +24,9 @@ const SideNav: FC = (): JSX.Element => {
   }, [])
 
   useLayoutEffect(() => {
-    window.ipcAPI.getPlatform().then((plat: string) => {
-      if (plat !== 'darwin') {
-        setIsMac(false)
-      }
-    })
+    if (window.ipcAPI.getPlatform() !== 'darwin') {
+      setIsMac(false)
+    }
   }, [])
 
   return (
@@ -59,11 +57,7 @@ const SideNav: FC = (): JSX.Element => {
             <>
               <BsMarkdown
                 style={{
-                  fontSize: '1.5em',
-                  color: useColorModeValue(
-                    'var(--chakra-colors-blue-600)',
-                    'var(--chakra-colors-blue-600)'
-                  )
+                  fontSize: '1.5em'
                 }}
               />
               <Text
