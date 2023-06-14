@@ -328,7 +328,7 @@ const imarkdownDefaultExtensions = [
   bracketMatching(),
   closeBrackets(),
   rectangularSelection(),
-  crosshairCursor(),
+  // crosshairCursor(),
   highlightActiveLine(),
   highlightSelectionMatches(),
   keymap.of([

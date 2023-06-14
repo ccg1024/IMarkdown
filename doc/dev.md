@@ -141,3 +141,13 @@ npm i rehype-react remark-gfm remark-math remark-parse remark-rehype unified
 **解决**
 
 使用`ensureSyntaxTree`方法替换`syntaxTree`方法，前者在将在提供的延迟时间内竟可能获取到目标位置的语法树。
+
+## 2023-06-14
+
+**问题**
+
+动态`padding`是通过codemirror插件更新循环中某个视图属性来触发的，但是该属性除了窗口大小变化之外，`viewport`的变化也会触发该属性为真，导致许多无意义的变化，尝试添加dom的resize事件监听，但没有被触发。暂时不知道原因。
+
+**妥协方案**
+
+插件更新`padding`前对比前后差异来决定是否改变，同时移除codemirror扩展`crosshairCursor`，该扩展是让鼠标指针呈现十字，window系统通过`alt`按键触发，mac系统通过`option`按键触发。触发后会导致`padding`插件的更新。

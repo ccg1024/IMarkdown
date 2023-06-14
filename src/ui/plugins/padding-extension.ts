@@ -6,9 +6,14 @@ import pubsubConfig from '../../config/pubsub.config'
 export function updatePadding(view: EditorView): void {
   const contentElement = view.contentDOM
   if (contentElement) {
-    const paddingSize = view.scrollDOM.clientHeight - view.defaultLineHeight - 5
-    contentElement.style.paddingBottom = `${paddingSize}px`
-    PubSub.publish(pubsubConfig.UPDATE_PADDING_BOTTOM, `${paddingSize}px`)
+    const paddingSize = Math.floor(
+      view.scrollDOM.clientHeight - view.defaultLineHeight
+    )
+    const currentPadding = `${paddingSize}px`
+    if (contentElement.style.paddingBottom !== currentPadding) {
+      contentElement.style.paddingBottom = currentPadding
+      PubSub.publish(pubsubConfig.UPDATE_PADDING_BOTTOM, currentPadding)
+    }
   }
 }
 
