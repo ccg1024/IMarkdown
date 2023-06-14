@@ -19,10 +19,10 @@ import {
 } from '@chakra-ui/react'
 
 function getStartLine(node: any) {
-  return node.position.start.line
+  return node.position?.start.line
 }
 function getEndLine(node: any) {
-  return node.position.end.line
+  return node.position?.end.line
 }
 
 export function RemarkText(props: any): JSX.Element {
