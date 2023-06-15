@@ -59,7 +59,7 @@ const TitleBar: FC = (): JSX.Element => {
         gap={2}
         justifyContent="right"
         alignItems="center"
-        minHeight={4}
+        minHeight={showWinIcon ? 'unset' : 4}
       >
         {showWinIcon && (
           <>
