@@ -21,13 +21,19 @@ export function SideFileItem(props: SideFileItemProps): JSX.Element {
       id={props.detail.id}
       borderBottom="1px"
       borderStyle="solid"
-      borderColor={useColorModeValue('gray.300', 'gray.300')}
-      backgroundColor={props.isActive ? 'blue.500' : 'unset'}
+      borderColor={useColorModeValue('gray.300', 'gray.500')}
+      backgroundColor={useColorModeValue(
+        props.isActive ? 'blue.500' : 'unset',
+        props.isActive ? 'gray.600' : 'unset'
+      )}
       onClick={
         props.isActive ? null : e => props.clickCallback(e.currentTarget.id)
       }
       _hover={{
-        backgroundColor: props.isActive ? 'blue.500' : 'blue.50',
+        backgroundColor: useColorModeValue(
+          props.isActive ? 'blue.500' : 'blue.50',
+          props.isActive ? 'gray.600' : 'gray.800'
+        ),
         cursor: 'pointer'
       }}
     >
@@ -46,13 +52,19 @@ export function SideFileItem(props: SideFileItemProps): JSX.Element {
           whiteSpace="nowrap"
           fontFamily="inherit"
           textOverflow="ellipsis"
-          color={props.isActive ? 'white' : 'black'}
+          color={useColorModeValue(props.isActive ? 'white' : 'black', 'white')}
         >
           {props.detail.title ? props.detail.title : 'Unname title'}
         </Heading>
 
         <Flex gap={2} alignItems="center">
-          <Text fontSize="0.8em" color={props.isActive ? 'white' : 'black'}>
+          <Text
+            fontSize="0.8em"
+            color={useColorModeValue(
+              props.isActive ? 'white' : 'black',
+              'white'
+            )}
+          >
             {props.detail.date ? props.detail.date : 'Unknow time'}
           </Text>
           {props.detail.tag && <MarkTag tag={props.detail.tag} />}
@@ -64,7 +76,7 @@ export function SideFileItem(props: SideFileItemProps): JSX.Element {
           fontSize="1em"
           whiteSpace="nowrap"
           textOverflow="ellipsis"
-          color={props.isActive ? 'white' : 'black'}
+          color={useColorModeValue(props.isActive ? 'white' : 'black', 'white')}
         >
           {props.detail.desc ? props.detail.desc : 'no description'}
         </Text>

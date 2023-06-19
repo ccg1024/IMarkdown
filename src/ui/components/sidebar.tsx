@@ -13,7 +13,7 @@ const Sidebar: FC = (): JSX.Element => {
         height="100%"
         overflow="auto"
         className="hidde-scroll-bar"
-        backgroundColor={useColorModeValue('#F4F4F3', '#F4F4F3')}
+        backgroundColor={useColorModeValue('#F4F4F3', 'blackAlpha.600')}
       >
         <Routes>
           <Route
@@ -68,7 +68,7 @@ function RouteItem({ title, children }: RouteItemProps): JSX.Element {
           padding={2}
           fontSize="1.1em"
           placeholder="Filter"
-          backgroundColor={useColorModeValue('white', 'white')}
+          backgroundColor={useColorModeValue('white', 'black')}
         />
       </Flex>
       {children}

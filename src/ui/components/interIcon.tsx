@@ -1,5 +1,5 @@
 import { FC, MouseEventHandler, ReactNode } from 'react'
-import { Box } from '@chakra-ui/react'
+import { Box, useColorModeValue } from '@chakra-ui/react'
 import { BsLayoutSplit, BsEye, BsPencil } from 'react-icons/bs'
 
 interface Props {
@@ -24,7 +24,11 @@ const IconBox: FC<IconBoxProps> = (props): JSX.Element => {
       padding={2}
       zIndex={1}
       opacity="0.4"
-      _hover={{ opacity: '1', backgroundColor: 'white', cursor: 'pointer' }}
+      _hover={{
+        opacity: '1',
+        backgroundColor: useColorModeValue('white', 'black'),
+        cursor: 'pointer'
+      }}
     >
       {props.children}
     </Box>

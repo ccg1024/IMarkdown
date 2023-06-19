@@ -31,7 +31,7 @@ const SideNav: FC = (): JSX.Element => {
 
   return (
     <Box
-      backgroundColor={useColorModeValue('#171920', '#171920')}
+      backgroundColor={useColorModeValue('#171920', 'blackAlpha.400')}
       color={useColorModeValue('gray.300', 'gray.300')}
       width="220px"
     >
@@ -83,7 +83,7 @@ const SideNav: FC = (): JSX.Element => {
           _hover={{
             backgroundColor: useColorModeValue(
               'whiteAlpha.400',
-              'whiteAlpha.200'
+              'whiteAlpha.400'
             )
           }}
         />
