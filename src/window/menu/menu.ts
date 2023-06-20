@@ -9,6 +9,7 @@ export default function createMenus(
   justEditCallback: any,
   livePreviewCallback: any,
   toggleSideBarCallback: any,
+  headNavCallback: any,
   formatFileCallback: any
 ): MenuItemConstructorOptions[] {
   // const appname = app.name
@@ -75,6 +76,11 @@ export default function createMenus(
           label: 'Toggle Sidebar',
           click: toggleSideBarCallback,
           accelerator: isMac ? 'Cmd+Shift+s' : 'Ctrl+Shift+s'
+        },
+        {
+          label: 'Toggle Headnav',
+          click: headNavCallback,
+          accelerator: isMac ? 'Cmd+Shift+h' : 'Ctrl+Shift+h'
         },
         { type: 'separator' },
         {

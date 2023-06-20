@@ -47,6 +47,7 @@ import { lightThemeColor } from './themes'
 import paddingExtension from '../plugins/padding-extension'
 import { codeBlockHighlight } from '../plugins/code-block-extension'
 import { imgPreview } from '../plugins/img-extension'
+import { headNavExtension } from '../plugins/head-nav-extension'
 
 const defaultTheme = EditorView.theme({
   '&': {
@@ -349,7 +350,8 @@ const imarkdownDefaultExtensions = [
   }),
   codeBlockHighlight(),
   paddingExtension,
-  imgPreview()
+  imgPreview(),
+  headNavExtension()
 ]
 
 interface Controller {
@@ -428,6 +430,7 @@ const generateState = (doc: string, reduxDispath: AppDispatch): EditorState => {
                   line: line
                 })
               }
+              PubSub.publish(pubsubConfig.ACTIVE_HEAD_NAV, line)
               controller.scrollTimer = null
             }, 500)
           }

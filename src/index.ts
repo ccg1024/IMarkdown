@@ -269,6 +269,9 @@ app.whenReady().then(() => {
   const toggleSidebarWrapper = () => {
     win?.webContents.send(ipcConfig.TOGGLE_VIEW, 4)
   }
+  const headNavWrapper = () => {
+    win?.webContents.send(ipcConfig.TOGGLE_VIEW, 5)
+  }
   const formatWrapper = () => {
     win?.webContents.send(ipcConfig.FORMAT_FILE)
   }
@@ -280,6 +283,7 @@ app.whenReady().then(() => {
     justEditWrapper,
     livePreviewWrapper,
     toggleSidebarWrapper,
+    headNavWrapper,
     formatWrapper
   )
   const menu = Menu.buildFromTemplate(menuTemplate)

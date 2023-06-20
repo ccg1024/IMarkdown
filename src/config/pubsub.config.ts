@@ -15,7 +15,11 @@ const pubsubConfig = {
   SYNC_SCROLL_FROM_PREVIEW: 'sync_scroll_from_preview',
 
   // for editor extension to sync data with other components
-  UPDATE_PADDING_BOTTOM: 'update_padding_bottom'
+  UPDATE_PADDING_BOTTOM: 'update_padding_bottom',
+  // for head nav extension
+  UPDATE_HEAD_NAV: 'update_head_nav',
+  EXECUTE_HEAD_NAV: 'execute_head_nav',
+  ACTIVE_HEAD_NAV: 'active_head_nav'
 }
 
 export default pubsubConfig

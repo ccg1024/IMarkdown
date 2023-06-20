@@ -11,4 +11,10 @@ the branch `friday` is the last javascript version. The current branch is all bu
 
 # screenshot
 
+## Archlinux
+
 ![screenshot](./img/screenshot.png)
+
+## Macos
+
+![mac-screenshot](./img/macos.png)

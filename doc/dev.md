@@ -151,3 +151,11 @@ npm i rehype-react remark-gfm remark-math remark-parse remark-rehype unified
 **妥协方案**
 
 插件更新`padding`前对比前后差异来决定是否改变，同时移除codemirror扩展`crosshairCursor`，该扩展是让鼠标指针呈现十字，window系统通过`alt`按键触发，mac系统通过`option`按键触发。触发后会导致`padding`插件的更新。
+
+## 2023-06-19
+
+使用设计codemirror插件，实现标题定位导航。通过`pubsub-js`进行插件与组件间的通信，文字变化采用节流进行优化，标题变化只会更新当前输入行以下的内容，当前所处标题高亮通过codemirror的滚动来控制。点击点击标题只会进行跳转。
+
+**小问题**
+
+因为是使用滚动来控制添加或删除某个标题的高亮css类，因此在打开新文件时，会出现没有一个标题高亮或着标题高亮错误的情况，滚动后会自动修正当前高亮标题。

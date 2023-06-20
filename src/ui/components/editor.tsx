@@ -177,6 +177,26 @@ const Editor: FC<EditorProps> = ({ isVisible }): JSX.Element => {
     }
   }, [])
 
+  // plugin event listener
+  useEffect(() => {
+    const headNavToken = PubSub.subscribe(
+      pubsubConfig.EXECUTE_HEAD_NAV,
+      (_, headAnchor: number) => {
+        if (editorRef.current && headAnchor) {
+          const line = editorRef.current.state.doc.line(headAnchor)
+          editorRef.current.dispatch({
+            selection: { anchor: line.from, head: line.from },
+            effects: EditorView.scrollIntoView(line.from, { y: 'start' })
+          })
+        }
+      }
+    )
+
+    return () => {
+      PubSub.unsubscribe(headNavToken)
+    }
+  }, [])
+
   return (
     <Box
       overflow="auto"

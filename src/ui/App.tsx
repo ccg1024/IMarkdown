@@ -24,6 +24,7 @@ import { updateRecentFiles } from './app/reducers/recentFilesSlice'
 import { updateCurrentFile } from './app/reducers/currentFileSlice'
 import InterIcon from './components/interIcon'
 import Sidebar from './components/sidebar'
+import HeadNav from './components/head-nav'
 
 interface FileToken {
   fullpath: string
@@ -35,6 +36,7 @@ const App: FC = (): JSX.Element => {
   const [showEditor, setShowEditor] = useState<boolean>(false)
   const [showPreview, setShowPreview] = useState<boolean>(false)
   const [showHeadInfo, setShowHeadInfo] = useState<boolean>(false)
+  const [showHeadNav, setShowHeadNav] = useState<boolean>(false)
   const uiControl = useRef<boolean>(false)
   const sideBarRef = useRef<HTMLDivElement>(null)
   const dispatch = useCallback(useDispatch(), [])
@@ -80,6 +82,11 @@ const App: FC = (): JSX.Element => {
       case 4:
         if (uiControl.current) {
           handleFullScreen()
+        }
+        break
+      case 5:
+        if (uiControl.current) {
+          setShowHeadNav(v => !v)
         }
         break
     }
@@ -212,6 +219,7 @@ const App: FC = (): JSX.Element => {
           <Flex height="100%" width="100%" overflow="auto">
             <Editor isVisible={showEditor} />
             <Preview isVisible={showPreview} />
+            <HeadNav isVisibale={showHeadNav} />
           </Flex>
           {showHeadInfo && (
             <InterIcon
