@@ -9,6 +9,8 @@ import {
   useLayoutEffect
 } from 'react'
 import { useDispatch } from 'react-redux'
+import { IpcRendererEvent } from 'electron'
+import { EditorView } from '@codemirror/view'
 
 import Editor from './components/editor'
 import Preview from './components/preview'
@@ -17,14 +19,21 @@ import GhostInfo from './components/ghost-info'
 import MarkHeadInfo from './components/mark-head'
 import pubsubConfig from '../config/pubsub.config'
 import imardownPlugins from '../config/plugin-list.config'
-import { formateDate } from './libs/tools'
+import { concatHeaderAndContent, formateDate } from './libs/tools'
 import { HeadInfo } from '../types/main'
 import { updateFileContent } from './app/reducers/fileContentSlice'
-import { updateRecentFiles } from './app/reducers/recentFilesSlice'
+import {
+  updateFileIsChange,
+  updateRecentFiles
+} from './app/reducers/recentFilesSlice'
 import { updateCurrentFile } from './app/reducers/currentFileSlice'
 import InterIcon from './components/interIcon'
 import Sidebar from './components/sidebar'
 import HeadNav from './components/head-nav'
+import { getMarkHead } from './app/store'
+import ipcConfig from '../config/ipc.config'
+import { clearToken } from './libs/generate-state'
+import formateContent from './libs/formate-content'
 
 interface FileToken {
   fullpath: string
@@ -37,6 +46,7 @@ const App: FC = (): JSX.Element => {
   const [showPreview, setShowPreview] = useState<boolean>(false)
   const [showHeadInfo, setShowHeadInfo] = useState<boolean>(false)
   const [showHeadNav, setShowHeadNav] = useState<boolean>(false)
+  const editorRef = useRef<EditorView>(null)
   const uiControl = useRef<boolean>(false)
   const sideBarRef = useRef<HTMLDivElement>(null)
   const dispatch = useCallback(useDispatch(), [])
@@ -161,10 +171,37 @@ const App: FC = (): JSX.Element => {
   useEffect(() => {
     window.ipcAPI.listenFileOpen(handleFileOpen)
     window.ipcAPI.listenToggleView(toggleView)
+    window.ipcAPI.listenFileSave((event: IpcRendererEvent, path: string) => {
+      try {
+        const doc = editorRef.current?.state.doc.toString()
+        const markHead = getMarkHead()
+        if (doc && markHead) {
+          const content = concatHeaderAndContent(markHead, doc)
+          event.sender.send(ipcConfig.SAVE_CONTENT, content, doc, path)
+          dispatch(
+            updateFileIsChange({
+              id: path,
+              isChange: false
+            })
+          )
+          clearToken('')
+        }
+      } catch (err) {
+        // error handle
+      }
+    })
+    window.ipcAPI.listenFormatFile(() => {
+      // format content
+      if (editorRef.current) {
+        formateContent(editorRef.current)
+      }
+    })
 
     return () => {
       window.ipcAPI.removeFileOpenListener()
       window.ipcAPI.removeToggleViewListener()
+      window.ipcAPI.removeFileSaveListener()
+      window.ipcAPI.removeFormatFileListener()
     }
   }, [])
 
@@ -217,7 +254,7 @@ const App: FC = (): JSX.Element => {
           <TitleBar />
           {showHeadInfo ? <MarkHeadInfo /> : <GhostInfo />}
           <Flex height="100%" width="100%" overflow="auto">
-            <Editor isVisible={showEditor} />
+            <Editor ref={editorRef} isVisible={showEditor} />
             <Preview isVisible={showPreview} />
             <HeadNav isVisibale={showHeadNav} />
           </Flex>

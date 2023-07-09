@@ -2,23 +2,23 @@ import PubSub from 'pubsub-js'
 import { Box } from '@chakra-ui/react'
 import { useDispatch } from 'react-redux'
 import { EditorView } from '@codemirror/view'
-import { FC, useRef, useEffect, useCallback, UIEvent } from 'react'
-import { IpcRendererEvent } from 'electron'
+import {
+  useRef,
+  useEffect,
+  useCallback,
+  UIEvent,
+  ForwardRefRenderFunction,
+  forwardRef,
+  useImperativeHandle
+} from 'react'
+import { vim } from '@replit/codemirror-vim'
 
-import StatusLine from './status-line'
-import { getMarkHead } from '../app/store'
 import { LiveScroll, EditorConfig } from '../../types/renderer'
 import pubsubConfig from '../../config/pubsub.config'
-import ipcConfig from '../../config/ipc.config'
 import imardownPlugins, {
   ImarkdownPlugin
 } from '../../config/plugin-list.config'
 import generateState, { clearToken, vimPlugin } from '../libs/generate-state'
-import formatContent from '../libs/formate-content'
-import { concatHeaderAndContent } from '../libs/tools'
-import { updateFileIsChange } from '../app/reducers/recentFilesSlice'
-
-import { vim } from '@replit/codemirror-vim'
 
 interface EditorProps {
   isVisible: boolean
@@ -34,7 +34,11 @@ const controller: Controller = {
   scrollBarTimer: null
 }
 
-const Editor: FC<EditorProps> = ({ isVisible }): JSX.Element => {
+const InternalEditor: ForwardRefRenderFunction<EditorView, EditorProps> = (
+  props,
+  ref
+): JSX.Element => {
+  const { isVisible } = props
   const containerRef = useRef<HTMLDivElement>(null)
   const editorRef = useRef<EditorView>(null)
   const currentFile = useRef<string>('')
@@ -128,37 +132,6 @@ const Editor: FC<EditorProps> = ({ isVisible }): JSX.Element => {
     }
   }, [])
 
-  // ipc event listeners
-  useEffect(() => {
-    window.ipcAPI.listenFileSave((event: IpcRendererEvent, path: string) => {
-      try {
-        const doc = editorRef.current?.state.doc.toString()
-        const markHead = getMarkHead()
-
-        if (doc && markHead) {
-          const content = concatHeaderAndContent(markHead, doc)
-          event.sender.send(ipcConfig.SAVE_CONTENT, content, doc, path)
-          reduxDispatch(
-            updateFileIsChange({
-              id: path,
-              isChange: false
-            })
-          )
-        }
-        clearToken('')
-      } catch (err) {}
-    })
-    window.ipcAPI.listenFormatFile(() => {
-      // format content
-      formatContent(editorRef.current)
-    })
-
-    return () => {
-      window.ipcAPI.removeFileSaveListener()
-      window.ipcAPI.removeFormatFileListener()
-    }
-  }, [])
-
   // dynamic plugin
   useEffect(() => {
     const pluginToken = PubSub.subscribe(
@@ -197,6 +170,10 @@ const Editor: FC<EditorProps> = ({ isVisible }): JSX.Element => {
     }
   }, [])
 
+  useImperativeHandle(ref, () => {
+    return editorRef.current
+  })
+
   return (
     <Box
       overflow="auto"
@@ -217,5 +194,7 @@ const Editor: FC<EditorProps> = ({ isVisible }): JSX.Element => {
     </Box>
   )
 }
+
+const Editor = forwardRef<EditorView, EditorProps>(InternalEditor)
 
 export default Editor
