@@ -1,4 +1,4 @@
-import { FC, MouseEventHandler, ReactNode } from 'react'
+import { FC, MouseEventHandler, ReactNode, useEffect, useRef } from 'react'
 import { Box, useColorModeValue } from '@chakra-ui/react'
 import { BsLayoutSplit, BsEye, BsPencil } from 'react-icons/bs'
 
@@ -16,6 +16,7 @@ interface IconBoxProps {
 const IconBox: FC<IconBoxProps> = (props): JSX.Element => {
   return (
     <Box
+      boxShadow="lg"
       onClick={props.clickCallback}
       borderWidth="1px"
       borderRadius="full"
@@ -23,10 +24,8 @@ const IconBox: FC<IconBoxProps> = (props): JSX.Element => {
       borderStyle="solid"
       padding={2}
       zIndex={1}
-      opacity="0.4"
+      backgroundColor={useColorModeValue('white', 'black')}
       _hover={{
-        opacity: '1',
-        backgroundColor: useColorModeValue('white', 'black'),
         cursor: 'pointer'
       }}
     >
@@ -36,8 +35,42 @@ const IconBox: FC<IconBoxProps> = (props): JSX.Element => {
 }
 
 const InterIcon: FC<Props> = props => {
+  const interIconRef = useRef<HTMLDivElement>(null)
+  const timer = useRef<NodeJS.Timeout>(null)
+
+  useEffect(() => {
+    if (interIconRef.current) {
+      const { current: container } = interIconRef
+
+      function mouseEnter() {
+        if (timer && timer.current) {
+          clearTimeout(timer.current)
+          timer.current = null
+        }
+        container.style.opacity = '1'
+      }
+      function mouseLeave() {
+        timer.current = setTimeout(() => {
+          container.style.opacity = '0'
+        }, 1000)
+      }
+
+      container.addEventListener('mouseenter', mouseEnter)
+      container.addEventListener('mouseleave', mouseLeave)
+
+      function clear() {
+        container.removeEventListener('mouseenter', mouseEnter)
+        container.removeEventListener('mouseleave', mouseLeave)
+      }
+
+      return clear
+    }
+  }, [])
+
   return (
     <Box
+      opacity={0}
+      ref={interIconRef}
       display="flex"
       gap={2}
       position="absolute"
