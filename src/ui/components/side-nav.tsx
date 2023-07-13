@@ -1,5 +1,7 @@
-import {
-  FC,
+import React, {
+  forwardRef,
+  ForwardRefExoticComponent,
+  ForwardRefRenderFunction,
   MouseEvent,
   MouseEventHandler,
   useCallback,
@@ -17,7 +19,16 @@ import { BsList, BsMarkdown } from 'react-icons/bs'
 import { NavLink } from 'react-router-dom'
 import { Global } from '@emotion/react'
 
-const SideNav: FC = (): JSX.Element => {
+type CompoundedComponent = ForwardRefExoticComponent<
+  React.RefAttributes<HTMLDivElement>
+> & {
+  __IMARKDOWN: boolean
+}
+
+const InternalSideNav: ForwardRefRenderFunction<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+> = (_props, ref) => {
   const [isMac, setIsMac] = useState<boolean>(true)
   const clickMenu: MouseEventHandler = useCallback((event: MouseEvent) => {
     window.ipcAPI.openMenu(event.clientX, event.clientY)
@@ -31,6 +42,7 @@ const SideNav: FC = (): JSX.Element => {
 
   return (
     <Box
+      ref={ref}
       backgroundColor={useColorModeValue('#171920', 'blackAlpha.400')}
       color={useColorModeValue('gray.300', 'gray.300')}
       width="220px"
@@ -129,5 +141,12 @@ function NavItem({ path, children }: any): JSX.Element {
     </>
   )
 }
+
+const SideNav = forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(InternalSideNav) as CompoundedComponent
+
+SideNav.__IMARKDOWN = true
 
 export default SideNav

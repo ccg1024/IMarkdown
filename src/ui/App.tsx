@@ -28,7 +28,7 @@ import {
 } from './app/reducers/recentFilesSlice'
 import { updateCurrentFile } from './app/reducers/currentFileSlice'
 import InterIcon from './components/interIcon'
-import Sidebar from './components/sidebar'
+import Sidebar, { SideBarRef } from './components/sidebar'
 import HeadNav from './components/head-nav'
 import { getMarkHead } from './app/store'
 import ipcConfig from '../config/ipc.config'
@@ -48,16 +48,14 @@ const App: FC = (): JSX.Element => {
   const [showHeadNav, setShowHeadNav] = useState<boolean>(false)
   const editorRef = useRef<EditorView>(null)
   const uiControl = useRef<boolean>(false)
-  const sideBarRef = useRef<HTMLDivElement>(null)
+  const sideBarRef = useRef<SideBarRef>(null)
+
   const dispatch = useCallback(useDispatch(), [])
-  const handleFullScreen = useCallback(() => {
-    const siderBar = sideBarRef.current
-    if (siderBar) {
-      if (siderBar.style.display === 'none') {
-        siderBar.style.display = 'flex'
-      } else {
-        siderBar.style.display = 'none'
-      }
+  const handleFullScreen = useCallback((token: number) => {
+    if (token === 1) {
+      sideBarRef.current.toggleNav()
+    } else {
+      sideBarRef.current.toggleMid()
     }
   }, [])
   const handleToggleLivePreview = useCallback(() => {
@@ -91,12 +89,17 @@ const App: FC = (): JSX.Element => {
         break
       case 4:
         if (uiControl.current) {
-          handleFullScreen()
+          handleFullScreen(1)
         }
         break
       case 5:
         if (uiControl.current) {
           setShowHeadNav(v => !v)
+        }
+        break
+      case 6:
+        if (uiControl.current) {
+          handleFullScreen(2)
         }
         break
     }
@@ -240,8 +243,8 @@ const App: FC = (): JSX.Element => {
   return (
     <>
       <Flex height="100%" width="100%" id="content_root">
-        <Box ref={sideBarRef} height="100%" flexShrink={0} display="flex">
-          <Sidebar />
+        <Box height="100%" flexShrink={0} display="flex">
+          <Sidebar ref={sideBarRef} />
         </Box>
         <Box
           display="flex"

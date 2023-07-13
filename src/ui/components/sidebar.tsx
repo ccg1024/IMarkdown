@@ -1,14 +1,64 @@
-import { FC, ReactNode } from 'react'
+import React, {
+  forwardRef,
+  ForwardRefExoticComponent,
+  ForwardRefRenderFunction,
+  ReactNode,
+  useImperativeHandle,
+  useRef
+} from 'react'
 import SideNav from './side-nav'
 import { Box, Flex, Input, Text, useColorModeValue } from '@chakra-ui/react'
 import { Route, Routes } from 'react-router-dom'
 import SideRecentFiles from './side-recent-files'
 
-const Sidebar: FC = (): JSX.Element => {
+export interface SideBarRef {
+  toggleNav: () => void
+  toggleMid: () => void
+}
+
+type CompounedComponent = ForwardRefExoticComponent<
+  React.HTMLAttributes<HTMLElement> & React.RefAttributes<SideBarRef>
+> & {
+  __IMARKDOWN: boolean
+}
+
+const InternalSidebar: ForwardRefRenderFunction<
+  SideBarRef,
+  React.HTMLAttributes<HTMLElement>
+> = (_props, ref) => {
+  const sideNavRef = useRef<HTMLDivElement>(null)
+  const midNavRef = useRef<HTMLDivElement>(null)
+
+  useImperativeHandle(
+    ref,
+    () => {
+      function toggle(ref: React.MutableRefObject<HTMLDivElement>) {
+        if (ref.current) {
+          const { current: container } = ref
+          if (container.style.display === 'none') {
+            container.style.display = 'unset'
+          } else {
+            container.style.display = 'none'
+          }
+        }
+      }
+
+      return {
+        toggleNav() {
+          toggle(sideNavRef)
+        },
+        toggleMid() {
+          toggle(midNavRef)
+        }
+      }
+    },
+    []
+  )
   return (
     <>
-      <SideNav />
+      <SideNav ref={sideNavRef} />
       <Box
+        ref={midNavRef}
         width="300px"
         height="100%"
         overflow="auto"
@@ -75,5 +125,11 @@ function RouteItem({ title, children }: RouteItemProps): JSX.Element {
     </>
   )
 }
+
+const Sidebar = forwardRef<SideBarRef, React.HTMLAttributes<HTMLElement>>(
+  InternalSidebar
+) as CompounedComponent
+
+Sidebar.__IMARKDOWN = true
 
 export default Sidebar

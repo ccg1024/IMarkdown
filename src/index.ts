@@ -272,6 +272,9 @@ app.whenReady().then(() => {
   const headNavWrapper = () => {
     win?.webContents.send(ipcConfig.TOGGLE_VIEW, 5)
   }
+  const toggleMidbarWrapper = () => {
+    win?.webContents.send(ipcConfig.TOGGLE_VIEW, 6)
+  }
   const formatWrapper = () => {
     win?.webContents.send(ipcConfig.FORMAT_FILE)
   }
@@ -283,6 +286,7 @@ app.whenReady().then(() => {
     justEditWrapper,
     livePreviewWrapper,
     toggleSidebarWrapper,
+    toggleMidbarWrapper,
     headNavWrapper,
     formatWrapper
   )

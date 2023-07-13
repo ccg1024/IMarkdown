@@ -9,6 +9,7 @@ export default function createMenus(
   justEditCallback: any,
   livePreviewCallback: any,
   toggleSideBarCallback: any,
+  toggleMidBarCallback: any,
   headNavCallback: any,
   formatFileCallback: any
 ): MenuItemConstructorOptions[] {
@@ -76,6 +77,11 @@ export default function createMenus(
           label: 'Toggle Sidebar',
           click: toggleSideBarCallback,
           accelerator: isMac ? 'Cmd+Shift+s' : 'Ctrl+Shift+s'
+        },
+        {
+          label: 'Toggle Midbar',
+          click: toggleMidBarCallback,
+          accelerator: isMac ? 'Cmd+Shift+t' : 'Ctrl+Shift+t'
         },
         {
           label: 'Toggle Headnav',
