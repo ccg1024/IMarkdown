@@ -26,6 +26,10 @@ interface EditorProps {
 interface Controller {
   scrollBarTimer: NodeJS.Timeout | null
 }
+export interface EditorRef {
+  getDoc: () => string
+  getEditor: () => EditorView
+}
 
 const dynamicPlugin: ImarkdownPlugin = {
   vim: false
@@ -34,7 +38,7 @@ const controller: Controller = {
   scrollBarTimer: null
 }
 
-const InternalEditor: ForwardRefRenderFunction<EditorView, EditorProps> = (
+const InternalEditor: ForwardRefRenderFunction<EditorRef, EditorProps> = (
   props,
   ref
 ): JSX.Element => {
@@ -170,9 +174,20 @@ const InternalEditor: ForwardRefRenderFunction<EditorView, EditorProps> = (
     }
   }, [])
 
-  useImperativeHandle(ref, () => {
-    return editorRef.current
-  })
+  useImperativeHandle(
+    ref,
+    () => {
+      return {
+        getDoc() {
+          return editorRef.current?.state.doc.toString()
+        },
+        getEditor() {
+          return editorRef.current
+        }
+      }
+    },
+    []
+  )
 
   return (
     <Box
@@ -195,6 +210,6 @@ const InternalEditor: ForwardRefRenderFunction<EditorView, EditorProps> = (
   )
 }
 
-const Editor = forwardRef<EditorView, EditorProps>(InternalEditor)
+const Editor = forwardRef<EditorRef, EditorProps>(InternalEditor)
 
 export default Editor

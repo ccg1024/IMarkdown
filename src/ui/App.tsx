@@ -10,9 +10,8 @@ import {
 } from 'react'
 import { useDispatch } from 'react-redux'
 import { IpcRendererEvent } from 'electron'
-import { EditorView } from '@codemirror/view'
 
-import Editor from './components/editor'
+import Editor, { EditorRef } from './components/editor'
 import Preview from './components/preview'
 import TitleBar from './components/title-bar'
 import GhostInfo from './components/ghost-info'
@@ -46,7 +45,7 @@ const App: FC = (): JSX.Element => {
   const [showPreview, setShowPreview] = useState<boolean>(false)
   const [showHeadInfo, setShowHeadInfo] = useState<boolean>(false)
   const [showHeadNav, setShowHeadNav] = useState<boolean>(false)
-  const editorRef = useRef<EditorView>(null)
+  const editorRef = useRef<EditorRef>(null)
   const uiControl = useRef<boolean>(false)
   const sideBarRef = useRef<SideBarRef>(null)
 
@@ -176,7 +175,7 @@ const App: FC = (): JSX.Element => {
     window.ipcAPI.listenToggleView(toggleView)
     window.ipcAPI.listenFileSave((event: IpcRendererEvent, path: string) => {
       try {
-        const doc = editorRef.current?.state.doc.toString()
+        const doc = editorRef.current?.getDoc()
         const markHead = getMarkHead()
         if (doc && markHead) {
           const content = concatHeaderAndContent(markHead, doc)
@@ -195,8 +194,9 @@ const App: FC = (): JSX.Element => {
     })
     window.ipcAPI.listenFormatFile(() => {
       // format content
-      if (editorRef.current) {
-        formateContent(editorRef.current)
+      const editor = editorRef.current.getEditor()
+      if (editor) {
+        formateContent(editor)
       }
     })
 
