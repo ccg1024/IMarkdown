@@ -1,6 +1,16 @@
 import { dialog } from 'electron'
 import { convertWindowsPathToUnixPath } from './tools'
 
+export async function dirOpenDialog(): Promise<string | null> {
+  const { canceled, filePaths } = await dialog.showOpenDialog({
+    properties: ['openDirectory']
+  })
+
+  if (canceled) return null
+
+  return convertWindowsPathToUnixPath(filePaths[0])
+}
+
 export async function fileOpenDialog(): Promise<string | null> {
   const { canceled, filePaths } = await dialog.showOpenDialog({
     filters: [{ name: 'Markdown', extensions: ['md'] }]

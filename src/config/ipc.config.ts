@@ -5,6 +5,7 @@ const ipcConfig = {
   TOGGLE_VIEW: 'toggle_view', //toggleViewChannel
   SEND_SAVE_INFO: 'send_save_info', //sendSavedInfo
   FORMAT_FILE: 'format_file',
+  OPEN_DIR: 'open_dir',
 
   GET_CONFIG: 'get_config', //configPathChannel
   VIM_OPTION: 'vim_option', //vimOptionChannel

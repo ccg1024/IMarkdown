@@ -8,6 +8,12 @@ interface DefaultAppDirectory {
   logDir: string
 }
 
+export type MarkFile = {
+  size: string
+  time: string
+  name: string
+}
+
 export const createDirectory = async (path: string): Promise<void> => {
   try {
     if (!fs.existsSync(path)) {
@@ -64,4 +70,29 @@ export function fileCreationTime() {
   day = day < 10 ? +`0${day}` : day
 
   return `${year}-${month}-${day}`
+}
+
+function getNormalSize(size: number) {
+  if (size > 102400) {
+    return String(Math.floor(size / 102400)) + 'MB'
+  } else if (size > 1024) {
+    return String(Math.floor(size / 1024)) + 'KB'
+  }
+  return String(size) + 'B'
+}
+
+export function getMarkdownFile(dirPath: string): MarkFile[] {
+  const filelist = fs.readdirSync(dirPath, { encoding: 'utf8' })
+  const markFile: MarkFile[] = []
+  filelist.forEach(file => {
+    const stats = fs.statSync(path.join(dirPath, file))
+    if (stats.isFile() && path.extname(file) === '.md') {
+      markFile.push({
+        name: path.basename(file, path.extname(file)),
+        time: stats.ctime.toLocaleString(),
+        size: getNormalSize(stats.size)
+      })
+    }
+  })
+  return markFile
 }

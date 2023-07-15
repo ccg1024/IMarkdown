@@ -2,6 +2,7 @@ import { app } from 'electron'
 import type { MenuItemConstructorOptions } from 'electron'
 
 export default function createMenus(
+  openDirCallback: any,
   openFileCallback: any,
   saveFileCallback: any,
   createFileCallback: any,
@@ -48,6 +49,11 @@ export default function createMenus(
           label: 'create file',
           click: createFileCallback,
           accelerator: isMac ? 'Cmd+n' : 'Ctrl+n'
+        },
+        {
+          label: 'open dir',
+          click: openDirCallback,
+          accelerator: isMac ? 'Cmd+w' : 'Ctrl+w'
         },
         { type: 'separator' },
         isMac ? { role: 'close' } : { role: 'quit' }

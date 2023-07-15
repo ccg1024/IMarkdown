@@ -33,6 +33,7 @@ import { getMarkHead } from './app/store'
 import ipcConfig from '../config/ipc.config'
 import { clearToken } from './libs/generate-state'
 import formateContent from './libs/formate-content'
+import { MarkFile } from '../window/tools'
 
 interface FileToken {
   fullpath: string
@@ -104,6 +105,10 @@ const App: FC = (): JSX.Element => {
     }
   }, [])
 
+  const handleDirOpen = useCallback((_: any, markFile: MarkFile) => {
+    console.log(markFile)
+  }, [])
+
   const handleFileOpen = useCallback(
     (
       _: any,
@@ -171,6 +176,7 @@ const App: FC = (): JSX.Element => {
 
   // ipc event listener
   useEffect(() => {
+    window.ipcAPI.listenOpenDir(handleDirOpen)
     window.ipcAPI.listenFileOpen(handleFileOpen)
     window.ipcAPI.listenToggleView(toggleView)
     window.ipcAPI.listenFileSave((event: IpcRendererEvent, path: string) => {
@@ -201,6 +207,7 @@ const App: FC = (): JSX.Element => {
     })
 
     return () => {
+      window.ipcAPI.removeDirOpenListener()
       window.ipcAPI.removeFileOpenListener()
       window.ipcAPI.removeToggleViewListener()
       window.ipcAPI.removeFileSaveListener()

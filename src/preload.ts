@@ -24,6 +24,9 @@ contextBridge.exposeInMainWorld('ipcAPI', {
   listenFormatFile: (callback: CallbackFunction) => {
     ipcRenderer.on(ipcConfig.FORMAT_FILE, callback)
   },
+  listenOpenDir: (callback: CallbackFunction) => {
+    ipcRenderer.on(ipcConfig.OPEN_DIR, callback)
+  },
 
   getConfig: (): Promise<any> => {
     return ipcRenderer.invoke(ipcConfig.GET_CONFIG)
@@ -76,5 +79,8 @@ contextBridge.exposeInMainWorld('ipcAPI', {
   },
   removeFormatFileListener: () => {
     ipcRenderer.removeAllListeners(ipcConfig.FORMAT_FILE)
+  },
+  removeDirOpenListener: () => {
+    ipcRenderer.removeAllListeners(ipcConfig.OPEN_DIR)
   }
 })

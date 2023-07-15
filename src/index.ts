@@ -14,6 +14,7 @@ import {
   convertWindowsPathToUnixPath
 } from './window/tools'
 import {
+  dirOpenCallback,
   fileOpenCallback,
   saveFileCallback,
   createFileCallback
@@ -226,6 +227,9 @@ app.whenReady().then(() => {
   })
 
   // create a menu
+  const openDirWrapper = () => {
+    dirOpenCallback()
+  }
   const openFileWrapper = () => {
     fileOpenCallback(fileCache).then(res => {
       if (res) {
@@ -279,6 +283,7 @@ app.whenReady().then(() => {
     win?.webContents.send(ipcConfig.FORMAT_FILE)
   }
   const menuTemplate = createMenus(
+    openDirWrapper,
     openFileWrapper,
     saveFileWrapper,
     createFileWrapper,

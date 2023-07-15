@@ -7,6 +7,7 @@ export interface IElectronIPC {
   listenToggleView: (callback: Function) => Promise<void>
   listenSendSaveInfo: (callback: Function) => Promise<void>
   listenFormatFile: (callback: Function) => Promise<void>
+  listenOpenDir: (callback: Function) => Promise<void>
 
   getConfig: () => Promise<any>
   vimOption: (option: VimOptionIPC) => Promise<void>
@@ -28,6 +29,7 @@ export interface IElectronIPC {
   removeToggleViewListener: () => Promise<void>
   removeSendSaveInfoListener: () => Promise<void>
   removeFormatFileListener: () => Promise<void>
+  removeDirOpenListener: () => Promise<void>
 }
 
 declare global {

@@ -4,8 +4,24 @@ import { BrowserWindow } from 'electron'
 
 import { FileCache } from '../../types/main'
 import ipcConfig from '../../config/ipc.config'
-import { fileOpenDialog, createFileDialog } from '../dialog'
-import { fileCreationTime } from '../tools'
+import { fileOpenDialog, createFileDialog, dirOpenDialog } from '../dialog'
+import { fileCreationTime, getMarkdownFile } from '../tools'
+
+export async function dirOpenCallback() {
+  const dirPath = await dirOpenDialog()
+
+  if (dirPath) {
+    try {
+      const markFile = getMarkdownFile(dirPath)
+      BrowserWindow.getFocusedWindow()?.webContents.send(
+        ipcConfig.OPEN_DIR,
+        markFile
+      )
+    } catch (err) {
+      throw err
+    }
+  }
+}
 
 export async function fileOpenCallback(fileCache: FileCache) {
   const filePath = await fileOpenDialog()
