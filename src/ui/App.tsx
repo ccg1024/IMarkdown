@@ -6,7 +6,8 @@ import {
   useState,
   useEffect,
   useCallback,
-  useLayoutEffect
+  useLayoutEffect,
+  useMemo
 } from 'react'
 import { useDispatch } from 'react-redux'
 import { IpcRendererEvent } from 'electron'
@@ -34,6 +35,7 @@ import ipcConfig from '../config/ipc.config'
 import { clearToken } from './libs/generate-state'
 import formateContent from './libs/formate-content'
 import { MarkFile } from '../window/tools'
+import { updateDirlist } from './app/reducers/dirlistSlice'
 
 interface FileToken {
   fullpath: string
@@ -50,7 +52,7 @@ const App: FC = (): JSX.Element => {
   const uiControl = useRef<boolean>(false)
   const sideBarRef = useRef<SideBarRef>(null)
 
-  const dispatch = useCallback(useDispatch(), [])
+  const dispatch = useDispatch()
   const handleFullScreen = useCallback((token: number) => {
     if (token === 1) {
       sideBarRef.current.toggleNav()
@@ -105,8 +107,8 @@ const App: FC = (): JSX.Element => {
     }
   }, [])
 
-  const handleDirOpen = useCallback((_: any, markFile: MarkFile) => {
-    console.log(markFile)
+  const handleDirOpen = useCallback((_: any, markFile: MarkFile[]) => {
+    dispatch(updateDirlist(markFile))
   }, [])
 
   const handleFileOpen = useCallback(

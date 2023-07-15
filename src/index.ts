@@ -122,6 +122,34 @@ app.whenReady().then(() => {
     }
   )
 
+  // listen to dir module file click
+  ipcMain.on(ipcConfig.DIR_ITEM_CLICK, async (_, filepath: string) => {
+    if (filepath && filepath !== '') {
+      if (fileCache.hasOwnProperty(filepath)) {
+        win?.webContents.send(
+          ipcConfig.OPEN_FILE,
+          filepath,
+          fileCache[filepath].fileContent,
+          fileCache[filepath].headInfo,
+          fileCache[filepath].isChange,
+          fileCache[filepath].scrollPos
+        )
+      } else {
+        fileOpenCallback(fileCache, filepath).then(res => {
+          if (res) {
+            fileCache[res.filePath] = {
+              fileContent: res.fileContent,
+              headInfo: res.headInfo,
+              isChange: res.isChange
+            }
+          }
+        })
+      }
+      currentFilePath = filepath
+      win?.setTitle(formatWin32Title(currentFilePath))
+    }
+  })
+
   // listen to open recent file event
   ipcMain.on(ipcConfig.OPEN_RECENT_FILE, async (_, filepath: string) => {
     if (fileCache.hasOwnProperty(filepath)) {

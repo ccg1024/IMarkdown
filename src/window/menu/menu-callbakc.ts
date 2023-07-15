@@ -23,8 +23,13 @@ export async function dirOpenCallback() {
   }
 }
 
-export async function fileOpenCallback(fileCache: FileCache) {
-  const filePath = await fileOpenDialog()
+export async function fileOpenCallback(fileCache: FileCache, path?: string) {
+  let filePath
+  if (path === undefined || path === null || path === '') {
+    filePath = await fileOpenDialog()
+  } else {
+    filePath = path
+  }
 
   if (filePath) {
     if (fileCache.hasOwnProperty(filePath)) {

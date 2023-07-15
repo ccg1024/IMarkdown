@@ -9,6 +9,7 @@ interface DefaultAppDirectory {
 }
 
 export type MarkFile = {
+  id: string
   size: string
   time: string
   name: string
@@ -88,6 +89,7 @@ export function getMarkdownFile(dirPath: string): MarkFile[] {
     const stats = fs.statSync(path.join(dirPath, file))
     if (stats.isFile() && path.extname(file) === '.md') {
       markFile.push({
+        id: path.join(dirPath, file),
         name: path.basename(file, path.extname(file)),
         time: stats.ctime.toLocaleString(),
         size: getNormalSize(stats.size)

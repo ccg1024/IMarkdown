@@ -54,6 +54,9 @@ contextBridge.exposeInMainWorld('ipcAPI', {
   updateScrollPos: (pos: number, file: string) => {
     ipcRenderer.send(ipcConfig.UPDATE_SCROLL_POS, pos, file)
   },
+  openDirFile: (path: string) => {
+    ipcRenderer.send(ipcConfig.DIR_ITEM_CLICK, path)
+  },
 
   closeWindow: () => {
     ipcRenderer.send(ipcConfig.CLOSE_WINDOW)

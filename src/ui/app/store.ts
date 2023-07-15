@@ -3,12 +3,14 @@ import currentFileReducer from './reducers/currentFileSlice'
 import fileContentReducer from './reducers/fileContentSlice'
 import recentFilesReducer from './reducers/recentFilesSlice'
 import { RecentFilesPayload } from './reducers/recentFilesSlice'
+import dirlistReducer from './reducers/dirlistSlice'
 
 const store = configureStore({
   reducer: {
     currentFile: currentFileReducer,
     fileContent: fileContentReducer,
-    recentFiles: recentFilesReducer
+    recentFiles: recentFilesReducer,
+    dirlist: dirlistReducer
   }
 })
 

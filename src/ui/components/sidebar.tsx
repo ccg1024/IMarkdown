@@ -10,6 +10,7 @@ import SideNav from './side-nav'
 import { Box, Flex, Input, Text, useColorModeValue } from '@chakra-ui/react'
 import { Route, Routes } from 'react-router-dom'
 import SideRecentFiles from './side-recent-files'
+import SideDirlist from './side-dirlist'
 
 export interface SideBarRef {
   toggleNav: () => void
@@ -76,7 +77,11 @@ const InternalSidebar: ForwardRefRenderFunction<
           />
           <Route
             path="main_window/folder"
-            element={<RouteItem title="Folder">folder</RouteItem>}
+            element={
+              <RouteItem title="Folder">
+                <SideDirlist />
+              </RouteItem>
+            }
           />
         </Routes>
       </Box>

@@ -19,6 +19,7 @@ export interface IElectronIPC {
   openRecentFile: (path: string) => Promise<void>
   openMenu: (x: number, y: number) => Promise<void>
   updateScrollPos: (scrollPos: number, file: string) => Promise<void>
+  openDirFile: (path: string) => Promise<void>
 
   closeWindow: () => Promise<void>
   minimizeWindow: () => Promise<void>
