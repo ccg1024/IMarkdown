@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import { selectDirlist } from '../app/reducers/dirlistSlice'
 import { selectCurrentFile } from '../app/reducers/currentFileSlice'
 import { selectRecentFiles } from '../app/reducers/recentFilesSlice'
-import { SideFileItem } from './side-file-item'
+import { SideFileItemNew } from './side-file-item'
 
 const SideDirlist: React.FC = () => {
   const dirlist = useSelector(selectDirlist)
@@ -17,22 +17,19 @@ const SideDirlist: React.FC = () => {
   return (
     <>
       {dirlist?.map(file => {
-        const detail = {
-          id: file.id,
-          date: file.time,
-          title: file.name,
-          isChange:
-            currentFile && recentFiles[currentFile]
-              ? recentFiles[currentFile].isChange
-              : false,
-          desc: 'file size ' + file.size
-        }
+        const isChange = recentFiles[file.id]
+          ? recentFiles[file.id].isChange
+          : false
         return (
-          <SideFileItem
+          <SideFileItemNew
             key={file.id}
-            detail={detail}
+            uuid={file.id}
+            name={file.name}
+            time={file.time}
+            size={file.size}
+            isChange={isChange}
             isActive={currentFile === file.id}
-            clickCallback={openFile}
+            onClick={openFile}
           />
         )
       })}
