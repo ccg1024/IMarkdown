@@ -6,11 +6,11 @@ import {
   useState,
   useEffect,
   useCallback,
-  useLayoutEffect,
-  useMemo
+  useLayoutEffect
 } from 'react'
 import { useDispatch } from 'react-redux'
 import { IpcRendererEvent } from 'electron'
+import { useNavigate } from 'react-router-dom'
 
 import Editor, { EditorRef } from './components/editor'
 import Preview from './components/preview'
@@ -53,6 +53,7 @@ const App: FC = (): JSX.Element => {
   const sideBarRef = useRef<SideBarRef>(null)
 
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const handleFullScreen = useCallback((token: number) => {
     if (token === 1) {
       sideBarRef.current.toggleNav()
@@ -109,6 +110,7 @@ const App: FC = (): JSX.Element => {
 
   const handleDirOpen = useCallback((_: any, markFile: MarkFile[]) => {
     dispatch(updateDirlist(markFile))
+    navigate('main_window/folder')
   }, [])
 
   const handleFileOpen = useCallback(
