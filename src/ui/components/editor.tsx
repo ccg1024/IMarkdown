@@ -1,6 +1,5 @@
 import PubSub from 'pubsub-js'
 import { Box } from '@chakra-ui/react'
-import { useDispatch } from 'react-redux'
 import { EditorView } from '@codemirror/view'
 import {
   useRef,
@@ -18,7 +17,7 @@ import pubsubConfig from '../../config/pubsub.config'
 import imardownPlugins, {
   ImarkdownPlugin
 } from '../../config/plugin-list.config'
-import generateState, { clearToken, vimPlugin } from '../libs/generate-state'
+import generateState, { vimPlugin } from '../libs/generate-state'
 
 interface EditorProps {
   isVisible: boolean
@@ -29,6 +28,7 @@ interface Controller {
 export interface EditorRef {
   getDoc: () => string
   getEditor: () => EditorView
+  getFileName: () => string
 }
 
 const dynamicPlugin: ImarkdownPlugin = {
@@ -46,7 +46,6 @@ const InternalEditor: ForwardRefRenderFunction<EditorRef, EditorProps> = (
   const containerRef = useRef<HTMLDivElement>(null)
   const editorRef = useRef<EditorView>(null)
   const currentFile = useRef<string>('')
-  const reduxDispatch = useCallback(useDispatch(), [])
 
   const handleEditorScroll = useCallback((e: UIEvent) => {
     if (controller.scrollBarTimer) {
@@ -76,7 +75,7 @@ const InternalEditor: ForwardRefRenderFunction<EditorRef, EditorProps> = (
         }
         currentFile.current = data.file
         const view = new EditorView({
-          state: generateState(data.doc, reduxDispatch),
+          state: generateState(data.doc),
           parent: containerRef.current
         })
 
@@ -97,7 +96,6 @@ const InternalEditor: ForwardRefRenderFunction<EditorRef, EditorProps> = (
         }
 
         editorRef.current = view
-        clearToken('')
       }
     )
 
@@ -183,6 +181,9 @@ const InternalEditor: ForwardRefRenderFunction<EditorRef, EditorProps> = (
         },
         getEditor() {
           return editorRef.current
+        },
+        getFileName() {
+          return currentFile.current
         }
       }
     },

@@ -37,11 +37,7 @@ import {
   closeBracketsKeymap
 } from '@codemirror/autocomplete'
 
-import { AppDispatch, getCurrentFile } from '../app/store'
 import pubsubConfig from '../../config/pubsub.config'
-import { updateFileContent } from '../app/reducers/fileContentSlice'
-import { updateFileIsChange } from '../app/reducers/recentFilesSlice'
-import { LineOfStatusLine } from '../../types/renderer'
 
 import { lightThemeColor } from './themes'
 import paddingExtension from '../plugins/padding-extension'
@@ -366,29 +362,13 @@ const controller: Controller = {
   scrollTimer: null
 }
 
-function updateMainDocCache(doc: string) {
-  window.ipcAPI.updateDocCache(doc)
-}
-
-const generateState = (doc: string, reduxDispath: AppDispatch): EditorState => {
+const generateState = (doc: string): EditorState => {
   const state = EditorState.create({
     doc: doc,
     extensions: [
       EditorView.updateListener.of(update => {
         if (update.docChanged) {
-          if (!controller.closeChange) {
-            // PubSub.publish(pubsubConfig.UPDATE_STATUS_LINE, true)
-            reduxDispath(
-              updateFileIsChange({
-                id: getCurrentFile(),
-                isChange: true
-              })
-            )
-            controller.closeChange = true
-          }
-
-          reduxDispath(updateFileContent(update.state.doc.toString()))
-          updateMainDocCache(update.state.doc.toString())
+          PubSub.publish(pubsubConfig.UPDATE_EDITOR_CONTENT)
         }
 
         // if (update.selectionSet) {

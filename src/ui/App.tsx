@@ -32,7 +32,6 @@ import Sidebar, { SideBarRef } from './components/sidebar'
 import HeadNav from './components/head-nav'
 import { getMarkHead } from './app/store'
 import ipcConfig from '../config/ipc.config'
-import { clearToken } from './libs/generate-state'
 import formateContent from './libs/formate-content'
 import { MarkFile } from '../window/tools'
 import { updateDirlist } from './app/reducers/dirlistSlice'
@@ -41,6 +40,14 @@ interface FileToken {
   fullpath: string
   fileContent: string
   headInfo: HeadInfo
+}
+
+type UpdateGate = {
+  isChangeGate: boolean
+}
+
+const updateGate: UpdateGate = {
+  isChangeGate: false
 }
 
 const App: FC = (): JSX.Element => {
@@ -145,6 +152,7 @@ const App: FC = (): JSX.Element => {
         file: fullpath,
         scrollPos: scrollPos && scrollPos
       })
+      updateGate.isChangeGate = false
       // PubSub.publish(pubsubConfig.UPDATE_STATUS_LINE, isChange)
     },
     []
@@ -196,7 +204,7 @@ const App: FC = (): JSX.Element => {
               isChange: false
             })
           )
-          clearToken('')
+          updateGate.isChangeGate = false
         }
       } catch (err) {
         // error handle
@@ -217,6 +225,37 @@ const App: FC = (): JSX.Element => {
       window.ipcAPI.removeFileSaveListener()
       window.ipcAPI.removeFormatFileListener()
     }
+  }, [])
+
+  // listen editor content change
+  useEffect(() => {
+    function updateContent() {
+      const editorContent = editorRef.current?.getDoc()
+      dispatch(updateFileContent(editorContent))
+      window.ipcAPI.updateDocCache(editorContent)
+    }
+    // const updateContentDebounce = _.debounce(updateContent, 300)
+
+    const contentToken = PubSub.subscribe(
+      pubsubConfig.UPDATE_EDITOR_CONTENT,
+      () => {
+        const editorFile = editorRef.current?.getFileName()
+
+        // update file change
+        if (editorFile && !updateGate.isChangeGate) {
+          dispatch(updateFileIsChange({ id: editorFile, isChange: true }))
+          updateGate.isChangeGate = true
+        }
+
+        // update file content
+        updateContent()
+      }
+    )
+
+    function clear() {
+      PubSub.unsubscribe(contentToken)
+    }
+    return clear
   }, [])
 
   // config setting

@@ -19,7 +19,10 @@ const pubsubConfig = {
   // for head nav extension
   UPDATE_HEAD_NAV: 'update_head_nav',
   EXECUTE_HEAD_NAV: 'execute_head_nav',
-  ACTIVE_HEAD_NAV: 'active_head_nav'
+  ACTIVE_HEAD_NAV: 'active_head_nav',
+
+  // for editor content update
+  UPDATE_EDITOR_CONTENT: 'update_editor_content'
 }
 
 export default pubsubConfig
