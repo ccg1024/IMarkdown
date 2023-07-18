@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
-import { mkdir } from 'fs/promises'
+import readline from 'readline'
+import { mkdir, stat, readdir } from 'fs/promises'
 import type { MessageBoxSyncOptions } from 'electron'
 
 interface DefaultAppDirectory {
@@ -13,6 +14,7 @@ export type MarkFile = {
   size: string
   time: string
   name: string
+  firstLine?: string
 }
 
 export const createDirectory = async (path: string): Promise<void> => {
@@ -82,6 +84,65 @@ function getNormalSize(size: number) {
   return String(size) + 'B'
 }
 
+function haveContent(str: string): boolean {
+  return str !== '' && str !== '\n' && str !== '\r\n'
+}
+
+export async function getFileFirstLine(filepath: string): Promise<string> {
+  const readStream = fs.createReadStream(filepath, { encoding: 'utf8' })
+  const rl = readline.createInterface({ input: readStream })
+  let result = ''
+  let lineCnt = 0
+  let frontMatterCnt = 0
+  let frontMatterExp = /^---/
+  let MAX_LINE = 10
+
+  for await (const line of rl) {
+    if (lineCnt >= MAX_LINE) {
+      break
+    }
+
+    if (haveContent(line)) {
+      if (!frontMatterExp.test(line) && frontMatterCnt === 0) {
+        result = line
+        break
+      } else if (frontMatterCnt >= 2) {
+        result = line
+        break
+      } else if (frontMatterExp.test(line)) {
+        frontMatterCnt += 1
+      }
+    }
+
+    lineCnt += 1
+  }
+
+  rl.close()
+  readStream.close()
+  return result
+}
+
+export async function getMarkFile(dirPath: string) {
+  const markFile: MarkFile[] = []
+  const filelist = await readdir(dirPath, { encoding: 'utf8' })
+  for (const file of filelist) {
+    const stats = await stat(path.join(dirPath, file))
+    if (stats.isFile() && path.extname(file) === '.md') {
+      const fileFirstLine = await getFileFirstLine(path.join(dirPath, file))
+      markFile.push({
+        id: path.join(dirPath, file),
+        name: path.basename(file, path.extname(file)),
+        time: stats.ctime.toLocaleString(),
+        size: getNormalSize(stats.size),
+        firstLine: fileFirstLine
+      })
+    }
+  }
+
+  return markFile
+}
+
+// duplicate
 export function getMarkdownFile(dirPath: string): MarkFile[] {
   const filelist = fs.readdirSync(dirPath, { encoding: 'utf8' })
   const markFile: MarkFile[] = []

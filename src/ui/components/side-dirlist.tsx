@@ -27,6 +27,7 @@ const SideDirlist: React.FC = () => {
             name={file.name}
             time={file.time}
             size={file.size}
+            desc={file.firstLine}
             isChange={isChange}
             isActive={currentFile === file.id}
             onClick={openFile}
