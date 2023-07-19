@@ -108,8 +108,8 @@ const HeadNav: FC<HeadNavProps> = ({ isVisibale }): JSX.Element => {
           <Box
             key={headAnchor.headPos}
             data-line={headAnchor.headPos}
-            paddingRight={4}
-            paddingLeft={`${(+headAnchor.headLevel - 1) * 20 + 16}px`}
+            paddingX={4}
+            marginLeft={`${(+headAnchor.headLevel - 1) * 20}px`}
             className="base-head-nav"
           >
             {headAnchor.headText.replace(/^#+\s+?/, '')}
