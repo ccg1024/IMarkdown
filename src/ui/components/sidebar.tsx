@@ -6,9 +6,11 @@ import React, {
   useImperativeHandle,
   useRef
 } from 'react'
-import SideNav from './side-nav'
-import { Box, Flex, Input, Text, useColorModeValue } from '@chakra-ui/react'
+import { Box, Flex, Text, useColorModeValue } from '@chakra-ui/react'
 import { Route, Routes } from 'react-router-dom'
+import { BsSearch } from 'react-icons/bs'
+
+import SideNav from './side-nav'
 import SideRecentFiles from './side-recent-files'
 import SideDirlist from './side-dirlist'
 
@@ -117,14 +119,24 @@ function RouteItem({ title, children }: RouteItemProps): JSX.Element {
         >
           {title}
         </Text>
-        <Input
+        <Box
+          aria-label="search bar"
+          display="flex"
+          height="40px"
           width="90%"
-          height="inherit"
-          padding={2}
-          fontSize="1.1em"
-          placeholder="Filter"
+          border="1px solid black"
+          borderWidth="1px"
+          borderColor={useColorModeValue('gray.200', 'gray.200')}
+          borderStyle="solid"
+          borderRadius="md"
           backgroundColor={useColorModeValue('white', 'black')}
-        />
+          color={useColorModeValue('gray.600', 'gray.400')}
+          justifyContent="center"
+          alignItems="center"
+          _hover={{ cursor: 'pointer' }}
+        >
+          <BsSearch />
+        </Box>
       </Flex>
       {children}
     </>
