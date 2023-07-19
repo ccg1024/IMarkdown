@@ -140,12 +140,9 @@ export const SideFileItemNew: React.FC<SideFileItemNewProps> = props => {
           display="flex"
           gap={2}
           alignItems="center"
+          justifyContent="space-between"
+          width="100%"
         >
-          {isChange && (
-            <RadioGroup defaultValue="1">
-              <Radio value="1" colorScheme="red" />
-            </RadioGroup>
-          )}
           <Heading
             width="100%"
             fontSize="1.2em"
@@ -157,6 +154,11 @@ export const SideFileItemNew: React.FC<SideFileItemNewProps> = props => {
           >
             {name}
           </Heading>
+          {isChange && (
+            <RadioGroup defaultValue="1">
+              <Radio value="1" colorScheme="red" />
+            </RadioGroup>
+          )}
         </Box>
 
         <Box
