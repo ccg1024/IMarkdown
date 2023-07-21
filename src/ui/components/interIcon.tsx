@@ -18,15 +18,13 @@ const IconBox: FC<IconBoxProps> = (props): JSX.Element => {
     <Box
       boxShadow="lg"
       onClick={props.clickCallback}
-      borderWidth="1px"
       borderRadius="full"
-      borderColor="gray.200"
-      borderStyle="solid"
       padding={2}
       zIndex={1}
       backgroundColor={useColorModeValue('white', 'black')}
       _hover={{
-        cursor: 'pointer'
+        cursor: 'pointer',
+        backgroundColor: useColorModeValue('gray.200', 'gray.200')
       }}
     >
       {props.children}
