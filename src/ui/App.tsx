@@ -35,6 +35,7 @@ import ipcConfig from '../config/ipc.config'
 import formateContent from './libs/formate-content'
 import { MarkFile } from '../window/tools'
 import { updateDirlist } from './app/reducers/dirlistSlice'
+import Message, { MessageRefMethod } from './components/message'
 
 interface FileToken {
   fullpath: string
@@ -58,6 +59,7 @@ const App: FC = (): JSX.Element => {
   const editorRef = useRef<EditorRef>(null)
   const uiControl = useRef<boolean>(false)
   const sideBarRef = useRef<SideBarRef>(null)
+  const messageRef = useRef<MessageRefMethod>(null)
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -205,6 +207,9 @@ const App: FC = (): JSX.Element => {
             })
           )
           updateGate.isChangeGate = false
+          if (messageRef) {
+            messageRef.current.showMessage(`save: ${path}`)
+          }
         }
       } catch (err) {
         // error handle
@@ -320,6 +325,7 @@ const App: FC = (): JSX.Element => {
           )}
         </Box>
       </Flex>
+      <Message ref={messageRef} />
     </>
   )
 }
