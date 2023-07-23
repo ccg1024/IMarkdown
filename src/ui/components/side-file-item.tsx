@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
   Box,
   Flex,
@@ -108,6 +108,13 @@ type SideFileItemNewProps = {
 export const SideFileItemNew: React.FC<SideFileItemNewProps> = props => {
   const { uuid, name, time, desc, size, isChange, isActive, onClick, ...rest } =
     props
+
+  useEffect(() => {
+    if (isActive) {
+      document.getElementById(uuid).scrollIntoView({ block: 'nearest' })
+    }
+  }, [isActive, uuid])
+
   return (
     <Box
       id={uuid}
