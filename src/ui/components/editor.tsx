@@ -71,7 +71,12 @@ const InternalEditor: ForwardRefRenderFunction<EditorRef, EditorProps> = (
           // update scroll pos to main process
           const scrollTop = editorRef.current.scrollDOM.scrollTop
           const blockInfo = editorRef.current.elementAtHeight(scrollTop)
-          window.ipcAPI.updateScrollPos(blockInfo.from, currentFile.current)
+          window.ipcAPI.updateScrollPos({
+            filepath: currentFile.current,
+            fileData: {
+              scrollPos: blockInfo.from
+            }
+          })
         }
         currentFile.current = data.file
         const view = new EditorView({

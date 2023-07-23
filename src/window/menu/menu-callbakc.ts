@@ -2,17 +2,38 @@ import fs from 'fs'
 import matter from 'gray-matter'
 import { BrowserWindow } from 'electron'
 
-import { FileCache } from '../../types/main'
+import { HeadInfo } from '../../types/main'
 import ipcConfig from '../../config/ipc.config'
 import { fileOpenDialog, createFileDialog, dirOpenDialog } from '../dialog'
-import { fileCreationTime, getMarkFile } from '../tools'
+import { getMarkFiles, getMarkFile, getTempMarkFile, MarkFile } from '../tools'
+
+export type FileData = {
+  headInfo: HeadInfo
+  content: string
+  isChange: boolean
+  scrollPos?: number
+}
+
+export type OpenFileType = {
+  fileInfo: MarkFile
+  fileData: FileData
+}
+
+export type FileCache = {
+  [key: string]: OpenFileType
+} & Object
+
+export type UpdateFileData = {
+  filepath: string
+  fileData: Partial<Omit<FileData, 'isChange'>>
+}
 
 export async function dirOpenCallback() {
   const dirPath = await dirOpenDialog()
 
   if (dirPath) {
     try {
-      const markFile = await getMarkFile(dirPath)
+      const markFile = await getMarkFiles(dirPath)
       BrowserWindow.getFocusedWindow()?.webContents.send(
         ipcConfig.OPEN_DIR,
         markFile
@@ -23,8 +44,11 @@ export async function dirOpenCallback() {
   }
 }
 
-export async function fileOpenCallback(fileCache: FileCache, path?: string) {
-  let filePath
+export async function fileOpenCallback(
+  fileCache: FileCache,
+  path?: string
+): Promise<OpenFileType> {
+  let filePath, fileInfo: MarkFile, fileData: FileData
   if (path === undefined || path === null || path === '') {
     filePath = await fileOpenDialog()
   } else {
@@ -33,38 +57,39 @@ export async function fileOpenCallback(fileCache: FileCache, path?: string) {
 
   if (filePath) {
     if (fileCache.hasOwnProperty(filePath)) {
-      BrowserWindow.getFocusedWindow()?.webContents.send(
-        ipcConfig.OPEN_FILE,
-        filePath,
-        fileCache[filePath].fileContent,
-        fileCache[filePath].headInfo,
-        fileCache[filePath].isChange,
-        fileCache[filePath].scrollPos
-      )
-
-      return { filePath }
+      fileInfo = fileCache[filePath].fileInfo
+      fileData = fileCache[filePath].fileData
     } else {
       try {
+        fileInfo = await getMarkFile(filePath)
+
         const fileContent = fs.readFileSync(filePath, 'utf8')
         const parseContent = matter(fileContent)
+        const headInfo = parseContent.data as HeadInfo
+
+        fileData = {
+          headInfo,
+          content: parseContent.content,
+          isChange: false,
+          scrollPos: undefined
+        }
 
         BrowserWindow.getFocusedWindow()?.webContents.send(
           ipcConfig.OPEN_FILE,
-          filePath,
-          parseContent.content,
-          parseContent.data,
-          false
+          { fileInfo, fileData }
         )
-
-        return {
-          filePath,
-          fileContent: parseContent.content,
-          headInfo: parseContent.data,
-          isChange: false
-        }
       } catch (err) {
         throw err
       }
+    }
+
+    BrowserWindow.getFocusedWindow()?.webContents.send(ipcConfig.OPEN_FILE, {
+      fileInfo,
+      fileData
+    })
+    return {
+      fileInfo,
+      fileData
     }
   }
 }
@@ -80,27 +105,27 @@ export async function saveFileCallback(filePath: string) {
   }
 }
 
-export async function createFileCallback() {
+export async function createFileCallback(): Promise<OpenFileType> {
   const filePath = await createFileDialog()
   if (filePath) {
-    const createTime = fileCreationTime()
     const headInfo = {
       title: '',
-      date: createTime,
       desc: ''
     }
-    BrowserWindow.getFocusedWindow()?.webContents.send(
-      ipcConfig.OPEN_FILE,
-      filePath,
-      '',
+    const fileInfo: MarkFile = getTempMarkFile(filePath)
+    const fileData: FileData = {
       headInfo,
-      false
-    )
+      content: '',
+      isChange: false,
+      scrollPos: undefined
+    }
+    BrowserWindow.getFocusedWindow()?.webContents.send(ipcConfig.OPEN_FILE, {
+      fileInfo,
+      fileData
+    })
     return {
-      filePath,
-      fileContent: '',
-      headInfo,
-      isChange: false
+      fileInfo,
+      fileData
     }
   }
 }

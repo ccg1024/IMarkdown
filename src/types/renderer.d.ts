@@ -1,3 +1,4 @@
+import { UpdateFileData } from '../window/menu/menu-callbakc'
 import { VimOptionIPC } from '../config/vim-option.config'
 import { HeadInfo } from './main'
 
@@ -14,11 +15,11 @@ export interface IElectronIPC {
   initRenderer: () => Promise<any>
   getPlatform: () => string
 
-  updateDocCache: (content: string) => Promise<void>
-  updateHeader: (header: HeadInfo) => Promise<void>
+  updateDocCache: (update: UpdateFileData) => Promise<void>
+  updateHeader: (update: UpdateFileData) => Promise<void>
   openRecentFile: (path: string) => Promise<void>
   openMenu: (x: number, y: number) => Promise<void>
-  updateScrollPos: (scrollPos: number, file: string) => Promise<void>
+  updateScrollPos: (update: UpdateFileData) => Promise<void>
   openDirFile: (path: string) => Promise<void>
 
   closeWindow: () => Promise<void>

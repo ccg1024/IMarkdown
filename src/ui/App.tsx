@@ -19,9 +19,9 @@ import GhostInfo from './components/ghost-info'
 import MarkHeadInfo from './components/mark-head'
 import pubsubConfig from '../config/pubsub.config'
 import imardownPlugins from '../config/plugin-list.config'
-import { concatHeaderAndContent, formateDate } from './libs/tools'
+import { concatHeaderAndContent } from './libs/tools'
 import { HeadInfo } from '../types/main'
-import { updateFileContent } from './app/reducers/fileContentSlice'
+import { updateFileContent, updateFile } from './app/reducers/fileContentSlice'
 import {
   updateFileIsChange,
   updateRecentFiles
@@ -35,6 +35,7 @@ import ipcConfig from '../config/ipc.config'
 import formateContent from './libs/formate-content'
 import { MarkFile } from '../window/tools'
 import { updateDirlist } from './app/reducers/dirlistSlice'
+import { OpenFileType } from '../window/menu/menu-callbakc'
 
 interface FileToken {
   fullpath: string
@@ -120,70 +121,62 @@ const App: FC = (): JSX.Element => {
     navigate('main_window/folder')
   }, [])
 
-  const handleFileOpen = useCallback(
-    (
-      _: any,
-      fullpath: string,
-      fileContent: string,
-      headInfo: HeadInfo,
-      isChange: boolean,
-      scrollPos: number
-    ) => {
-      dispatch(updateFileContent(fileContent))
-      dispatch(
-        updateRecentFiles({
-          id: fullpath,
-          date: formateDate(headInfo.date),
-          desc: headInfo.desc,
-          title: headInfo.title,
-          isChange: isChange,
-          tag: headInfo.tag
-        })
-      )
-      dispatch(updateCurrentFile(fullpath))
-      setShowEditor(true)
-      setShowHeadInfo(true)
-      if (!uiControl.current) {
-        uiControl.current = true
-      }
-
-      PubSub.publish(pubsubConfig.UPDATE_EDITOR_STATE, {
-        doc: fileContent,
-        file: fullpath,
-        scrollPos: scrollPos && scrollPos
+  const handleFileOpen = useCallback((_: any, openFileInfo: OpenFileType) => {
+    const { fileInfo, fileData } = openFileInfo
+    dispatch(
+      updateFile({
+        content: fileData.content,
+        headinfo: fileData.headInfo
       })
-      updateGate.isChangeGate = false
-      // PubSub.publish(pubsubConfig.UPDATE_STATUS_LINE, isChange)
-    },
-    []
-  )
+    )
+    dispatch(
+      updateRecentFiles({
+        filepath: fileInfo.id,
+        fileInfo: fileInfo,
+        isChange: fileData.isChange
+      })
+    )
+    dispatch(updateCurrentFile(openFileInfo.fileInfo.id))
+    setShowEditor(true)
+    setShowHeadInfo(true)
+    if (!uiControl.current) {
+      uiControl.current = true
+    }
+
+    PubSub.publish(pubsubConfig.UPDATE_EDITOR_STATE, {
+      doc: fileData.content,
+      file: fileInfo.id,
+      scrollPos: fileData.scrollPos && fileData.scrollPos
+    })
+    updateGate.isChangeGate = false
+  }, [])
 
   // check if file is loaded
   useEffect(() => {
-    window.ipcAPI.initRenderer().then((result: string) => {
-      if (result) {
-        const initialFile = JSON.parse(result) as FileToken
-        dispatch(updateFileContent(initialFile.fileContent))
-        dispatch(
-          updateRecentFiles({
-            id: initialFile.fullpath,
-            date: formateDate(initialFile.headInfo.date),
-            desc: initialFile.headInfo.desc,
-            title: initialFile.headInfo.title,
-            isChange: false,
-            tag: initialFile.headInfo.tag
-          })
-        )
-        dispatch(updateCurrentFile(initialFile.fullpath))
-        PubSub.publish(pubsubConfig.UPDATE_EDITOR_STATE, {
-          doc: initialFile.fileContent,
-          file: initialFile.fullpath
-        })
-        setShowEditor(true)
-        setShowHeadInfo(true)
-        uiControl.current = true
-      }
-    })
+    // window.ipcAPI.initRenderer().then((result: string) => {
+    //   if (result) {
+    //     const initialFile = JSON.parse(result) as FileToken
+    //     dispatch(updateFileContent(initialFile.fileContent))
+    //     dispatch(
+    //       updateRecentFiles({
+    //         id: initialFile.fullpath,
+    //         date: formateDate(initialFile.headInfo.date),
+    //         desc: initialFile.headInfo.desc,
+    //         title: initialFile.headInfo.title,
+    //         isChange: false,
+    //         tag: initialFile.headInfo.tag
+    //       })
+    //     )
+    //     dispatch(updateCurrentFile(initialFile.fullpath))
+    //     PubSub.publish(pubsubConfig.UPDATE_EDITOR_STATE, {
+    //       doc: initialFile.fileContent,
+    //       file: initialFile.fullpath
+    //     })
+    //     setShowEditor(true)
+    //     setShowHeadInfo(true)
+    //     uiControl.current = true
+    //   }
+    // })
   }, [])
 
   // ipc event listener
@@ -200,7 +193,7 @@ const App: FC = (): JSX.Element => {
           event.sender.send(ipcConfig.SAVE_CONTENT, content, doc, path)
           dispatch(
             updateFileIsChange({
-              id: path,
+              filepath: path,
               isChange: false
             })
           )
@@ -231,8 +224,12 @@ const App: FC = (): JSX.Element => {
   useEffect(() => {
     function updateContent() {
       const editorContent = editorRef.current?.getDoc()
+      const filepath = editorRef.current.getFileName()
       dispatch(updateFileContent(editorContent))
-      window.ipcAPI.updateDocCache(editorContent)
+      window.ipcAPI.updateDocCache({
+        filepath: filepath,
+        fileData: { content: editorContent }
+      })
     }
     // const updateContentDebounce = _.debounce(updateContent, 300)
 
@@ -243,7 +240,7 @@ const App: FC = (): JSX.Element => {
 
         // update file change
         if (editorFile && !updateGate.isChangeGate) {
-          dispatch(updateFileIsChange({ id: editorFile, isChange: true }))
+          dispatch(updateFileIsChange({ filepath: editorFile, isChange: true }))
           updateGate.isChangeGate = true
         }
 

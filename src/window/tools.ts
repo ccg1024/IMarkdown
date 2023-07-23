@@ -10,7 +10,7 @@ interface DefaultAppDirectory {
 }
 
 export type MarkFile = {
-  id: string
+  id: string // absolute path of file
   size: string
   time: string
   name: string
@@ -122,24 +122,44 @@ export async function getFileFirstLine(filepath: string): Promise<string> {
   return result
 }
 
-export async function getMarkFile(dirPath: string) {
-  const markFile: MarkFile[] = []
-  const filelist = await readdir(dirPath, { encoding: 'utf8' })
-  for (const file of filelist) {
-    const stats = await stat(path.join(dirPath, file))
-    if (stats.isFile() && path.extname(file) === '.md') {
-      const fileFirstLine = await getFileFirstLine(path.join(dirPath, file))
-      markFile.push({
-        id: path.join(dirPath, file),
-        name: path.basename(file, path.extname(file)),
-        time: stats.ctime.toLocaleString(),
-        size: getNormalSize(stats.size),
-        firstLine: fileFirstLine
-      })
+export function getTempMarkFile(filepath: string) {
+  const res: MarkFile = {
+    id: filepath,
+    size: '0B',
+    name: path.basename(filepath, path.extname(filepath)),
+    time: new Date().toLocaleString()
+  }
+  return res
+}
+
+export async function getMarkFile(filepath: string) {
+  let res: MarkFile
+  const stats = await stat(filepath)
+  if (stats.isFile() && path.extname(filepath) === '.md') {
+    const fileFirstLine = await getFileFirstLine(filepath)
+    res = {
+      id: filepath,
+      name: path.basename(filepath, path.extname(filepath)),
+      time: stats.ctime.toLocaleString(),
+      size: getNormalSize(stats.size),
+      firstLine: fileFirstLine
     }
   }
 
-  return markFile
+  return res
+}
+
+export async function getMarkFiles(dirPath: string) {
+  const markFiles: MarkFile[] = []
+  const filelist = await readdir(dirPath, { encoding: 'utf8' })
+  for (const file of filelist) {
+    const markFile = await getMarkFile(path.join(dirPath, file))
+    if (markFile) {
+      markFiles.push(markFile)
+    }
+  }
+
+  return markFiles
 }
 
 // duplicate

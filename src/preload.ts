@@ -3,7 +3,7 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron'
 import ipcConfig from './config/ipc.config'
 import { VimOptionIPC } from './config/vim-option.config'
-import { HeadInfo } from './types/main'
+import { UpdateFileData } from './window/menu/menu-callbakc'
 
 type CallbackFunction = (event: IpcRendererEvent, ...args: any[]) => void
 
@@ -39,11 +39,11 @@ contextBridge.exposeInMainWorld('ipcAPI', {
   },
   getPlatform: (): string => process.platform,
 
-  updateDocCache: (content: string) => {
-    ipcRenderer.send(ipcConfig.UPDATE_DOC_CACHE, content)
+  updateDocCache: (update: UpdateFileData) => {
+    ipcRenderer.send(ipcConfig.UPDATE_DOC_CACHE, update)
   },
-  updateHeader: (header: HeadInfo) => {
-    ipcRenderer.send(ipcConfig.UPDATE_HEADER, header)
+  updateHeader: (update: UpdateFileData) => {
+    ipcRenderer.send(ipcConfig.UPDATE_HEADER, update)
   },
   openRecentFile: (path: string) => {
     ipcRenderer.send(ipcConfig.OPEN_RECENT_FILE, path)
@@ -51,8 +51,8 @@ contextBridge.exposeInMainWorld('ipcAPI', {
   openMenu: (x: number, y: number) => {
     ipcRenderer.send(ipcConfig.SHOW_MENU, { x, y })
   },
-  updateScrollPos: (pos: number, file: string) => {
-    ipcRenderer.send(ipcConfig.UPDATE_SCROLL_POS, pos, file)
+  updateScrollPos: (update: UpdateFileData) => {
+    ipcRenderer.send(ipcConfig.UPDATE_SCROLL_POS, update)
   },
   openDirFile: (path: string) => {
     ipcRenderer.send(ipcConfig.DIR_ITEM_CLICK, path)

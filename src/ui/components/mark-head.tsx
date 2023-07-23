@@ -1,15 +1,9 @@
-import { FC, useCallback } from 'react'
+import React, { FC } from 'react'
 import {
-  Tag,
   Box,
-  Menu,
-  Badge,
-  MenuList,
+  Text,
   Editable,
-  MenuButton,
   EditableInput,
-  MenuOptionGroup,
-  MenuItemOption,
   EditablePreview,
   useColorModeValue
 } from '@chakra-ui/react'
@@ -19,87 +13,80 @@ import { BsChevronRight } from 'react-icons/bs'
 import { selectCurrentFile } from '../app/reducers/currentFileSlice'
 import {
   selectRecentFiles,
-  updateFileTitle,
-  updateFileDesc,
   updateFileIsChange,
-  updateFileTag,
   RecentFilesStateItem
 } from '../app/reducers/recentFilesSlice'
+import {
+  selectFileHeadInfo,
+  updateFileHeadInfo
+} from '../app/reducers/fileContentSlice'
+import { HeadInfo } from '../../types/main'
 
-interface MarkTagProps {
-  tag: string | string[]
+type MarkTagProps = {
+  children?: React.ReactNode
+} & React.HTMLAttributes<HTMLDivElement>
+
+export const MarkTag: FC<MarkTagProps> = (props): JSX.Element => {
+  const { children, ...rest } = props
+  return (
+    <Box
+      borderRadius="md"
+      fontSize="inherit"
+      lineHeight={1}
+      backgroundColor="darkorange"
+      color="white"
+      paddingX={2}
+      paddingY={1}
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      textAlign="center"
+      {...rest}
+    >
+      {children}
+    </Box>
+  )
 }
-export const MarkTag: FC<MarkTagProps> = ({ tag }): JSX.Element => {
-  return <Tag colorScheme="teal">{tag}</Tag>
+
+function getArrayTag(tag: string | string[]): string[] {
+  if (tag instanceof Array) return tag
+  const wrapper: string[] = []
+  wrapper.push(tag)
+  return wrapper
 }
 
 const MarkHeadInfo: FC = (): JSX.Element => {
   const currentFile: string = useSelector(selectCurrentFile)
   const recentFiles: RecentFilesStateItem = useSelector(selectRecentFiles)
-  const reduxDispatch = useCallback(useDispatch(), [])
-  const noteTitle = (currentFile && recentFiles[currentFile].title) || ''
-  const noteTime = (currentFile && recentFiles[currentFile].date) || ''
-  const noteDesc = (currentFile && recentFiles[currentFile].desc) || ''
-  const noteTag = (currentFile && recentFiles[currentFile].tag) || 'default'
+  const headInfo = useSelector(selectFileHeadInfo)
 
-  const onChangeTitle = (nextValue: string) => {
-    if (currentFile) {
+  const reduxDispatch = useDispatch()
+  const noteTitle = headInfo.title || ''
+  const noteDesc = headInfo.desc || ''
+  const noteTag: string[] = headInfo.tag ? getArrayTag(headInfo.tag) : []
+
+  const makeChange = () => {
+    if (!recentFiles[currentFile].isChange) {
       reduxDispatch(
-        updateFileTitle({
-          id: currentFile,
-          title: nextValue
+        updateFileIsChange({
+          filepath: currentFile,
+          isChange: true
         })
       )
-      window.ipcAPI.updateHeader({ title: nextValue })
-
-      if (!recentFiles[currentFile].isChange) {
-        reduxDispatch(updateFileIsChange({ id: currentFile, isChange: true }))
-      }
     }
   }
-  const onChangeDesc = (nextValue: string) => {
+  const updateFun = (headInfo: HeadInfo) => {
     if (currentFile) {
-      reduxDispatch(
-        updateFileDesc({
-          id: currentFile,
-          desc: nextValue
-        })
-      )
-      window.ipcAPI.updateHeader({ desc: nextValue })
-      if (!recentFiles[currentFile].isChange) {
-        reduxDispatch(
-          updateFileIsChange({
-            id: currentFile,
-            isChange: true
-          })
-        )
-      }
-    }
-  }
-
-  const onChangeTag = useCallback(
-    (nextValue: string) => {
-      if (currentFile) {
-        reduxDispatch(
-          updateFileTag({
-            id: currentFile,
-            tag: nextValue
-          })
-        )
-
-        window.ipcAPI.updateHeader({ tag: nextValue })
-        if (!recentFiles[currentFile].isChange) {
-          reduxDispatch(
-            updateFileIsChange({
-              id: currentFile,
-              isChange: true
-            })
-          )
+      reduxDispatch(updateFileHeadInfo(headInfo))
+      window.ipcAPI.updateHeader({
+        filepath: currentFile,
+        fileData: {
+          headInfo: headInfo
         }
-      }
-    },
-    [currentFile]
-  )
+      })
+      makeChange()
+    }
+  }
 
   return (
     <Box padding={4}>
@@ -108,7 +95,7 @@ const MarkHeadInfo: FC = (): JSX.Element => {
         fontSize="1.2em"
         marginY={2}
         placeholder="Unname title"
-        onChange={onChangeTitle}
+        onChange={(nextValue: string) => updateFun({ title: nextValue })}
         flexGrow={1}
         selectAllOnFocus={false}
         fontWeight="bold"
@@ -123,33 +110,21 @@ const MarkHeadInfo: FC = (): JSX.Element => {
         alignItems="center"
         color={useColorModeValue('gray.500', 'gray.500')}
       >
-        <Menu>
-          <MenuButton>
-            <MarkTag tag={noteTag} />
-          </MenuButton>
-          <MenuList>
-            <MenuOptionGroup
-              value={noteTag}
-              type="radio"
-              onChange={onChangeTag}
-            >
-              <MenuItemOption value="normal">normal</MenuItemOption>
-              <MenuItemOption value="medium">medium</MenuItemOption>
-              <MenuItemOption value="important">important</MenuItemOption>
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
+        <Text lineHeight={1}>note text</Text>
         <BsChevronRight />
-        <Badge fontSize="inherit" colorScheme="blue">
-          {noteTime ? noteTime : 'Unknow time'}
-        </Badge>
+        {noteTag.map((tag, index) => (
+          <MarkTag key={index}>{tag}</MarkTag>
+        ))}
+        <MarkTag color="gray" style={{ backgroundColor: 'lightgray' }}>
+          add Tag
+        </MarkTag>
       </Box>
       <Editable
         marginY={2}
         value={noteDesc}
         fontSize="0.8em"
         placeholder="no file description"
-        onChange={onChangeDesc}
+        onChange={(nextValue: string) => updateFun({ desc: nextValue })}
         color={useColorModeValue('gray.500', 'gray.500')}
         selectAllOnFocus={false}
       >

@@ -2,7 +2,7 @@ import { FC, useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import { selectCurrentFile } from '../app/reducers/currentFileSlice'
 import { selectRecentFiles } from '../app/reducers/recentFilesSlice'
-import { SideFileItem } from './side-file-item'
+import { SideFileItemNew } from './side-file-item'
 
 const SideRecentFiles: FC = (): JSX.Element => {
   const recentFiles = useSelector(selectRecentFiles)
@@ -15,12 +15,18 @@ const SideRecentFiles: FC = (): JSX.Element => {
   return (
     <>
       {recentPath.map(path => {
+        const file = recentFiles[path]
         return (
-          <SideFileItem
-            key={path}
-            detail={recentFiles[path]}
-            isActive={currentFile === path}
-            clickCallback={openRencentFile}
+          <SideFileItemNew
+            key={file.filepath}
+            uuid={file.filepath}
+            name={file.fileInfo.name}
+            time={file.fileInfo.time}
+            desc={file.fileInfo.firstLine}
+            size={file.fileInfo.size}
+            isChange={file.isChange}
+            isActive={file.filepath === currentFile}
+            onClick={openRencentFile}
           />
         )
       })}

@@ -1,13 +1,15 @@
+/**
+ * just save file information which have already open
+ */
+
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { RootState } from '../store'
+import { MarkFile } from '../../../window/tools'
 
-export interface RecentFilesPayload {
-  id?: string
-  date?: string
-  desc?: string
-  title?: string
-  isChange?: boolean
-  tag?: string
+export type RecentFilesPayload = {
+  filepath: string
+  fileInfo: Partial<Omit<MarkFile, 'id'>>
+  isChange: boolean
 }
 
 export interface RecentFilesStateItem {
@@ -27,35 +29,22 @@ export const recentFilesSlice = createSlice({
   initialState,
   reducers: {
     updateRecentFiles: (state, action: PayloadAction<RecentFilesPayload>) => {
-      if (action.payload.id) {
-        state.value[action.payload.id] = {
-          id: action.payload.id,
-          date: action.payload.date,
-          desc: action.payload.desc,
-          title: action.payload.title,
-          isChange: action.payload.isChange,
-          tag: action.payload.tag
+      const { filepath, fileInfo, isChange } = action.payload
+      if (filepath) {
+        state.value[filepath] = {
+          filepath: filepath,
+          fileInfo: fileInfo,
+          isChange: isChange
         }
       }
     },
-    updateFileTitle: (state, action: PayloadAction<RecentFilesPayload>) => {
-      if (action.payload.id) {
-        state.value[action.payload.id].title = action.payload.title
-      }
-    },
-    updateFileDesc: (state, action: PayloadAction<RecentFilesPayload>) => {
-      if (action.payload.id) {
-        state.value[action.payload.id].desc = action.payload.desc
-      }
-    },
-    updateFileIsChange: (state, action: PayloadAction<RecentFilesPayload>) => {
-      if (action.payload.id) {
-        state.value[action.payload.id].isChange = action.payload.isChange
-      }
-    },
-    updateFileTag: (state, action: PayloadAction<RecentFilesPayload>) => {
-      if (action.payload.id) {
-        state.value[action.payload.id].tag = action.payload.tag
+    updateFileIsChange: (
+      state,
+      action: PayloadAction<Omit<RecentFilesPayload, 'fileInfo'>>
+    ) => {
+      const { filepath, isChange } = action.payload
+      if (filepath) {
+        state.value[filepath].isChange = isChange
       }
     }
   }
@@ -63,12 +52,7 @@ export const recentFilesSlice = createSlice({
 
 export const selectRecentFiles = (state: RootState) => state.recentFiles.value
 
-export const {
-  updateRecentFiles,
-  updateFileTitle,
-  updateFileDesc,
-  updateFileIsChange,
-  updateFileTag
-} = recentFilesSlice.actions
+export const { updateRecentFiles, updateFileIsChange } =
+  recentFilesSlice.actions
 
 export default recentFilesSlice.reducer

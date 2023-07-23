@@ -1,10 +1,10 @@
-export interface HeadInfo {
-  date?: string
+export type HeadInfo = {
   desc?: string
   title?: string
-  tag?: string
+  tag?: Array
 }
 
+// duplicated
 export interface FileCache extends Object {
   [key: string]: {
     fileContent: string

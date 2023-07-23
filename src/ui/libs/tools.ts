@@ -1,4 +1,4 @@
-import { RecentFilesPayload } from '../app/reducers/recentFilesSlice'
+import { HeadInfo } from '../../types/main'
 
 export function formateDate(date: Date | string): string {
   if (typeof date === 'string') {
@@ -18,19 +18,18 @@ export function formateDate(date: Date | string): string {
 }
 
 export function concatHeaderAndContent(
-  header: RecentFilesPayload,
+  header: HeadInfo,
   content: string
 ): string {
-  const subHeader: any = {
-    title: header.title,
-    desc: header.desc,
-    date: header.date,
-    tag: header.tag
-  }
   let result = '---\n'
-  for (const key in subHeader) {
-    if (subHeader[key]) {
-      result += `${key}: ${subHeader[key]}\n`
+  let key: keyof HeadInfo
+  for (key in header) {
+    if (header[key]) {
+      if (header[key] instanceof Array) {
+        result += `${key}: ${JSON.stringify(header[key])}\n`
+      } else {
+        result += `${key}: ${header[key]}\n`
+      }
     }
   }
   result += '---\n'
