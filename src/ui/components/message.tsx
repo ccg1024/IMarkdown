@@ -2,6 +2,7 @@ import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Box, Text, useColorModeValue } from '@chakra-ui/react'
 import { AnimatePresence, motion } from 'framer-motion'
+import Celebrate from '../img/celebrate.svg'
 
 interface BaseMessageProps {
   [key: `data-${string}`]: string
@@ -92,11 +93,15 @@ const InternalMessage: React.ForwardRefRenderFunction<
             <Box
               borderRadius="md"
               padding={2}
+              marginRight={2}
               boxShadow="lg"
               backgroundColor={colors.backgroundColor}
               {...rest}
             >
-              <Text>{mess}</Text>
+              <Box display="flex" gap={2} alignItems="center">
+                <Celebrate style={{ width: '1em', height: '1em' }} />
+                <Text lineHeight={1}>{mess}</Text>
+              </Box>
               {children && <Box>{children}</Box>}
             </Box>
           </motion.div>

@@ -201,7 +201,7 @@ const App: FC = (): JSX.Element => {
           )
           updateGate.isChangeGate = false
           if (messageRef) {
-            messageRef.current.showMessage(`save: ${path}`)
+            messageRef.current.showMessage(`${path}`)
           }
         }
       } catch (err) {

@@ -24,6 +24,7 @@
     "@electron-forge/maker-squirrel": "^6.1.1",
     "@electron-forge/maker-zip": "^6.1.1",
     "@electron-forge/plugin-webpack": "^6.1.1",
+    "@svgr/webpack": "^8.0.1",
     "@types/prettier": "^2.7.2",
     "@types/pubsub-js": "^1.8.3",
     "@types/react": "^18.2.6",
