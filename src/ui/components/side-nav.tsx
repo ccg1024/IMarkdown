@@ -15,7 +15,7 @@ import {
   Text,
   useColorModeValue
 } from '@chakra-ui/react'
-import { BsList, BsMarkdown } from 'react-icons/bs'
+import { BsList, BsMarkdown, BsFileRichtext, BsFolder } from 'react-icons/bs'
 import { NavLink } from 'react-router-dom'
 import { Global } from '@emotion/react'
 
@@ -102,13 +102,24 @@ const InternalSideNav: ForwardRefRenderFunction<
       </Flex>
 
       {/*<NavItem path="main_window/recent_file">Recent Files</NavItem>*/}
-      <NavItem path="/">Recent Files</NavItem>
-      <NavItem path="main_window/folder">Folder</NavItem>
+      <NavItem path="/" icon={<BsFileRichtext />}>
+        Recent Files
+      </NavItem>
+      <NavItem path="main_window/folder" icon={<BsFolder />}>
+        Folder
+      </NavItem>
     </Box>
   )
 }
 
-function NavItem({ path, children }: any): JSX.Element {
+type NavItemProps = {
+  path: string
+  icon?: React.ReactNode
+  children: React.ReactNode
+}
+
+function NavItem(props: NavItemProps): JSX.Element {
+  const { path, icon, children } = props
   return (
     <>
       <Global
@@ -125,7 +136,7 @@ function NavItem({ path, children }: any): JSX.Element {
             paddingBottom: 'var(--chakra-space-2)',
             paddingLeft: 'var(--chakra-space-4)',
             paddingRight: 'var(--chakra-space-4)',
-            fontSize: '1.1em',
+            fontSize: '1.0em',
             userSelect: 'none'
           }
         }}
@@ -136,7 +147,10 @@ function NavItem({ path, children }: any): JSX.Element {
           isActive ? 'active-side-nav nav-item' : 'no-active nav-item'
         }
       >
-        {children}
+        <Flex gap={2} alignItems="center">
+          {icon && icon}
+          {children}
+        </Flex>
       </NavLink>
     </>
   )

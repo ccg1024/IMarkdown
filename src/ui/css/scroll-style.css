@@ -33,3 +33,7 @@ pre:hover::-webkit-scrollbar-thumb {
 .hidde-scroll-bar::-webkit-scrollbar {
   display: none;
 }
+
+.scroll-y-overlay {
+  overflow-y: overlay;
+}

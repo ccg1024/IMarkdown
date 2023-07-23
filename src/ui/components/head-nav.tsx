@@ -27,7 +27,7 @@ const HeadNavStyle = () => (
         )
       },
       '.base-head-nav': {
-        fontSize: '1.2em'
+        fontSize: '1.0em'
       },
       '.base-head-nav:hover': {
         cursor: 'pointer',
@@ -90,17 +90,17 @@ const HeadNav: FC<HeadNavProps> = ({ isVisibale }): JSX.Element => {
   return (
     <Box
       ref={headRef}
-      borderLeft="1px"
+      borderLeft="2px"
       borderColor={useColorModeValue('gray.200', 'gray.600')}
       borderStyle="solid"
       height="100%"
       display={isVisibale ? 'flex' : 'none'}
       flexDirection="column"
-      width="300px"
-      overflowY="auto"
+      width="250px"
       overflowX="hidden"
       onClick={onHeadAnchorClick}
       flexShrink={0}
+      className="scroll-y-overlay"
     >
       <HeadNavStyle />
       {isVisibale &&
@@ -108,7 +108,8 @@ const HeadNav: FC<HeadNavProps> = ({ isVisibale }): JSX.Element => {
           <Box
             key={headAnchor.headPos}
             data-line={headAnchor.headPos}
-            paddingLeft={`${+headAnchor.headLevel * 10}px`}
+            paddingX={4}
+            marginLeft={`${(+headAnchor.headLevel - 1) * 20}px`}
             className="base-head-nav"
           >
             {headAnchor.headText.replace(/^#+\s+?/, '')}
