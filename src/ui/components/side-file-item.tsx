@@ -6,6 +6,7 @@ import {
   Badge,
   Heading,
   Radio,
+  Tooltip,
   RadioGroup,
   useColorModeValue
 } from '@chakra-ui/react'
@@ -66,18 +67,20 @@ export const SideFileItemNew: React.FC<SideFileItemNewProps> = props => {
           justifyContent="space-between"
           width="100%"
         >
-          <Heading
-            width="100%"
-            overflow="hidden"
-            fontSize="1.2em"
-            marginBottom={2}
-            whiteSpace="nowrap"
-            fontFamily="inherit"
-            textOverflow="ellipsis"
-            color={useColorModeValue(isActive ? 'white' : 'black', 'white')}
-          >
-            {name}
-          </Heading>
+          <Tooltip label={name} placement="auto">
+            <Heading
+              width="100%"
+              overflow="hidden"
+              fontSize="1.2em"
+              marginBottom={2}
+              whiteSpace="nowrap"
+              fontFamily="inherit"
+              textOverflow="ellipsis"
+              color={useColorModeValue(isActive ? 'white' : 'black', 'white')}
+            >
+              {name}
+            </Heading>
+          </Tooltip>
           {isChange && (
             <RadioGroup defaultValue="1">
               <Radio value="1" colorScheme="red" />
