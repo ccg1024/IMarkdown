@@ -27,6 +27,8 @@ export function concatHeaderAndContent(
     if (header[key]) {
       if (header[key] instanceof Array) {
         result += `${key}: ${JSON.stringify(header[key])}\n`
+      } else if (typeof header[key] === 'string') {
+        result += `${key}: '${header[key]}'\n`
       } else {
         result += `${key}: ${header[key]}\n`
       }
