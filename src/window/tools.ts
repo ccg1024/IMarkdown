@@ -179,3 +179,11 @@ export function getMarkdownFile(dirPath: string): MarkFile[] {
   })
   return markFile
 }
+
+export function existProp(obj: any, p: string) {
+  if (typeof obj === 'object') {
+    return obj[p] !== null && obj[p] !== undefined
+  }
+
+  throw new Error('function existProp can just using for normal object')
+}

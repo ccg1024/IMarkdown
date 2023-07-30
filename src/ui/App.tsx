@@ -35,7 +35,7 @@ import ipcConfig from '../config/ipc.config'
 import formateContent from './libs/formate-content'
 import { MarkFile } from '../window/tools'
 import { updateDirlist } from './app/reducers/dirlistSlice'
-import { OpenFileType } from '../window/menu/menu-callbakc'
+import { OpenFileType } from '../window/menu/menu-callback'
 import Message, { MessageRefMethod } from './components/message'
 
 interface FileToken {
@@ -192,7 +192,12 @@ const App: FC = (): JSX.Element => {
         const markHead = getMarkHead()
         if (doc && markHead) {
           const content = concatHeaderAndContent(markHead, doc)
-          event.sender.send(ipcConfig.SAVE_CONTENT, content, doc, path)
+          event.sender.send(ipcConfig.SAVE_CONTENT, {
+            headInfo: markHead,
+            content: content,
+            doc: doc,
+            filepath: path
+          })
           dispatch(
             updateFileIsChange({
               filepath: path,
