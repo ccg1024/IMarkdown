@@ -3,7 +3,7 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron'
 import ipcConfig from './config/ipc.config'
 import { VimOptionIPC } from './config/vim-option.config'
-import { UpdateFileData } from './window/menu/menu-callbakc'
+import { UpdateFileData } from './window/menu/menu-callback'
 
 type CallbackFunction = (event: IpcRendererEvent, ...args: any[]) => void
 
