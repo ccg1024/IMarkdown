@@ -1,6 +1,7 @@
-import type { Configuration } from 'webpack';
+import type { Configuration } from 'webpack'
+import path from 'path'
 
-import { rules } from './webpack.rules';
+import { rules } from './webpack.rules'
 
 export const mainConfig: Configuration = {
   /**
@@ -10,9 +11,12 @@ export const mainConfig: Configuration = {
   entry: './src/index.ts',
   // Put your normal webpack config below here
   module: {
-    rules,
+    rules
   },
   resolve: {
     extensions: ['.js', '.ts', '.jsx', '.tsx', '.css', '.json'],
-  },
-};
+    alias: {
+      src: path.resolve(__dirname, 'src/')
+    }
+  }
+}
