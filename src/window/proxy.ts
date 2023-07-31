@@ -42,19 +42,19 @@ export function getFileCacheProxyHandler() {
                   target[p].fileData.headInfo[key] = headInfo[key]
                 }
               }
+            }
 
-              // update rest
-              if (rest) {
-                const { content, isChange, scrollPos } = rest
-                if (content !== null && content !== undefined) {
-                  target[p].fileData.content = content
-                }
-                if (isChange !== null && isChange !== undefined) {
-                  target[p].fileData.isChange = isChange
-                }
-                if (scrollPos !== null && scrollPos !== undefined) {
-                  target[p].fileData.scrollPos = scrollPos
-                }
+            // update rest
+            if (rest) {
+              const { content, isChange, scrollPos } = rest
+              if (content !== null && content !== undefined) {
+                target[p].fileData.content = content
+              }
+              if (isChange !== null && isChange !== undefined) {
+                target[p].fileData.isChange = isChange
+              }
+              if (scrollPos !== null && scrollPos !== undefined) {
+                target[p].fileData.scrollPos = scrollPos
               }
             }
           }
