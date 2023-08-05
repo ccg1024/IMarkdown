@@ -4,10 +4,11 @@ import path from 'path'
 
 import {
   touchEnvName,
-  mountFileCache,
   touchFileCacheItem,
+  updateFileCache,
   touchWin,
-  setCurrentFile
+  setCurrentFile,
+  hasCache
 } from 'src/index'
 import ipcConfig from 'src/config/ipc.config'
 import { fileOpenCallback, UpdateFileData } from './menu/menu-callback'
@@ -23,7 +24,6 @@ export type SaveToken = {
 
 export function mountIPC() {
   const { logDir, logName, configDir, configName } = touchEnvName()
-  const fileCache = mountFileCache()
 
   ipcMain.handle(ipcConfig.GET_CONFIG, handleAppConfig)
   ipcMain.handle(ipcConfig.INIT_RENDERER, handleTouchFile)
@@ -60,9 +60,14 @@ export function mountIPC() {
       if (err) throw err
     })
 
-    fileCache[filepath].fileData.content = doc
-    fileCache[filepath].fileData.headInfo = headInfo
-    fileCache[filepath].fileData.isChange = false
+    // NOTE: update file cache after save file
+    updateFileCache(filepath, {
+      fileData: {
+        content: doc,
+        headInfo: headInfo,
+        isChange: false
+      }
+    })
   }
 
   async function handleDirItemClick(_e: any, filepath: string) {
@@ -89,40 +94,37 @@ export function mountIPC() {
   }
   async function handleUpdateDoc(_: any, update: UpdateFileData) {
     const { filepath, fileData } = update
-    if (
-      filepath &&
-      existProp(fileData, 'content') &&
-      fileCache.hasOwnProperty(filepath)
-    ) {
-      fileCache[filepath].fileData.content = fileData.content
-      fileCache[filepath].fileData.isChange = true
+    const cached = hasCache(filepath)
+    if (filepath && existProp(fileData, 'content') && cached) {
+      updateFileCache(filepath, {
+        fileData: {
+          content: fileData.content,
+          isChange: true
+        }
+      })
     }
   }
   async function handleUpdateHeader(_: any, update: UpdateFileData) {
     const { filepath, fileData } = update
-    if (
-      filepath &&
-      existProp(fileData, 'headInfo') &&
-      fileCache.hasOwnProperty(filepath)
-    ) {
-      let key: keyof HeadInfo
-      const { headInfo } = fileData
-      for (key in headInfo) {
-        if (existProp(headInfo, key)) {
-          fileCache[filepath].fileData.headInfo[key] = headInfo[key]
+    const cached = hasCache(filepath)
+    if (filepath && existProp(fileData, 'headInfo') && cached) {
+      updateFileCache(filepath, {
+        fileData: {
+          headInfo: fileData.headInfo,
+          isChange: true
         }
-      }
-      fileCache[filepath].fileData.isChange = true
+      })
     }
   }
   async function handleUpdateScroll(_: any, update: UpdateFileData) {
     const { filepath, fileData } = update
-    if (
-      filepath &&
-      existProp(fileData, 'scrollPos') &&
-      fileCache.hasOwnProperty(filepath)
-    ) {
-      fileCache[filepath].fileData.scrollPos = fileData.scrollPos
+    const cached = hasCache(filepath)
+    if (filepath && existProp(fileData, 'scrollPos') && cached) {
+      updateFileCache(filepath, {
+        fileData: {
+          scrollPos: fileData.scrollPos
+        }
+      })
     }
   }
   async function handleCloseWindow() {

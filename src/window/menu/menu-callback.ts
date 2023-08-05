@@ -10,7 +10,13 @@ import { HeadInfo } from 'src/types/main'
 import ipcConfig from 'src/config/ipc.config'
 import { fileOpenDialog, createFileDialog, dirOpenDialog } from '../dialog'
 import { getMarkFiles, getMarkFile, getTempMarkFile, MarkFile } from '../tools'
-import { mountFileCache, touchCurrentFile, setCurrentFile } from 'src/index'
+import {
+  touchFileCache,
+  touchCurrentFile,
+  setCurrentFile,
+  addFileCache,
+  hasCache
+} from 'src/index'
 
 export type FileData = {
   headInfo: HeadInfo
@@ -22,6 +28,11 @@ export type FileData = {
 export type OpenFileType = {
   fileInfo: MarkFile
   fileData: FileData
+}
+
+export type UpdateFileType = {
+  fileInfo?: Partial<MarkFile>
+  fileData?: Partial<FileData>
 }
 
 export type FileCache = {
@@ -47,7 +58,6 @@ export async function dirOpenCallback() {
 }
 
 export async function fileOpenCallback(path?: string): Promise<OpenFileType> {
-  const fileCache = mountFileCache()
   let filepath, fileInfo: MarkFile, fileData: FileData
   if (path === undefined || path === null || path === '') {
     filepath = await fileOpenDialog()
@@ -56,7 +66,9 @@ export async function fileOpenCallback(path?: string): Promise<OpenFileType> {
   }
 
   if (filepath) {
-    if (fileCache.hasOwnProperty(filepath)) {
+    const cached = hasCache(filepath)
+    if (cached) {
+      const fileCache = touchFileCache()
       fileInfo = fileCache[filepath].fileInfo
       fileData = fileCache[filepath].fileData
     } else {
@@ -73,7 +85,7 @@ export async function fileOpenCallback(path?: string): Promise<OpenFileType> {
           isChange: false,
           scrollPos: undefined
         }
-        fileCache[filepath] = { fileInfo, fileData }
+        addFileCache(filepath, { fileInfo, fileData })
       } catch (err) {
         throw err
       }
@@ -108,6 +120,7 @@ export async function createFileCallback(): Promise<OpenFileType> {
       isChange: false,
       scrollPos: undefined
     }
+    addFileCache(filepath, { fileInfo, fileData })
     return {
       fileInfo,
       fileData

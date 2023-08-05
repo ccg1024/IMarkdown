@@ -78,3 +78,30 @@ export function getFileCacheProxyHandler() {
 
   return handler
 }
+
+export function touchFileCacheProxyHandler<
+  T extends Object
+>(): ProxyHandler<T> {
+  const handler: ProxyHandler<T> = {
+    set(_target: T, _p: string, _value: any) {
+      throw new Error(
+        'the proxy of touchFileCache can not modify target object'
+      )
+    }
+  }
+  return handler
+}
+
+export function touchFileCacheItemProxyHandler<
+  T extends Object
+>(): ProxyHandler<T> {
+  const handler: ProxyHandler<T> = {
+    set(_target: T, _p: string, _value: any) {
+      throw new Error(
+        'the proxy of touchFileCacheItem can not modify target object'
+      )
+    }
+  }
+
+  return handler
+}
