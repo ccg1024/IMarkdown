@@ -30,7 +30,7 @@ import { updateCurrentFile } from './app/reducers/currentFileSlice'
 import InterIcon from './components/interIcon'
 import Sidebar, { SideBarRef } from './components/sidebar'
 import HeadNav from './components/head-nav'
-import { getMarkHead } from './app/store'
+import { didModified, getCurrentFile, getDoc, getMarkHead } from './app/store'
 import ipcConfig from '../config/ipc.config'
 import formateContent from './libs/formate-content'
 import { MarkFile } from '../window/tools'
@@ -123,7 +123,27 @@ const App: FC = (): JSX.Element => {
     navigate('main_window/folder')
   }, [])
 
-  const handleFileOpen = useCallback((_: any, openFileInfo: OpenFileType) => {
+  const handleFileOpen = (_: any, openFileInfo: OpenFileType) => {
+    // update old file cache before toggle to new file
+    // when file was modified
+    const isModified = didModified()
+    if (isModified) {
+      const header = getMarkHead()
+      const doc = getDoc()
+      const currentFile = getCurrentFile()
+      window.ipcAPI.updateDocCache({
+        filepath: currentFile,
+        fileData: { content: doc }
+      })
+      window.ipcAPI.updateHeader({
+        filepath: currentFile,
+        fileData: {
+          headInfo: header
+        }
+      })
+    }
+
+    // update recent files
     const { fileInfo, fileData } = openFileInfo
     dispatch(
       updateFile({
@@ -135,7 +155,8 @@ const App: FC = (): JSX.Element => {
       updateRecentFiles({
         filepath: fileInfo.id,
         fileInfo: fileInfo,
-        isChange: fileData.isChange
+        isChange: fileData.isChange,
+        didModified: false
       })
     )
     dispatch(updateCurrentFile(openFileInfo.fileInfo.id))
@@ -151,7 +172,7 @@ const App: FC = (): JSX.Element => {
       scrollPos: fileData.scrollPos && fileData.scrollPos
     })
     updateGate.isChangeGate = false
-  }, [])
+  }
 
   // check if file is loaded
   useEffect(() => {
@@ -236,10 +257,12 @@ const App: FC = (): JSX.Element => {
       const editorContent = editorRef.current?.getDoc()
       const filepath = editorRef.current.getFileName()
       dispatch(updateFileContent(editorContent))
-      window.ipcAPI.updateDocCache({
-        filepath: filepath,
-        fileData: { content: editorContent }
-      })
+      // NOTE: unnecessary updates
+      // just need update cache when save file and toggle file
+      // window.ipcAPI.updateDocCache({
+      //   filepath: filepath,
+      //   fileData: { content: editorContent }
+      // })
     }
     // const updateContentDebounce = _.debounce(updateContent, 300)
 

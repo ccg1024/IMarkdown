@@ -10,6 +10,7 @@ export type RecentFilesPayload = {
   filepath: string
   fileInfo: Partial<Omit<MarkFile, 'id'>>
   isChange: boolean
+  didModified?: boolean // indicate whether the file has been modified during current display phase
 }
 
 export interface RecentFilesStateItem {
@@ -29,12 +30,13 @@ export const recentFilesSlice = createSlice({
   initialState,
   reducers: {
     updateRecentFiles: (state, action: PayloadAction<RecentFilesPayload>) => {
-      const { filepath, fileInfo, isChange } = action.payload
+      const { filepath, fileInfo, isChange, didModified } = action.payload
       if (filepath) {
         state.value[filepath] = {
           filepath: filepath,
           fileInfo: fileInfo,
-          isChange: isChange
+          isChange: isChange,
+          didModified: didModified
         }
       }
     },
@@ -45,6 +47,7 @@ export const recentFilesSlice = createSlice({
       const { filepath, isChange } = action.payload
       if (filepath) {
         state.value[filepath].isChange = isChange
+        state.value[filepath].didModified = isChange
       }
     }
   }

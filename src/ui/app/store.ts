@@ -21,6 +21,20 @@ export const getMarkHead = () => {
   return fileContent.value.headinfo
 }
 
+export const getDoc = () => {
+  const { fileContent } = store.getState()
+  return fileContent.value.content
+}
+
+export const didModified = () => {
+  const { currentFile, recentFiles } = store.getState()
+  const filepath = currentFile.value
+  if (filepath) {
+    return recentFiles.value[filepath].didModified
+  }
+  return false
+}
+
 export const getCurrentFile = (): string => {
   const { currentFile } = store.getState()
   return currentFile.value

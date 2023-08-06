@@ -78,12 +78,14 @@ const MarkHeadInfo: FC = (): JSX.Element => {
   const updateFun = (headInfo: HeadInfo) => {
     if (currentFile) {
       reduxDispatch(updateFileHeadInfo(headInfo))
-      window.ipcAPI.updateHeader({
-        filepath: currentFile,
-        fileData: {
-          headInfo: headInfo
-        }
-      })
+      // NOTE: unnecessary updates
+      // just need update cache when save file and toggle file
+      // window.ipcAPI.updateHeader({
+      //   filepath: currentFile,
+      //   fileData: {
+      //     headInfo: headInfo
+      //   }
+      // })
       makeChange()
     }
   }
