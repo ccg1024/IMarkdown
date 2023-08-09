@@ -1,11 +1,7 @@
 import { EditorView } from '@codemirror/view'
 import { Extension } from '@codemirror/state'
 import { tags } from '@lezer/highlight'
-import {
-  HighlightStyle,
-  syntaxHighlighting,
-  defaultHighlightStyle
-} from '@codemirror/language'
+import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
 
 import { markTags } from '../markdown-tags-extension'
 
@@ -84,7 +80,7 @@ const customColors = {
     empahsisMark: '#FC8181',
     codeMark: '#A0AEC0',
     codeText: '#000000',
-    codeInfo: '#4A5568',
+    codeInfo: '#000000',
     linkTitle: 'blue',
     linkLabel: 'blue',
     tableDelimiter: '#A0AEC0'
@@ -96,80 +92,42 @@ const customColors = {
 
 const imarkdownSyntaxHighlighting = HighlightStyle.define([
   {
-    tag: tags.heading1,
-    fontWeight: 'bold',
-    color: customColors.content.head,
-    fontSize: '1em',
-    textDecoration: 'none !important'
-  },
-  {
-    tag: tags.heading2,
-    fontWeight: 'bold',
-    color: customColors.content.head,
-    fontSize: '1em',
-    textDecoration: 'none !important'
-  },
-  {
-    tag: tags.heading3,
-    fontWeight: 'bold',
-    color: customColors.content.head,
-    fontSize: '1em',
-    textDecoration: 'none !important'
-  },
-  {
-    tag: tags.heading4,
-    fontWeight: 'bold',
-    color: customColors.content.head,
-    fontSize: '1em',
-    textDecoration: 'none !important'
-  },
-  {
-    tag: tags.heading5,
-    fontWeight: 'bold',
-    color: customColors.content.head,
-    fontSize: '1em',
-    textDecoration: 'none !important'
-  },
-  {
-    tag: tags.heading6,
-    fontWeight: 'bold',
-    color: customColors.content.head,
-    fontSize: '1em',
-    textDecoration: 'none !important'
-  },
-  {
-    tag: tags.list,
+    tag: tags.list, // for ul or ol list content.
     color: customColors.content.list
   },
   {
     tag: tags.link,
-    color: customColors.content.link,
-    textDecoration: 'underline'
+    color: customColors.content.link
   },
   {
     tag: tags.quote,
     color: customColors.content.quote
   },
   {
-    tag: tags.emphasis,
+    tag: tags.emphasis, // italic style
     color: customColors.content.emphasis,
     fontStyle: 'italic'
   },
   {
-    tag: tags.strong,
+    tag: tags.strong, // bold style
     fontWeight: 'bold',
     color: customColors.content.emphasis
   },
   {
-    tag: tags.heading, // table head
+    tag: tags.heading, // table head and title head 1 - 6
     color: customColors.content.head,
-    textDecoration: 'none !important'
+    fontSize: '1em',
+    fontWeight: 'bold'
+  },
+  {
+    tag: tags.strikethrough, // 删除线
+    textDecoration: 'line-through'
   },
   // ------ for marker highlight
   {
     tag: markTags.headingMark,
     color: customColors.markers.headMark,
-    textDecoration: 'none !important'
+    textDecoration: 'none'
   },
   {
     tag: markTags.quoteMark,
@@ -182,7 +140,7 @@ const imarkdownSyntaxHighlighting = HighlightStyle.define([
   {
     tag: markTags.linkMark,
     color: customColors.markers.linkMark,
-    textDecoration: 'none !important'
+    textDecoration: 'none'
   },
   {
     tag: markTags.emphasisMark,
@@ -196,14 +154,14 @@ const imarkdownSyntaxHighlighting = HighlightStyle.define([
     tag: markTags.codeInfo,
     color: customColors.markers.codeInfo
   },
-  {
-    tag: markTags.linkTitle,
-    colors: customColors.markers.linkTitle
-  },
-  {
-    tag: markTags.linkLabel,
-    color: customColors.markers.linkLabel
-  },
+  // {
+  //   tag: markTags.linkTitle, // no characters found
+  //   colors: customColors.markers.linkTitle
+  // },
+  // {
+  //   tag: markTags.linkLabel, // no characters found
+  //   color: customColors.markers.linkLabel
+  // },
   {
     tag: markTags.url,
     color: customColors.content.url
@@ -215,11 +173,77 @@ const imarkdownSyntaxHighlighting = HighlightStyle.define([
   {
     tag: markTags.tableDelimiter,
     color: customColors.markers.tableDelimiter
+  },
+  {
+    tag: tags.meta, // could be delete mark ~~some~~.
+    color: customColors.markers.quoteMark
+  },
+  // for code block highlight
+  {
+    tag: [
+      tags.keyword,
+      tags.typeName,
+      tags.namespace,
+      tags.bracket,
+      tags.operator
+    ],
+    color: '#D73A4A'
+  },
+  {
+    tag: [tags.string, tags.deleted],
+    color: '#032A57'
+  },
+  {
+    tag: tags.variableName,
+    color: '#000000'
+  },
+  {
+    tag: [tags.regexp, /*@__PURE__*/ tags.special(tags.string)],
+    color: '#E36208'
+  },
+  {
+    tag: /*@__PURE__*/ tags.local(tags.variableName), // not work
+    color: 'yellow !important'
+  },
+  {
+    tag: [/*@__PURE__*/ tags.special(tags.variableName), tags.macroName], // not work
+    color: 'yellow'
+  },
+  {
+    tag: tags.propertyName,
+    color: '#333'
+  },
+  {
+    tag: tags.comment,
+    color: '#6A737D'
+  },
+  {
+    tag: tags.invalid, // not work
+    color: '#f00'
+  },
+  {
+    tag: [
+      tags.self,
+      tags.null,
+      tags.escape,
+      tags.number,
+      tags.definition(tags.variableName)
+    ],
+    color: '#015CC5'
+  },
+  {
+    tag: [
+      tags.className,
+      tags.attributeName,
+      tags.function(tags.variableName),
+      tags.function(tags.propertyName),
+      tags.definition(tags.propertyName)
+    ],
+    color: '#6F42C1'
   }
 ])
 
 export const imarkdown: Extension = [
   imarkdownTheme,
-  syntaxHighlighting(defaultHighlightStyle),
   syntaxHighlighting(imarkdownSyntaxHighlighting)
 ]
