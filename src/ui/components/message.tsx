@@ -38,7 +38,7 @@ const InternalMessage: React.ForwardRefRenderFunction<
   const debounce = useRef<NodeJS.Timeout>(null)
   const oldMessage = useRef<string>(null)
   const colors = {
-    backgroundColor: useColorModeValue('gray.200', 'gray.200')
+    backgroundColor: useColorModeValue('gray.200', 'black')
   }
 
   useImperativeHandle(

@@ -66,7 +66,7 @@ const InternalSidebar: ForwardRefRenderFunction<
         height="100%"
         overflow="auto"
         className="hidde-scroll-bar"
-        backgroundColor={useColorModeValue('#F4F4F3', 'blackAlpha.700')}
+        backgroundColor={useColorModeValue('#F4F4F3', 'blackAlpha.600')}
       >
         <Routes>
           <Route
