@@ -1,7 +1,8 @@
 import { highlightTree } from '@lezer/highlight'
 import { languages } from '@codemirror/language-data'
-import { defaultHighlightStyle } from '@codemirror/language'
 import type { Language, LanguageDescription } from '@codemirror/language'
+
+import { imarkdownSyntaxHighlighting } from '../plugins/theme/imarkdown'
 
 type RunModeCallback = (
   text: string,
@@ -17,7 +18,7 @@ function runmode(
 ): void {
   const tree = language.parser.parse(textContent)
   let pos = 0
-  highlightTree(tree, defaultHighlightStyle, (from, to, classes) => {
+  highlightTree(tree, imarkdownSyntaxHighlighting, (from, to, classes) => {
     if (from > pos) {
       callback(textContent.slice(pos, from), null, pos, from)
     }

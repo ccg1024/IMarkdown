@@ -90,7 +90,7 @@ const customColors = {
   }
 }
 
-const imarkdownSyntaxHighlighting = HighlightStyle.define([
+export const imarkdownSyntaxHighlighting = HighlightStyle.define([
   {
     tag: tags.list, // for ul or ol list content.
     color: customColors.content.list
