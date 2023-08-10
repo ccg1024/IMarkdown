@@ -24,7 +24,7 @@ export const lightThemeColor: ThemeColor = {
 
 export const darkThemeColor: ThemeColor = {
   editor: {
-    codeBlockHighlight: '#cccccc22',
+    codeBlockHighlight: 'RGBA(0, 0, 0, 0.24)',
     gutterBackground: '#ffffff',
     gutterForeground: '#8f8f8f',
     activeGutterBackground: '#cccccc44',

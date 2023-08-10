@@ -168,7 +168,8 @@ export const imarkdownSyntaxHighlighting = HighlightStyle.define([
   },
   {
     tag: markTags.inlineCode,
-    color: customColors.content.inlineCode
+    color: customColors.content.inlineCode,
+    backgroundColor: '#EBF8FF'
   },
   {
     tag: markTags.tableDelimiter,

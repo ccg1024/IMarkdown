@@ -1,5 +1,5 @@
 import PubSub from 'pubsub-js'
-import { Box } from '@chakra-ui/react'
+import { Box, useColorMode } from '@chakra-ui/react'
 import { EditorView } from '@codemirror/view'
 import {
   useRef,
@@ -17,7 +17,9 @@ import pubsubConfig from '../../config/pubsub.config'
 import imardownPlugins, {
   ImarkdownPlugin
 } from '../../config/plugin-list.config'
-import generateState, { vimPlugin } from '../libs/generate-state'
+import generateState, { vimPlugin, themePlugin } from '../libs/generate-state'
+import { imarkdown } from '../plugins/theme/imarkdown'
+import { imarkdownDark } from '../plugins/theme/imarkdown-dark'
 
 interface EditorProps {
   isVisible: boolean
@@ -46,6 +48,7 @@ const InternalEditor: ForwardRefRenderFunction<EditorRef, EditorProps> = (
   const containerRef = useRef<HTMLDivElement>(null)
   const editorRef = useRef<EditorView>(null)
   const currentFile = useRef<string>('')
+  const { colorMode } = useColorMode()
 
   const handleEditorScroll = useCallback((e: UIEvent) => {
     if (controller.scrollBarTimer) {
@@ -93,6 +96,15 @@ const InternalEditor: ForwardRefRenderFunction<EditorRef, EditorProps> = (
             effects: vimPlugin.reconfigure(vim())
           })
         }
+        if (colorMode === 'dark') {
+          view.dispatch({
+            effects: themePlugin.reconfigure(imarkdownDark)
+          })
+        } else {
+          view.dispatch({
+            effects: themePlugin.reconfigure(imarkdown)
+          })
+        }
 
         if (data.scrollPos) {
           view.dispatch({
@@ -107,7 +119,7 @@ const InternalEditor: ForwardRefRenderFunction<EditorRef, EditorProps> = (
     return () => {
       PubSub.unsubscribe(editorToken)
     }
-  }, [])
+  }, [colorMode])
 
   // scroll event listener
   useEffect(() => {
@@ -176,6 +188,20 @@ const InternalEditor: ForwardRefRenderFunction<EditorRef, EditorProps> = (
       PubSub.unsubscribe(headNavToken)
     }
   }, [])
+
+  useEffect(() => {
+    if (editorRef.current) {
+      if (colorMode === 'dark') {
+        editorRef.current.dispatch({
+          effects: themePlugin.reconfigure(imarkdownDark)
+        })
+      } else {
+        editorRef.current.dispatch({
+          effects: themePlugin.reconfigure(imarkdown)
+        })
+      }
+    }
+  }, [colorMode])
 
   useImperativeHandle(
     ref,

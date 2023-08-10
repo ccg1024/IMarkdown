@@ -39,9 +39,9 @@ import { codeBlockHighlight } from '../plugins/code-block-extension'
 import { imgPreview } from '../plugins/img-extension'
 import { headNavExtension } from '../plugins/head-nav-extension'
 import { markStylingExtension } from '../plugins/markdown-tags-extension'
-import { imarkdown } from '../plugins/theme/imarkdown'
 
 export const vimPlugin = new Compartment()
+export const themePlugin = new Compartment()
 
 const imarkdownDefaultExtensions = [
   vimPlugin.of([]),
@@ -53,7 +53,7 @@ const imarkdownDefaultExtensions = [
   dropCursor(),
   EditorState.allowMultipleSelections.of(true),
   indentOnInput(),
-  imarkdown,
+  themePlugin.of([]),
   bracketMatching(),
   closeBrackets(),
   rectangularSelection(),
