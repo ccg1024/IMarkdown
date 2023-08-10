@@ -43,7 +43,7 @@ const InternalSideNav: ForwardRefRenderFunction<
   return (
     <Box
       ref={ref}
-      backgroundColor={useColorModeValue('#171920', 'blackAlpha.400')}
+      backgroundColor={useColorModeValue('#171920', '#202124')}
       color={useColorModeValue('gray.300', 'gray.300')}
       width="220px"
     >
@@ -120,15 +120,19 @@ type NavItemProps = {
 
 function NavItem(props: NavItemProps): JSX.Element {
   const { path, icon, children } = props
+  const colors = useColorModeValue(
+    'var(--chakra-colors-whiteAlpha-200)',
+    'var(--chakra-colors-blackAlpha-400)'
+  )
   return (
     <>
       <Global
         styles={{
           '.active-side-nav': {
-            backgroundColor: 'var(--chakra-colors-whiteAlpha-200)'
+            backgroundColor: colors
           },
           '.no-active:hover': {
-            backgroundColor: 'var(--chakra-colors-whiteAlpha-200)'
+            backgroundColor: colors
           },
           '.nav-item': {
             display: 'block',
