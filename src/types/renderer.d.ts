@@ -34,9 +34,17 @@ export interface IElectronIPC {
   removeDirOpenListener: () => Promise<void>
 }
 
+const themeModels = ['light', 'dark'] as const
+export type ThemeModel = (typeof themeModels)[number]
+
+interface IMarkdown {
+  themeModel: ThemeModel
+}
+
 declare global {
   interface Window {
     ipcAPI: IElectronIPC
+    imarkdown: IMarkdown
   }
 }
 

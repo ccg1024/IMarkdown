@@ -50,6 +50,8 @@ const InternalEditor: ForwardRefRenderFunction<EditorRef, EditorProps> = (
   const currentFile = useRef<string>('')
   const { colorMode } = useColorMode()
 
+  window.imarkdown.themeModel = colorMode
+
   const handleEditorScroll = useCallback((e: UIEvent) => {
     if (controller.scrollBarTimer) {
       clearTimeout(controller.scrollBarTimer)

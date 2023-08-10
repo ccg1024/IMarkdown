@@ -3,6 +3,7 @@ import { languages } from '@codemirror/language-data'
 import type { Language, LanguageDescription } from '@codemirror/language'
 
 import { imarkdownSyntaxHighlighting } from '../plugins/theme/imarkdown'
+import { imarkdownDarkSyntaxHighlighting } from '../plugins/theme/imarkdown-dark'
 
 type RunModeCallback = (
   text: string,
@@ -18,7 +19,11 @@ function runmode(
 ): void {
   const tree = language.parser.parse(textContent)
   let pos = 0
-  highlightTree(tree, imarkdownSyntaxHighlighting, (from, to, classes) => {
+  const highlighter =
+    window.imarkdown.themeModel === 'light'
+      ? imarkdownSyntaxHighlighting
+      : imarkdownDarkSyntaxHighlighting
+  highlightTree(tree, highlighter, (from, to, classes) => {
     if (from > pos) {
       callback(textContent.slice(pos, from), null, pos, from)
     }

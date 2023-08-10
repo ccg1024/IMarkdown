@@ -24,7 +24,7 @@ const IconBox: FC<IconBoxProps> = (props): JSX.Element => {
       backgroundColor={useColorModeValue('white', 'black')}
       _hover={{
         cursor: 'pointer',
-        backgroundColor: useColorModeValue('gray.200', 'gray.200')
+        backgroundColor: useColorModeValue('gray.200', 'whiteAlpha.200')
       }}
     >
       {props.children}

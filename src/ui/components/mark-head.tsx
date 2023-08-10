@@ -65,6 +65,13 @@ const MarkHeadInfo: FC = (): JSX.Element => {
   const noteDesc = headInfo.desc || ''
   const noteTag: string[] = headInfo.tag ? getArrayTag(headInfo.tag) : []
 
+  const colors = {
+    tagColor: useColorModeValue(
+      'lightgray',
+      'var(--chakra-colors-blackAlpha-400)'
+    )
+  }
+
   const makeChange = () => {
     if (!recentFiles[currentFile].isChange) {
       reduxDispatch(
@@ -117,7 +124,7 @@ const MarkHeadInfo: FC = (): JSX.Element => {
         {noteTag.map((tag, index) => (
           <MarkTag key={index}>{tag}</MarkTag>
         ))}
-        <MarkTag color="gray" style={{ backgroundColor: 'lightgray' }}>
+        <MarkTag color="gray" style={{ backgroundColor: colors.tagColor }}>
           add Tag
         </MarkTag>
       </Box>

@@ -178,7 +178,7 @@ export function RemarkCodePre(props: any): JSX.Element {
       data-endline={props.node && getEndLine(props.node)}
       boxSizing="border-box"
       padding={2}
-      backgroundColor={useColorModeValue('#CCCCCC22', '#CCCCCC22')}
+      backgroundColor={useColorModeValue('#CCCCCC22', 'blackAlpha.400')}
       overflow="auto"
     >
       {props.children}

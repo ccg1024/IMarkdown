@@ -13,7 +13,8 @@ import {
   Flex,
   IconButton,
   Text,
-  useColorModeValue
+  useColorModeValue,
+  useColorMode
 } from '@chakra-ui/react'
 import { BsList, BsMarkdown, BsFileRichtext, BsFolder } from 'react-icons/bs'
 import { NavLink } from 'react-router-dom'
@@ -43,9 +44,10 @@ const InternalSideNav: ForwardRefRenderFunction<
   return (
     <Box
       ref={ref}
-      backgroundColor={useColorModeValue('#171920', '#202124')}
-      color={useColorModeValue('gray.300', 'gray.300')}
+      backgroundColor={useColorModeValue('#171920', 'blackAlpha.500')}
+      color={useColorModeValue('white', 'white')}
       width="220px"
+      backdropBlur="md"
     >
       <Global
         styles={{
@@ -95,7 +97,7 @@ const InternalSideNav: ForwardRefRenderFunction<
           _hover={{
             backgroundColor: useColorModeValue(
               'whiteAlpha.400',
-              'whiteAlpha.400'
+              'blackAlpha.400'
             )
           }}
         />
@@ -124,6 +126,7 @@ function NavItem(props: NavItemProps): JSX.Element {
     'var(--chakra-colors-whiteAlpha-200)',
     'var(--chakra-colors-blackAlpha-400)'
   )
+  const { colorMode } = useColorMode()
   return (
     <>
       <Global
@@ -151,7 +154,11 @@ function NavItem(props: NavItemProps): JSX.Element {
           isActive ? 'active-side-nav nav-item' : 'no-active nav-item'
         }
       >
-        <Flex gap={2} alignItems="center">
+        <Flex
+          gap={2}
+          alignItems="center"
+          fontWeight={colorMode === 'light' ? 'normal' : 'bold'}
+        >
           {icon && icon}
           {children}
         </Flex>

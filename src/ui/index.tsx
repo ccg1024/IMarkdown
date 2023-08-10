@@ -10,6 +10,11 @@ import theme from './libs/global'
 
 import '@fontsource/m-plus-rounded-1c'
 
+// mount a global object
+window.imarkdown = {
+  themeModel: 'light'
+}
+
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
   <ChakraProvider theme={theme}>

@@ -35,18 +35,18 @@ export const SideFileItemNew: React.FC<SideFileItemNewProps> = props => {
   return (
     <Box
       id={uuid}
-      borderBottom="1px"
+      borderBottom="2px"
       borderStyle="solid"
-      borderColor={useColorModeValue('gray.300', 'gray.500')}
+      borderColor={useColorModeValue('gray.300', 'whiteAlpha.400')}
       backgroundColor={useColorModeValue(
         isActive ? 'blue.500' : 'unset',
-        isActive ? 'gray.600' : 'unset'
+        isActive ? 'blackAlpha.800' : 'unset'
       )}
       onClick={isActive ? null : e => onClick(e.currentTarget.id)}
       _hover={{
         backgroundColor: useColorModeValue(
           isActive ? 'blue.500' : 'blue.50',
-          isActive ? 'gray.600' : 'gray.800'
+          isActive ? 'blackAlpha.800' : 'blackAlpha.700'
         ),
         cursor: 'pointer'
       }}

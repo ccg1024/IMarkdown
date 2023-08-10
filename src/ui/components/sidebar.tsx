@@ -66,7 +66,7 @@ const InternalSidebar: ForwardRefRenderFunction<
         height="100%"
         overflow="auto"
         className="hidde-scroll-bar"
-        backgroundColor={useColorModeValue('#F4F4F3', '#35363A')}
+        backgroundColor={useColorModeValue('#F4F4F3', 'blackAlpha.700')}
       >
         <Routes>
           <Route
@@ -107,7 +107,7 @@ function RouteItem({ title, children }: RouteItemProps): JSX.Element {
         position="sticky"
         zIndex={1}
         top={0}
-        backgroundColor="inherit"
+        backgroundColor="unset"
       >
         <Text
           as="h1"
