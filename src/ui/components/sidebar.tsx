@@ -98,16 +98,16 @@ interface RouteItemProps {
 
 function RouteItem({ title, children }: RouteItemProps): JSX.Element {
   return (
-    <>
+    <Box display="flex" flexDirection="column" height="inherit">
       <Flex
         alignItems="center"
         justifyContent="center"
         flexDirection="column"
         paddingBottom={4}
-        position="sticky"
         zIndex={1}
-        top={0}
         backgroundColor="unset"
+        flexShrink={0}
+        flexGrow={0}
       >
         <Text
           as="h1"
@@ -138,8 +138,16 @@ function RouteItem({ title, children }: RouteItemProps): JSX.Element {
           <BsSearch />
         </Box>
       </Flex>
-      {children}
-    </>
+      <Box
+        flexGrow={1}
+        overflow="auto"
+        display="flex"
+        flexDirection="column"
+        className="hidde-scroll-bar"
+      >
+        {children}
+      </Box>
+    </Box>
   )
 }
 

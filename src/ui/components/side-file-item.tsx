@@ -40,13 +40,13 @@ export const SideFileItemNew: React.FC<SideFileItemNewProps> = props => {
       borderColor={useColorModeValue('gray.300', 'whiteAlpha.400')}
       backgroundColor={useColorModeValue(
         isActive ? 'blue.500' : 'unset',
-        isActive ? 'blackAlpha.800' : 'unset'
+        isActive ? 'whiteAlpha.200' : 'unset'
       )}
       onClick={isActive ? null : e => onClick(e.currentTarget.id)}
       _hover={{
         backgroundColor: useColorModeValue(
           isActive ? 'blue.500' : 'blue.50',
-          isActive ? 'blackAlpha.800' : 'blackAlpha.700'
+          isActive ? 'whiteAlpha.200' : 'whiteAlpha.100'
         ),
         cursor: 'pointer'
       }}
@@ -67,7 +67,7 @@ export const SideFileItemNew: React.FC<SideFileItemNewProps> = props => {
           justifyContent="space-between"
           width="100%"
         >
-          <Tooltip label={name} placement="auto">
+          <Tooltip label={name} placement="auto" openDelay={1000}>
             <Heading
               width="100%"
               overflow="hidden"

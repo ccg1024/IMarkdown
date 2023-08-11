@@ -127,6 +127,12 @@ function NavItem(props: NavItemProps): JSX.Element {
     'var(--chakra-colors-blackAlpha-400)'
   )
   const { colorMode } = useColorMode()
+  const customStyle = (isActive: boolean) => {
+    const notActive = 'no-active nav-item'
+    const active = 'active-side-nav nav-item'
+    // active = colorMode === 'dark' ? active + ' active-border' : active
+    return isActive ? active : notActive
+  }
   return (
     <>
       <Global
@@ -148,12 +154,7 @@ function NavItem(props: NavItemProps): JSX.Element {
           }
         }}
       />
-      <NavLink
-        to={path}
-        className={({ isActive }) =>
-          isActive ? 'active-side-nav nav-item' : 'no-active nav-item'
-        }
-      >
+      <NavLink to={path} className={({ isActive }) => customStyle(isActive)}>
         <Flex
           gap={2}
           alignItems="center"
