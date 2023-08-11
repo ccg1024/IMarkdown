@@ -1,4 +1,4 @@
-import { ipcMain, IpcMainEvent } from 'electron'
+import { app, ipcMain, IpcMainEvent } from 'electron'
 import fs from 'fs'
 import path from 'path'
 
@@ -21,6 +21,7 @@ export function mountIPC() {
 
   ipcMain.handle(ipcConfig.GET_CONFIG, handleAppConfig)
   ipcMain.handle(ipcConfig.INIT_RENDERER, handleTouchFile)
+  ipcMain.handle(ipcConfig.GET_VERSION, handleGetVersion)
 
   // listen info from renderer
   ipcMain.on(ipcConfig.SAVE_CONTENT, handleContentSave)
@@ -32,6 +33,10 @@ export function mountIPC() {
   ipcMain.on(ipcConfig.CLOSE_WINDOW, handleCloseWindow)
   ipcMain.on(ipcConfig.MINIMIZE_WINDOW, handleMinWindow)
   ipcMain.on(ipcConfig.MAXIMIZE_WINDOW, handleMaxWindow)
+
+  async function handleGetVersion() {
+    return app.getVersion()
+  }
 
   async function handleAppConfig() {
     const fileContent = fs.readFileSync(

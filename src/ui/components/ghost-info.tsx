@@ -1,4 +1,4 @@
-import { FC, ReactNode } from 'react'
+import { FC, ReactNode, useEffect, useState } from 'react'
 import { Box, Text, useColorModeValue } from '@chakra-ui/react'
 
 interface GhostTextProps {
@@ -18,6 +18,10 @@ const GhostText: FC<GhostTextProps> = (props): JSX.Element => {
 }
 
 const GhostInfo: FC = (): JSX.Element => {
+  const [version, setVersion] = useState<string>('1.0.0')
+  useEffect(() => {
+    window.ipcAPI.getVersion().then(v => setVersion(v))
+  }, [])
   return (
     <Box
       position="absolute"
@@ -26,7 +30,7 @@ const GhostInfo: FC = (): JSX.Element => {
       left="50%"
       transform="translate(-50%, -50%)"
     >
-      <GhostText>IMarkdown -v 2.0.0</GhostText>
+      <GhostText>IMarkdown -v {version}</GhostText>
       <GhostText>
         This is a personal hobby project, using Electron and ReactJS to build a
         cross-platform markdown editor

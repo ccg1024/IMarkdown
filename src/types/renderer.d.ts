@@ -14,6 +14,7 @@ export interface IElectronIPC {
   vimOption: (option: VimOptionIPC) => Promise<void>
   initRenderer: () => Promise<FileToken>
   getPlatform: () => string
+  getVersion: () => Promise<string>
 
   updateDocCache: (update: UpdateFileData) => Promise<void>
   updateHeader: (update: UpdateFileData) => Promise<void>

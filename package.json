@@ -1,7 +1,7 @@
 {
   "name": "imarkdown",
   "productName": "imarkdown",
-  "version": "1.0.0",
+  "version": "4.0.1",
   "description": "personal markdown editor build with electron and react",
   "main": ".webpack/main",
   "scripts": {

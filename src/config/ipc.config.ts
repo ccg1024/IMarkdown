@@ -10,6 +10,7 @@ const ipcConfig = {
   GET_CONFIG: 'get_config', //configPathChannel
   VIM_OPTION: 'vim_option', //vimOptionChannel
   INIT_RENDERER: 'init_renderer', //initialedRender
+  GET_VERSION: 'get_version',
 
   SAVE_CONTENT: 'save_content', //reciveContentChannel
   UPDATE_DOC_CACHE: 'update_doc_cache', //updateCacheFromReact
