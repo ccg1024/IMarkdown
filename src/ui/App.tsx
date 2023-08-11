@@ -20,7 +20,7 @@ import MarkHeadInfo from './components/mark-head'
 import pubsubConfig from '../config/pubsub.config'
 import imardownPlugins from '../config/plugin-list.config'
 import { concatHeaderAndContent } from './libs/tools'
-import { HeadInfo } from '../types/main'
+import { MarkFile, OpenFileType } from '../types'
 import { updateFileContent, updateFile } from './app/reducers/fileContentSlice'
 import {
   updateFileIsChange,
@@ -33,16 +33,8 @@ import HeadNav from './components/head-nav'
 import { didModified, getCurrentFile, getDoc, getMarkHead } from './app/store'
 import ipcConfig from '../config/ipc.config'
 import formateContent from './libs/formate-content'
-import { MarkFile } from '../window/tools'
 import { updateDirlist } from './app/reducers/dirlistSlice'
-import { OpenFileType } from '../window/menu/menu-callback'
 import Message, { MessageRefMethod } from './components/message'
-
-interface FileToken {
-  fullpath: string
-  fileContent: string
-  headInfo: HeadInfo
-}
 
 type UpdateGate = {
   isChangeGate: boolean
@@ -83,7 +75,7 @@ const App: FC = (): JSX.Element => {
     setShowEditor(true)
     setShowPreview(false)
   }, [])
-  const toggleView = useCallback((_: any, value: number) => {
+  const toggleView = useCallback((_: IpcRendererEvent, value: number) => {
     switch (value) {
       case 1:
         if (uiControl.current) {
@@ -118,12 +110,12 @@ const App: FC = (): JSX.Element => {
     }
   }, [])
 
-  const handleDirOpen = useCallback((_: any, markFile: MarkFile[]) => {
+  const handleDirOpen = (_: IpcRendererEvent, markFile: MarkFile[]) => {
     dispatch(updateDirlist(markFile))
     navigate('main_window/folder')
-  }, [])
+  }
 
-  const handleFileOpen = (_: any, openFileInfo: OpenFileType) => {
+  const handleFileOpen = (_: IpcRendererEvent, openFileInfo: OpenFileType) => {
     // update old file cache before toggle to new file
     // when file was modified
     const isModified = didModified()

@@ -3,8 +3,9 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron'
 import ipcConfig from './config/ipc.config'
 import { VimOptionIPC } from './config/vim-option.config'
-import { UpdateFileData } from './window/menu/menu-callback'
+import { UpdateFileData, ConfigFile, FileToken } from 'src/types'
 
+// eslint-disable-next-line
 type CallbackFunction = (event: IpcRendererEvent, ...args: any[]) => void
 
 // Expose protected methods that allow the renderer process to use
@@ -28,13 +29,13 @@ contextBridge.exposeInMainWorld('ipcAPI', {
     ipcRenderer.on(ipcConfig.OPEN_DIR, callback)
   },
 
-  getConfig: (): Promise<any> => {
+  getConfig: (): Promise<ConfigFile> => {
     return ipcRenderer.invoke(ipcConfig.GET_CONFIG)
   },
   vimOption: (option: VimOptionIPC) => {
     ipcRenderer.invoke(ipcConfig.VIM_OPTION, option)
   },
-  initRenderer: (): Promise<any> => {
+  initRenderer: (): Promise<FileToken> => {
     return ipcRenderer.invoke(ipcConfig.INIT_RENDERER)
   },
   getPlatform: (): string => process.platform,

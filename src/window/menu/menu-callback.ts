@@ -6,10 +6,10 @@ import fs from 'fs'
 import matter from 'gray-matter'
 import { BrowserWindow, MenuItem, KeyboardEvent } from 'electron'
 
-import { HeadInfo } from 'src/types/main'
+import { HeadInfo, MarkFile, FileData, OpenFileType } from 'src/types'
 import ipcConfig from 'src/config/ipc.config'
 import { fileOpenDialog, createFileDialog, dirOpenDialog } from '../dialog'
-import { getMarkFiles, getMarkFile, getTempMarkFile, MarkFile } from '../tools'
+import { getMarkFiles, getMarkFile, getTempMarkFile } from '../tools'
 import {
   touchFileCache,
   touchCurrentFile,
@@ -18,42 +18,12 @@ import {
   hasCache
 } from 'src/index'
 
-export type FileData = {
-  headInfo: HeadInfo
-  content: string
-  isChange: boolean
-  scrollPos?: number
-}
-
-export type OpenFileType = {
-  fileInfo: MarkFile
-  fileData: FileData
-}
-
-export type UpdateFileType = {
-  fileInfo?: Partial<MarkFile>
-  fileData?: Partial<FileData>
-}
-
-export type FileCache = {
-  [key: string]: OpenFileType
-} & Object
-
-export type UpdateFileData = {
-  filepath: string
-  fileData: Partial<Omit<FileData, 'isChange'>>
-}
-
 export async function dirOpenCallback() {
   const dirPath = await dirOpenDialog()
 
   if (dirPath) {
-    try {
-      const markFile = await getMarkFiles(dirPath)
-      return markFile
-    } catch (err) {
-      throw err
-    }
+    const markFile = await getMarkFiles(dirPath)
+    return markFile
   }
 }
 
@@ -72,23 +42,19 @@ export async function fileOpenCallback(path?: string): Promise<OpenFileType> {
       fileInfo = fileCache[filepath].fileInfo
       fileData = fileCache[filepath].fileData
     } else {
-      try {
-        fileInfo = await getMarkFile(filepath)
+      fileInfo = await getMarkFile(filepath)
 
-        const fileContent = fs.readFileSync(filepath, 'utf8')
-        const parseContent = matter(fileContent)
-        const headInfo = parseContent.data as HeadInfo
+      const fileContent = fs.readFileSync(filepath, 'utf8')
+      const parseContent = matter(fileContent)
+      const headInfo = parseContent.data as HeadInfo<string>
 
-        fileData = {
-          headInfo,
-          content: parseContent.content,
-          isChange: false,
-          scrollPos: undefined
-        }
-        addFileCache(filepath, { fileInfo, fileData })
-      } catch (err) {
-        throw err
+      fileData = {
+        headInfo,
+        content: parseContent.content,
+        isChange: false,
+        scrollPos: undefined
       }
+      addFileCache(filepath, { fileInfo, fileData })
     }
 
     return {
@@ -99,11 +65,7 @@ export async function fileOpenCallback(path?: string): Promise<OpenFileType> {
 }
 
 export async function saveFileCallback(win: BrowserWindow, filepath: string) {
-  try {
-    win?.webContents.send(ipcConfig.SAVE_FILE, filepath)
-  } catch (err) {
-    throw err
-  }
+  win?.webContents.send(ipcConfig.SAVE_FILE, filepath)
 }
 
 export async function createFileCallback(): Promise<OpenFileType> {
@@ -133,6 +95,7 @@ export async function createFileCallback(): Promise<OpenFileType> {
 export async function openFileWrapper(
   _menuItem: MenuItem,
   win: BrowserWindow,
+  // eslint-disable-next-line
   _event: KeyboardEvent
 ) {
   fileOpenCallback()
@@ -149,6 +112,7 @@ export async function openFileWrapper(
 export async function saveFileWrapper(
   _menuItem: MenuItem,
   win: BrowserWindow,
+  // eslint-disable-next-line
   _event: KeyboardEvent
 ) {
   const filepath = touchCurrentFile()
@@ -163,6 +127,7 @@ export async function saveFileWrapper(
 export async function createFileWrapper(
   _menuItem: MenuItem,
   win: BrowserWindow,
+  // eslint-disable-next-line
   _event: KeyboardEvent
 ) {
   createFileCallback()
@@ -179,6 +144,7 @@ export async function createFileWrapper(
 export async function openDirWrapper(
   _menuItem: MenuItem,
   win: BrowserWindow,
+  // eslint-disable-next-line
   _event: KeyboardEvent
 ) {
   dirOpenCallback()
@@ -202,6 +168,7 @@ export async function viewController(
 export async function formatContentWrapper(
   _menuItem: MenuItem,
   win: BrowserWindow,
+  // eslint-disable-next-line
   _event: KeyboardEvent
 ) {
   win?.webContents.send(ipcConfig.FORMAT_FILE)

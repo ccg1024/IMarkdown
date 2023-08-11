@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron'
+import { ipcMain, IpcMainEvent } from 'electron'
 import fs from 'fs'
 import path from 'path'
 
@@ -11,16 +11,10 @@ import {
   hasCache
 } from 'src/index'
 import ipcConfig from 'src/config/ipc.config'
-import { fileOpenCallback, UpdateFileData } from './menu/menu-callback'
+import { fileOpenCallback } from './menu/menu-callback'
 import { existProp } from './tools'
-import { HeadInfo } from 'src/types/main'
 
-export type SaveToken = {
-  headInfo: HeadInfo
-  content: string
-  doc: string
-  filepath: string
-}
+import { UpdateFileData, SaveToken } from 'src/types'
 
 export function mountIPC() {
   const { logDir, logName, configDir, configName } = touchEnvName()
@@ -40,18 +34,14 @@ export function mountIPC() {
   ipcMain.on(ipcConfig.MAXIMIZE_WINDOW, handleMaxWindow)
 
   async function handleAppConfig() {
-    try {
-      return fs.readFileSync(path.join(configDir, configName), 'utf8')
-    } catch (err) {
-      throw err
-    }
+    return fs.readFileSync(path.join(configDir, configName), 'utf8')
   }
 
   function log(filepath: string) {
     return `[LOG] ${new Date().toLocaleString()} - ${filepath} - save content\n`
   }
 
-  async function handleContentSave(_e: any, saveToken: SaveToken) {
+  async function handleContentSave(_e: IpcMainEvent, saveToken: SaveToken) {
     const { filepath, headInfo, content, doc } = saveToken
     fs.writeFile(filepath, content, err => {
       if (err) throw err
@@ -70,7 +60,7 @@ export function mountIPC() {
     })
   }
 
-  async function handleDirItemClick(_e: any, filepath: string) {
+  async function handleDirItemClick(_e: IpcMainEvent, filepath: string) {
     if (filepath) {
       fileOpenCallback(filepath)
         .then(file => {
@@ -84,7 +74,7 @@ export function mountIPC() {
         })
     }
   }
-  async function handleRencentFile(_: any, filepath: string) {
+  async function handleRencentFile(_: IpcMainEvent, filepath: string) {
     const fileCacheItem = touchFileCacheItem(filepath)
 
     if (fileCacheItem) {
@@ -92,7 +82,7 @@ export function mountIPC() {
       setCurrentFile(filepath)
     }
   }
-  async function handleUpdateDoc(_: any, update: UpdateFileData) {
+  async function handleUpdateDoc(_: IpcMainEvent, update: UpdateFileData) {
     const { filepath, fileData } = update
     const cached = hasCache(filepath)
     if (filepath && existProp(fileData, 'content') && cached) {
@@ -104,7 +94,7 @@ export function mountIPC() {
       })
     }
   }
-  async function handleUpdateHeader(_: any, update: UpdateFileData) {
+  async function handleUpdateHeader(_: IpcMainEvent, update: UpdateFileData) {
     const { filepath, fileData } = update
     const cached = hasCache(filepath)
     if (filepath && existProp(fileData, 'headInfo') && cached) {
@@ -116,7 +106,7 @@ export function mountIPC() {
       })
     }
   }
-  async function handleUpdateScroll(_: any, update: UpdateFileData) {
+  async function handleUpdateScroll(_: IpcMainEvent, update: UpdateFileData) {
     const { filepath, fileData } = update
     const cached = hasCache(filepath)
     if (filepath && existProp(fileData, 'scrollPos') && cached) {

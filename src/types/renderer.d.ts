@@ -1,18 +1,18 @@
-import { UpdateFileData } from '../window/menu/menu-callbakc'
+import { UpdateFileData } from '../window/menu/menu-callback'
 import { VimOptionIPC } from '../config/vim-option.config'
-import { HeadInfo } from './main'
+import { ThemeModel, FileToken, ConfigFile } from '.'
 
 export interface IElectronIPC {
-  listenFileOpen: (callback: Function) => Promise<void>
-  listenFileSave: (callback: Function) => Promise<void>
-  listenToggleView: (callback: Function) => Promise<void>
-  listenSendSaveInfo: (callback: Function) => Promise<void>
-  listenFormatFile: (callback: Function) => Promise<void>
-  listenOpenDir: (callback: Function) => Promise<void>
+  listenFileOpen: (callback: (...args) => void) => Promise<void>
+  listenFileSave: (callback: (...args) => void) => Promise<void>
+  listenToggleView: (callback: (...args) => void) => Promise<void>
+  listenSendSaveInfo: (callback: (...args) => void) => Promise<void>
+  listenFormatFile: (callback: (...args) => void) => Promise<void>
+  listenOpenDir: (callback: (...args) => void) => Promise<void>
 
-  getConfig: () => Promise<any>
+  getConfig: () => Promise<ConfigFile>
   vimOption: (option: VimOptionIPC) => Promise<void>
-  initRenderer: () => Promise<any>
+  initRenderer: () => Promise<FileToken>
   getPlatform: () => string
 
   updateDocCache: (update: UpdateFileData) => Promise<void>
@@ -34,9 +34,6 @@ export interface IElectronIPC {
   removeDirOpenListener: () => Promise<void>
 }
 
-const themeModels = ['light', 'dark'] as const
-export type ThemeModel = (typeof themeModels)[number]
-
 interface IMarkdown {
   themeModel: ThemeModel
 }
@@ -46,26 +43,4 @@ declare global {
     ipcAPI: IElectronIPC
     imarkdown: IMarkdown
   }
-}
-
-export interface ScrollPosRef {
-  editorScrollTo: number
-  previewScrollTo: number
-  scrollTopOfPreview: number
-}
-
-export interface LineOfStatusLine {
-  current: number
-  total: number
-}
-
-export interface LiveScroll {
-  line: number
-  percent: number
-}
-
-export interface EditorConfig {
-  doc: string
-  file: string
-  scrollPos?: number
 }

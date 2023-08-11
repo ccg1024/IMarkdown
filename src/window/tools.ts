@@ -4,26 +4,16 @@ import readline from 'readline'
 import { mkdir, stat, readdir } from 'fs/promises'
 import type { MessageBoxSyncOptions } from 'electron'
 
+import { MarkFile } from 'src/types'
+
 interface DefaultAppDirectory {
   configDir: string
   logDir: string
 }
 
-export type MarkFile = {
-  id: string // absolute path of file
-  size: string
-  time: string
-  name: string
-  firstLine?: string
-}
-
 export const createDirectory = async (path: string): Promise<void> => {
-  try {
-    if (!fs.existsSync(path)) {
-      await mkdir(path, { recursive: true })
-    }
-  } catch (error) {
-    throw error
+  if (!fs.existsSync(path)) {
+    await mkdir(path, { recursive: true })
   }
 }
 
@@ -94,8 +84,8 @@ export async function getFileFirstLine(filepath: string): Promise<string> {
   let result = ''
   let lineCnt = 0
   let frontMatterCnt = 0
-  let frontMatterExp = /^---/
-  let MAX_LINE = 10
+  const frontMatterExp = /^---/
+  const MAX_LINE = 10
 
   for await (const line of rl) {
     if (lineCnt >= MAX_LINE) {
@@ -180,10 +170,18 @@ export function getMarkdownFile(dirPath: string): MarkFile[] {
   return markFile
 }
 
-export function existProp(obj: any, p: string) {
+export function existProp(obj: Record<string, unknown>, p: string) {
   if (typeof obj === 'object') {
     return obj[p] !== null && obj[p] !== undefined
   }
 
   throw new Error('function existProp can just using for normal object')
+}
+
+// iterative assignment for objects of custom types
+// for security reason, starting from version 3.5, ts cannot directly use loop
+// to assign values to union types
+// https://stackoverflow.com/questions/63118414/type-error-when-trying-to-assign-to-object-copy
+export function copyProp<T, K extends keyof T>(dist: T, src: T, key: K) {
+  dist[key] = src[key]
 }
