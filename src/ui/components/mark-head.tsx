@@ -73,13 +73,14 @@ const MarkHeadInfo: FC = (): JSX.Element => {
   }
 
   const makeChange = () => {
-    if (!recentFiles[currentFile].isChange) {
+    if (!window.imarkdown.didModified) {
       reduxDispatch(
         updateFileIsChange({
           filepath: currentFile,
           isChange: true
         })
       )
+      window.imarkdown.didModified = true
     }
   }
   const updateFun = (headInfo: HeadInfo<string>) => {

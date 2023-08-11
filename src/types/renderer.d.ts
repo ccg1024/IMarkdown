@@ -36,6 +36,7 @@ export interface IElectronIPC {
 
 interface IMarkdown {
   themeModel: ThemeModel
+  didModified: boolean // Determine whether the editor object modifies the document this time
 }
 
 declare global {

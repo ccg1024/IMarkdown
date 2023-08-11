@@ -30,19 +30,11 @@ import { updateCurrentFile } from './app/reducers/currentFileSlice'
 import InterIcon from './components/interIcon'
 import Sidebar, { SideBarRef } from './components/sidebar'
 import HeadNav from './components/head-nav'
-import { didModified, getCurrentFile, getDoc, getMarkHead } from './app/store'
+import { getCurrentFile, getDoc, getMarkHead } from './app/store'
 import ipcConfig from '../config/ipc.config'
 import formateContent from './libs/formate-content'
 import { updateDirlist } from './app/reducers/dirlistSlice'
 import Message, { MessageRefMethod } from './components/message'
-
-type UpdateGate = {
-  isChangeGate: boolean
-}
-
-const updateGate: UpdateGate = {
-  isChangeGate: false
-}
 
 const App: FC = (): JSX.Element => {
   const [showEditor, setShowEditor] = useState<boolean>(false)
@@ -116,10 +108,9 @@ const App: FC = (): JSX.Element => {
   }
 
   const handleFileOpen = (_: IpcRendererEvent, openFileInfo: OpenFileType) => {
-    // update old file cache before toggle to new file
+    // update old file cache before toggle to other file
     // when file was modified
-    const isModified = didModified()
-    if (isModified) {
+    if (window.imarkdown.didModified) {
       const header = getMarkHead()
       const doc = getDoc()
       const currentFile = getCurrentFile()
@@ -147,8 +138,7 @@ const App: FC = (): JSX.Element => {
       updateRecentFiles({
         filepath: fileInfo.id,
         fileInfo: fileInfo,
-        isChange: fileData.isChange,
-        didModified: false
+        isChange: fileData.isChange
       })
     )
     dispatch(updateCurrentFile(openFileInfo.fileInfo.id))
@@ -163,7 +153,8 @@ const App: FC = (): JSX.Element => {
       file: fileInfo.id,
       scrollPos: fileData.scrollPos && fileData.scrollPos
     })
-    updateGate.isChangeGate = false
+    // reset modified flag when open file
+    window.imarkdown.didModified = false
   }
 
   // check if file is loaded
@@ -217,7 +208,8 @@ const App: FC = (): JSX.Element => {
               isChange: false
             })
           )
-          updateGate.isChangeGate = false
+          // reset modified flag when save current file
+          window.imarkdown.didModified = false
           if (messageRef) {
             messageRef.current.showMessage(`${path}`)
           }
@@ -256,10 +248,11 @@ const App: FC = (): JSX.Element => {
       () => {
         const editorFile = editorRef.current?.getFileName()
 
-        // update file change
-        if (editorFile && !updateGate.isChangeGate) {
+        // update file change and recorde the doc is change
+        // and need update cache before toggle file (or create new editor)
+        if (editorFile && !window.imarkdown.didModified) {
           dispatch(updateFileIsChange({ filepath: editorFile, isChange: true }))
-          updateGate.isChangeGate = true
+          window.imarkdown.didModified = true
         }
 
         // update file content
