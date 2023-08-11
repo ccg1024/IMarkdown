@@ -15,7 +15,7 @@ import {
 } from '@chakra-ui/react'
 
 import pubsubConfig from '../../config/pubsub.config'
-import { LineOfStatusLine } from '../../types/renderer'
+import { LineOfStatusLine } from 'src/types'
 
 function getCurrentTime(): string {
   const date = new Date()
@@ -65,6 +65,7 @@ const StatusLine = (): JSX.Element => {
   }, [])
 
   useEffect(() => {
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     window.ipcAPI.listenSendSaveInfo((_event: any, info: string, err: any) => {
       if (err) {
         setMessage([info, '[GotError]', err, getCurrentTime()].join(' '))

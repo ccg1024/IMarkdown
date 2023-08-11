@@ -15,7 +15,6 @@ import {
   EditorView,
   lineNumbers,
   drawSelection,
-  crosshairCursor,
   highlightActiveLine,
   rectangularSelection,
   highlightSpecialChars,
@@ -26,11 +25,7 @@ import {
   indentOnInput,
   bracketMatching
 } from '@codemirror/language'
-import {
-  closeBrackets,
-  completionKeymap,
-  closeBracketsKeymap
-} from '@codemirror/autocomplete'
+import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete'
 
 import pubsubConfig from '../../config/pubsub.config'
 

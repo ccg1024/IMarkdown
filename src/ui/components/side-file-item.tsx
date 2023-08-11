@@ -19,7 +19,7 @@ type SideFileItemNewProps = {
   size?: string
   isChange: boolean
   isActive: boolean
-  onClick: Function
+  onClick: (filepath: string) => void
 } & Omit<React.HTMLAttributes<HTMLDivElement>, 'onClick'>
 
 export const SideFileItemNew: React.FC<SideFileItemNewProps> = props => {

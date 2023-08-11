@@ -20,7 +20,7 @@ import MarkHeadInfo from './components/mark-head'
 import pubsubConfig from '../config/pubsub.config'
 import imardownPlugins from '../config/plugin-list.config'
 import { concatHeaderAndContent } from './libs/tools'
-import { MarkFile, OpenFileType } from '../types'
+import { ConfigFile, MarkFile, OpenFileType } from '../types'
 import { updateFileContent, updateFile } from './app/reducers/fileContentSlice'
 import {
   updateFileIsChange,
@@ -247,14 +247,7 @@ const App: FC = (): JSX.Element => {
   useEffect(() => {
     function updateContent() {
       const editorContent = editorRef.current?.getDoc()
-      const filepath = editorRef.current.getFileName()
       dispatch(updateFileContent(editorContent))
-      // NOTE: unnecessary updates
-      // just need update cache when save file and toggle file
-      // window.ipcAPI.updateDocCache({
-      //   filepath: filepath,
-      //   fileData: { content: editorContent }
-      // })
     }
     // const updateContentDebounce = _.debounce(updateContent, 300)
 
@@ -282,32 +275,27 @@ const App: FC = (): JSX.Element => {
 
   // config setting
   useLayoutEffect(() => {
-    window.ipcAPI.getConfig().then((result: string) => {
-      try {
-        const settings = JSON.parse(result)
-        const editor = document.querySelector('#editor_box') as HTMLDivElement
-        const root = document.querySelector('#content_root') as HTMLDivElement
+    window.ipcAPI.getConfig().then((settings: ConfigFile) => {
+      const editor = document.querySelector('#editor_box') as HTMLDivElement
+      const root = document.querySelector('#content_root') as HTMLDivElement
 
-        for (const name in settings) {
-          switch (name) {
-            case 'fontSize':
-              root.style.fontSize = settings[name]
-              break
-            case 'editorFontFamily':
-              editor.style.fontFamily = settings[name]
-              break
-            case 'previewFontFamily':
-              root.style.fontFamily = settings[name]
-              break
-            case 'vimSupport':
-              PubSub.publish(pubsubConfig.UPDATE_DYNAMIC_PLUGINS, {
-                [imardownPlugins.VIM]: settings[name]
-              })
-              break
-          }
+      for (const name in settings) {
+        switch (name) {
+          case 'fontSize':
+            root.style.fontSize = settings[name]
+            break
+          case 'editorFontFamily':
+            editor.style.fontFamily = settings[name]
+            break
+          case 'previewFontFamily':
+            root.style.fontFamily = settings[name]
+            break
+          case 'vimSupport':
+            PubSub.publish(pubsubConfig.UPDATE_DYNAMIC_PLUGINS, {
+              [imardownPlugins.VIM]: settings[name]
+            })
+            break
         }
-      } catch (err) {
-        throw err
       }
     })
   }, [])

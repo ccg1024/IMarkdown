@@ -18,6 +18,7 @@ import {
   Divider
 } from '@chakra-ui/react'
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 function getStartLine(node: any) {
   return node.position?.start.line
 }

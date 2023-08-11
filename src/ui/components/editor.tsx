@@ -12,11 +12,9 @@ import {
 } from 'react'
 import { vim } from '@replit/codemirror-vim'
 
-import { LiveScroll, EditorConfig } from '../../types/renderer'
-import pubsubConfig from '../../config/pubsub.config'
-import imardownPlugins, {
-  ImarkdownPlugin
-} from '../../config/plugin-list.config'
+import { LiveScroll, EditorConfig } from 'src/types'
+import pubsubConfig from 'src/config/pubsub.config'
+import imardownPlugins, { ImarkdownPlugin } from 'src/config/plugin-list.config'
 import generateState, { vimPlugin, themePlugin } from '../libs/generate-state'
 import { imarkdown } from '../plugins/theme/imarkdown'
 import { imarkdownDark } from '../plugins/theme/imarkdown-dark'

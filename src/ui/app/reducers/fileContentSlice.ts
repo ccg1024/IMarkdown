@@ -1,10 +1,11 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
-import { HeadInfo } from '../../../types/main'
+import { HeadInfo } from 'src/types'
+import { copyProp } from 'src/ui/libs/tools'
 import { RootState } from '../store'
 
 export type FileContentType = {
   content: string
-  headinfo: HeadInfo
+  headinfo: HeadInfo<string>
 }
 
 interface FileContentState {
@@ -28,10 +29,11 @@ export const fileContentSlice = createSlice({
     updateFileContent: (state, action: PayloadAction<string>) => {
       state.value.content = action.payload
     },
-    updateFileHeadInfo: (state, action: PayloadAction<HeadInfo>) => {
-      let key: keyof HeadInfo
+    updateFileHeadInfo: (state, action: PayloadAction<HeadInfo<string>>) => {
+      let key: keyof HeadInfo<string>
       for (key in action.payload) {
-        state.value.headinfo[key] = action.payload[key]
+        // state.value.headinfo[key] = action.payload[key]
+        copyProp(state.value.headinfo, action.payload, key)
       }
     }
   }

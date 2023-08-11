@@ -57,9 +57,9 @@ const HeadNav: FC<HeadNavProps> = ({ isVisibale }): JSX.Element => {
         const headNavs = headRef.current.children
         let gate = false
         for (let idx = headNavs.length - 1; idx >= 0; idx--) {
-          let headNav = headNavs[idx]
+          const headNav = headNavs[idx]
           headNav.classList.remove('active-head-nav')
-          let lineData = (headNav as HTMLElement).dataset
+          const lineData = (headNav as HTMLElement).dataset
           if (lineData.line && Number(lineData.line) <= line && !gate) {
             headNav.classList.add('active-head-nav')
             headNav.scrollIntoView({ block: 'nearest' })

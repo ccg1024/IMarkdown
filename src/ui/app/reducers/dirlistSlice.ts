@@ -1,7 +1,7 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { RootState } from '../store'
 
-import { MarkFile } from '../../../window/tools'
+import { MarkFile } from 'src/types'
 
 export const dirlistSlice = createSlice({
   name: 'dirlist',

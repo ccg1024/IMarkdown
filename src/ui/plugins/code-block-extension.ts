@@ -53,9 +53,9 @@ const codeBlockHighlightPlugin = ViewPlugin.fromClass(
 )
 
 function newDeco(view: EditorView): DecorationSet {
-  let builder = new RangeSetBuilder<Decoration>()
+  const builder = new RangeSetBuilder<Decoration>()
 
-  for (let { from, to } of view.visibleRanges) {
+  for (const { from, to } of view.visibleRanges) {
     const tree = ensureSyntaxTree(view.state, to, 200)
     if (tree) {
       tree.iterate({
@@ -63,8 +63,8 @@ function newDeco(view: EditorView): DecorationSet {
         to,
         enter: node => {
           if (node.name == 'FencedCode') {
-            for (let pos = node.from; pos <= node.to; ) {
-              let line = view.state.doc.lineAt(pos)
+            for (let pos = node.from; pos <= node.to;) {
+              const line = view.state.doc.lineAt(pos)
               builder.add(line.from, line.from, codeBlockDeco)
               pos = line.to + 1
             }

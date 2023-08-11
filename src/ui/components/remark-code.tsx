@@ -23,6 +23,7 @@ const RemarkCode: React.FC<
         runmode(
           body as string,
           language,
+          // eslint-disable-next-line
           (text: string, style: string | null, _from: number, _to: number) => {
             tokens.push({ text, style })
           }

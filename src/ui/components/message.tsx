@@ -17,7 +17,7 @@ type NormalMessageProps = {
 type MessageProps = Partial<NormalMessageProps>
 
 export interface MessageRefMethod {
-  showMessage: Function
+  showMessage: (mess: string) => void
 }
 
 type CompoundedComponent = React.ForwardRefExoticComponent<
@@ -78,7 +78,7 @@ const InternalMessage: React.ForwardRefRenderFunction<
     [messagePrompt, isVisible]
   )
 
-  let messageNode = (
+  const messageNode = (
     <>
       <AnimatePresence mode="wait" initial={true}>
         {isVisible && (

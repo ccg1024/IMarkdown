@@ -4,7 +4,7 @@
 
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { RootState } from '../store'
-import { MarkFile } from '../../../window/tools'
+import { MarkFile } from 'src/types'
 
 export type RecentFilesPayload = {
   filepath: string

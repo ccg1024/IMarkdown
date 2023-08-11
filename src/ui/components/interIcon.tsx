@@ -37,29 +37,27 @@ const InterIcon: FC<Props> = props => {
   const timer = useRef<NodeJS.Timeout>(null)
 
   useEffect(() => {
-    if (interIconRef.current) {
-      const { current: container } = interIconRef
-
-      function mouseEnter() {
-        if (timer && timer.current) {
-          clearTimeout(timer.current)
-          timer.current = null
-        }
-        container.style.opacity = '1'
+    const { current: container } = interIconRef
+    function mouseEnter() {
+      if (timer && timer.current) {
+        clearTimeout(timer.current)
+        timer.current = null
       }
-      function mouseLeave() {
-        timer.current = setTimeout(() => {
-          container.style.opacity = '0'
-        }, 1000)
-      }
+      container.style.opacity = '1'
+    }
+    function mouseLeave() {
+      timer.current = setTimeout(() => {
+        container.style.opacity = '0'
+      }, 1000)
+    }
 
+    function clear() {
+      container.removeEventListener('mouseenter', mouseEnter)
+      container.removeEventListener('mouseleave', mouseLeave)
+    }
+    if (container) {
       container.addEventListener('mouseenter', mouseEnter)
       container.addEventListener('mouseleave', mouseLeave)
-
-      function clear() {
-        container.removeEventListener('mouseenter', mouseEnter)
-        container.removeEventListener('mouseleave', mouseLeave)
-      }
 
       return clear
     }

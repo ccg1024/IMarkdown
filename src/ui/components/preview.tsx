@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import PubSub from 'pubsub-js'
 import { Box } from '@chakra-ui/react'
 import React, {
@@ -24,7 +23,7 @@ import { useSelector } from 'react-redux'
 import * as remarkTags from './remark-tags'
 import RemarkCode from './remark-code'
 import pubsubConfig from '../../config/pubsub.config'
-import { LiveScroll } from '../../types/renderer'
+import { LiveScroll } from 'src/types'
 import { selectFileContent } from '../app/reducers/fileContentSlice'
 import '../css/scroll-style.css'
 
@@ -106,10 +105,10 @@ const Preview: React.FC<Props> = React.memo(props => {
               childDomIndx < domRef.current.children.length;
               childDomIndx++
             ) {
-              let childDom = domRef.current.children[
+              const childDom = domRef.current.children[
                 childDomIndx
               ] as HTMLElement
-              let lineDataSet = childDom.dataset as LineDataSet
+              const lineDataSet = childDom.dataset as LineDataSet
               if (
                 Number(lineDataSet.line) > scrollInfo.line ||
                 Number(lineDataSet.line) === scrollInfo.line
@@ -128,11 +127,11 @@ const Preview: React.FC<Props> = React.memo(props => {
                 Number(lineDataSet.endline) &&
                 Number(lineDataSet.endline) >= scrollInfo.line
               ) {
-                let totalRows =
+                const totalRows =
                   Number(lineDataSet.endline) - Number(lineDataSet.line) + 1
-                let elementHeight = childDom.offsetHeight
-                let offsetStart = scrollInfo.line - Number(lineDataSet.line)
-                let offsetFromTop = childDom.offsetTop
+                const elementHeight = childDom.offsetHeight
+                const offsetStart = scrollInfo.line - Number(lineDataSet.line)
+                const offsetFromTop = childDom.offsetTop
 
                 // domRef.current.scrollTop =
                 //   offsetFromTop -
@@ -198,7 +197,7 @@ const Preview: React.FC<Props> = React.memo(props => {
         if (
           parentScrollTop <=
           (domRef.current.children[0] as HTMLElement).offsetTop -
-            parentOffsetTop
+          parentOffsetTop
         ) {
           PubSub.publish(pubsubConfig.SYNC_SCROLL_FROM_PREVIEW, {
             line: 1,
@@ -209,31 +208,31 @@ const Preview: React.FC<Props> = React.memo(props => {
         }
 
         for (let idx = 0; idx < domRef.current.children.length; idx++) {
-          let childDom = domRef.current.children[idx] as HTMLElement
-          let nextChildDom =
+          const childDom = domRef.current.children[idx] as HTMLElement
+          const nextChildDom =
             idx !== domRef.current.children.length
               ? (domRef.current.children[idx + 1] as HTMLElement)
               : null
-          let childOffsetTop = childDom.offsetTop - parentOffsetTop
-          let childHeight = childDom.offsetHeight
+          const childOffsetTop = childDom.offsetTop - parentOffsetTop
+          const childHeight = childDom.offsetHeight
           if (
             parentScrollTop >= childOffsetTop &&
             nextChildDom &&
             parentScrollTop < nextChildDom.offsetTop - parentOffsetTop
           ) {
-            let lineDataSet = childDom.dataset as LineDataSet
-            let line = Number(lineDataSet.line)
+            const lineDataSet = childDom.dataset as LineDataSet
+            const line = Number(lineDataSet.line)
             if (lineDataSet.endline) {
-              let endline = Number(lineDataSet.endline)
-              let totalRows = endline - line + 1
-              let lineHeight = childHeight / totalRows
+              const endline = Number(lineDataSet.endline)
+              const totalRows = endline - line + 1
+              const lineHeight = childHeight / totalRows
               let row
               for (row = 0; row < totalRows; row++) {
                 if (
                   parentScrollTop >= childOffsetTop + row * lineHeight &&
                   parentScrollTop < childOffsetTop + (row + 1) * lineHeight
                 ) {
-                  let coveredPercent =
+                  const coveredPercent =
                     (parentScrollTop - (childOffsetTop + row * lineHeight)) /
                     lineHeight
                   PubSub.publish(pubsubConfig.SYNC_SCROLL_FROM_PREVIEW, {
@@ -251,7 +250,7 @@ const Preview: React.FC<Props> = React.memo(props => {
               }
               break
             } else {
-              let coveredPercent =
+              const coveredPercent =
                 (parentScrollTop - childOffsetTop) / childHeight
               PubSub.publish(pubsubConfig.SYNC_SCROLL_FROM_PREVIEW, {
                 line: line,
@@ -285,6 +284,7 @@ const Preview: React.FC<Props> = React.memo(props => {
 
 const PresentRehype: React.FC = React.memo(() => {
   const [content, setContent] = useState<React.ReactNode>()
+  // eslint-disable-next-line
   const [_, startTransition] = useTransition()
   const doc = useSelector(selectFileContent)
 

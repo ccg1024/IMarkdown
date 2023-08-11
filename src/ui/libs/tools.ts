@@ -1,4 +1,4 @@
-import { HeadInfo } from '../../types/main'
+import { HeadInfo } from 'src/types'
 
 export function formateDate(date: Date | string): string {
   if (typeof date === 'string') {
@@ -18,11 +18,11 @@ export function formateDate(date: Date | string): string {
 }
 
 export function concatHeaderAndContent(
-  header: HeadInfo,
+  header: HeadInfo<string>,
   content: string
 ): string {
   let result = '---\n'
-  let key: keyof HeadInfo
+  let key: keyof HeadInfo<string>
   for (key in header) {
     if (header[key]) {
       if (header[key] instanceof Array) {
@@ -36,4 +36,10 @@ export function concatHeaderAndContent(
   }
   result += '---\n'
   return result + content
+}
+
+// copy from src/window/tools.ts
+// because need using on render process, but can not import module fs, readline, etc.
+export function copyProp<T, K extends keyof T>(dist: T, src: T, key: K) {
+  dist[key] = src[key]
 }

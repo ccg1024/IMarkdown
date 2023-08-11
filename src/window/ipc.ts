@@ -14,7 +14,7 @@ import ipcConfig from 'src/config/ipc.config'
 import { fileOpenCallback } from './menu/menu-callback'
 import { existProp } from './tools'
 
-import { UpdateFileData, SaveToken } from 'src/types'
+import { UpdateFileData, SaveToken, ConfigFile } from 'src/types'
 
 export function mountIPC() {
   const { logDir, logName, configDir, configName } = touchEnvName()
@@ -34,7 +34,11 @@ export function mountIPC() {
   ipcMain.on(ipcConfig.MAXIMIZE_WINDOW, handleMaxWindow)
 
   async function handleAppConfig() {
-    return fs.readFileSync(path.join(configDir, configName), 'utf8')
+    const fileContent = fs.readFileSync(
+      path.join(configDir, configName),
+      'utf8'
+    )
+    return JSON.parse(fileContent) as ConfigFile
   }
 
   function log(filepath: string) {

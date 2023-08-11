@@ -20,7 +20,7 @@ import {
   selectFileHeadInfo,
   updateFileHeadInfo
 } from '../app/reducers/fileContentSlice'
-import { HeadInfo } from '../../types/main'
+import { HeadInfo } from 'src/types'
 
 type MarkTagProps = {
   children?: React.ReactNode
@@ -82,17 +82,9 @@ const MarkHeadInfo: FC = (): JSX.Element => {
       )
     }
   }
-  const updateFun = (headInfo: HeadInfo) => {
+  const updateFun = (headInfo: HeadInfo<string>) => {
     if (currentFile) {
       reduxDispatch(updateFileHeadInfo(headInfo))
-      // NOTE: unnecessary updates
-      // just need update cache when save file and toggle file
-      // window.ipcAPI.updateHeader({
-      //   filepath: currentFile,
-      //   fileData: {
-      //     headInfo: headInfo
-      //   }
-      // })
       makeChange()
     }
   }
