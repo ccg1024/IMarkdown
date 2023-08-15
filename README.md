@@ -24,3 +24,7 @@ the branch `friday` is the last javascript version. The current branch is all bu
 ### dark
 
 ![mac-screenshot-dark](./img/mac-dark.png)
+
+## windows
+
+![win-screenshot](./img/win.png)
