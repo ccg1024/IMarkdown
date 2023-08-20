@@ -95,7 +95,6 @@ export async function createFileCallback(): Promise<OpenFileType> {
 export async function openFileWrapper(
   _menuItem: MenuItem,
   win: BrowserWindow,
-  // eslint-disable-next-line
   _event: KeyboardEvent
 ) {
   fileOpenCallback()
@@ -112,7 +111,6 @@ export async function openFileWrapper(
 export async function saveFileWrapper(
   _menuItem: MenuItem,
   win: BrowserWindow,
-  // eslint-disable-next-line
   _event: KeyboardEvent
 ) {
   const filepath = touchCurrentFile()
@@ -127,7 +125,6 @@ export async function saveFileWrapper(
 export async function createFileWrapper(
   _menuItem: MenuItem,
   win: BrowserWindow,
-  // eslint-disable-next-line
   _event: KeyboardEvent
 ) {
   createFileCallback()
@@ -144,7 +141,6 @@ export async function createFileWrapper(
 export async function openDirWrapper(
   _menuItem: MenuItem,
   win: BrowserWindow,
-  // eslint-disable-next-line
   _event: KeyboardEvent
 ) {
   dirOpenCallback()
@@ -168,7 +164,6 @@ export async function viewController(
 export async function formatContentWrapper(
   _menuItem: MenuItem,
   win: BrowserWindow,
-  // eslint-disable-next-line
   _event: KeyboardEvent
 ) {
   win?.webContents.send(ipcConfig.FORMAT_FILE)
