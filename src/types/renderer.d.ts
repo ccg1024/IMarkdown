@@ -1,6 +1,12 @@
 import { UpdateFileData } from '../window/menu/menu-callback'
 import { VimOptionIPC } from '../config/vim-option.config'
-import { ThemeModel, FileToken, ConfigFile } from '.'
+import {
+  ThemeModel,
+  FileToken,
+  ConfigFile,
+  GitPipelineOut,
+  GitPipelineIn
+} from '.'
 
 export interface IElectronIPC {
   listenFileOpen: (callback: (...args) => void) => Promise<void>
@@ -15,6 +21,7 @@ export interface IElectronIPC {
   initRenderer: () => Promise<FileToken>
   getPlatform: () => string
   getVersion: () => Promise<string>
+  gitPipeline: (input: GitPipelineIn) => Promise<GitPipelineOut>
 
   updateDocCache: (update: UpdateFileData) => Promise<void>
   updateHeader: (update: UpdateFileData) => Promise<void>

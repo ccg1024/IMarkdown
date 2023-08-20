@@ -1,4 +1,4 @@
-import { app, ipcMain, IpcMainEvent } from 'electron'
+import { app, ipcMain, IpcMainEvent, IpcMainInvokeEvent } from 'electron'
 import fs from 'fs'
 import path from 'path'
 
@@ -14,14 +14,18 @@ import ipcConfig from 'src/config/ipc.config'
 import { fileOpenCallback } from './menu/menu-callback'
 import { existProp } from './tools'
 
-import { UpdateFileData, SaveToken, ConfigFile } from 'src/types'
+import { UpdateFileData, SaveToken, ConfigFile, GitPipelineIn } from 'src/types'
+import { Git } from './git'
 
 export function mountIPC() {
   const { logDir, logName, configDir, configName } = touchEnvName()
+  // create a git operation instance
+  const git = new Git()
 
   ipcMain.handle(ipcConfig.GET_CONFIG, handleAppConfig)
   ipcMain.handle(ipcConfig.INIT_RENDERER, handleTouchFile)
   ipcMain.handle(ipcConfig.GET_VERSION, handleGetVersion)
+  ipcMain.handle(ipcConfig.GIT_PIPELINE, handleGitPipeline)
 
   // listen info from renderer
   ipcMain.on(ipcConfig.SAVE_CONTENT, handleContentSave)
@@ -33,6 +37,29 @@ export function mountIPC() {
   ipcMain.on(ipcConfig.CLOSE_WINDOW, handleCloseWindow)
   ipcMain.on(ipcConfig.MINIMIZE_WINDOW, handleMinWindow)
   ipcMain.on(ipcConfig.MAXIMIZE_WINDOW, handleMaxWindow)
+
+  async function handleGitPipeline(
+    _event: IpcMainInvokeEvent,
+    input: GitPipelineIn
+  ) {
+    const { type, cwd } = input
+    let called
+    switch (type) {
+      case 'head':
+        called = await git.getHead({ cwd: path.dirname(cwd) })
+        break
+      case 'pull':
+        called = await git.pull({ cwd: path.dirname(cwd) })
+        break
+      case 'push':
+        called = await git.push({ cwd: path.dirname(cwd) })
+        break
+    }
+    return {
+      type,
+      out: called
+    }
+  }
 
   async function handleGetVersion() {
     return app.getVersion()

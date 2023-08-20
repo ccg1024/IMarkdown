@@ -90,3 +90,16 @@ export type SaveToken = {
   doc: string
   filepath: string
 }
+
+const gitTypes = ['head', 'pull', 'push'] as const
+export type GitType = (typeof gitTypes)[number]
+
+export type GitPipelineIn = {
+  type: GitType
+  cwd: string
+}
+
+export type GitPipelineOut = {
+  type: GitType
+  out: string
+} & Record<string, unknown>
