@@ -7,9 +7,20 @@ type ExecOptions = {
 
 export class Git {
   private branch: string
+  private controller: AbortController
+  private signal: AbortSignal
 
   constructor() {
     this.branch = ''
+    this.controller = new AbortController()
+    this.signal = this.controller.signal
+  }
+  abortExec() {
+    this.controller.abort()
+    // recreate a new controller since the signal is change
+    // and no way to back
+    this.controller = new AbortController()
+    this.signal = this.controller.signal
   }
   /**
    * Using promise to wrap function `exec`
@@ -22,13 +33,17 @@ export class Git {
     const { cwd } = options
 
     return new Promise((resolve, reject) => {
-      exec(cmd, { cwd: cwd || process.cwd() }, (err, stdout, stderr) => {
-        if (err) {
-          reject(err.message)
-        }
+      exec(
+        cmd,
+        { cwd: cwd || process.cwd(), signal: this.signal },
+        (err, stdout, stderr) => {
+          if (err) {
+            reject(err.message)
+          }
 
-        resolve(JSON.stringify({ stderr, stdout }))
-      })
+          resolve(JSON.stringify({ stderr, stdout }))
+        }
+      )
     })
   }
 
@@ -39,11 +54,13 @@ export class Git {
    * @returns A promise that resolve a branch name if a git tree was detected, undefined if no .git was detected
    */
   async getHead(options?: ExecOptions): Promise<string> {
-    this.branch = await this.promiseExec(
+    const out = await this.promiseExec(
       'git rev-parse --abbrev-ref HEAD',
       options
     )
-    return this.branch
+
+    this.branch = JSON.parse(out).stdout
+    return out
   }
 
   /**

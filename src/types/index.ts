@@ -91,12 +91,12 @@ export type SaveToken = {
   filepath: string
 }
 
-const gitTypes = ['head', 'pull', 'push'] as const
+const gitTypes = ['head', 'pull', 'push', 'abort'] as const
 export type GitType = (typeof gitTypes)[number]
 
 export type GitPipelineIn = {
   type: GitType
-  cwd: string
+  cwd?: string
 }
 
 export type GitPipelineOut = {

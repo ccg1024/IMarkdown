@@ -1,9 +1,23 @@
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC, useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { Box, Flex, Text, Tooltip, useColorModeValue } from '@chakra-ui/react'
-import { BsGit, BsArrowRepeat, BsArrowUpCircle } from 'react-icons/bs'
+import {
+  Box,
+  Flex,
+  Text,
+  Tooltip,
+  Spinner,
+  useColorModeValue
+} from '@chakra-ui/react'
+import {
+  BsGit,
+  BsXCircleFill,
+  BsArrowRepeat,
+  BsArrowUpCircle
+} from 'react-icons/bs'
 import { AnimatePresence, motion } from 'framer-motion'
 
+import { formatGitOut } from '../libs/tools'
+import Message, { MessageRefMethod } from './message'
 import { selectDirlist } from '../app/reducers/dirlistSlice'
 import '../css/git-bar.css'
 
@@ -17,13 +31,15 @@ const GitBar: FC<React.HTMLAttributes<HTMLDivElement>> = props => {
   const dirlist = useSelector(selectDirlist)
   const colors = {
     borderColor: useColorModeValue(
-      'var(--chakra-colors-gray-200)',
+      'var(--chakra-colors-whiteAlpha-200)',
       'var(--chakra-colors-whiteAlpha-200)'
     ),
     color: useColorModeValue('var(--chakra-colors-gray-200)', 'white')
   }
   const [branch, setBranch] = useState('no git branch')
   const [showGit, setShowGit] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const messageRef = useRef<MessageRefMethod>(null)
 
   const isGitWorkplace = branch !== 'no git branch'
 
@@ -49,24 +65,34 @@ const GitBar: FC<React.HTMLAttributes<HTMLDivElement>> = props => {
     }
   }
   const gitPull = () => {
+    setShowGit(false)
+    setIsLoading(true)
     window.ipcAPI
       .gitPipeline({ type: 'pull', cwd: dirlist[0].id })
       .then(res => {
-        console.log(res)
+        messageRef.current.showMessage(formatGitOut(res.out))
       })
       .catch(() => {
         // TODO: add a message alert
+      })
+      .finally(() => {
+        setIsLoading(false)
       })
   }
 
   const gitPush = () => {
+    setShowGit(false)
+    setIsLoading(true)
     window.ipcAPI
       .gitPipeline({ type: 'push', cwd: dirlist[0].id })
       .then(res => {
-        console.log(res)
+        messageRef.current.showMessage(formatGitOut(res.out))
       })
       .catch(() => {
         // TODO: add a message alert
+      })
+      .finally(() => {
+        setIsLoading(false)
       })
   }
 
@@ -98,9 +124,16 @@ const GitBar: FC<React.HTMLAttributes<HTMLDivElement>> = props => {
       borderColor={colors.borderColor}
       borderTopWidth="1px"
       color={colors.color}
+      position="relative"
       {...rest}
     >
-      <Flex position="relative" gap={2} alignItems="center" lineHeight="normal">
+      <Flex
+        opacity={isLoading ? 0.5 : 1}
+        position="relative"
+        gap={2}
+        alignItems="center"
+        lineHeight="normal"
+      >
         <BsGit
           onClick={toggleGit}
           className={isGitWorkplace && 'hover_cursor'}
@@ -108,6 +141,8 @@ const GitBar: FC<React.HTMLAttributes<HTMLDivElement>> = props => {
         <Text lineHeight="normal">{branch}</Text>
         {gitOperation}
       </Flex>
+      {isLoading && <Mask />}
+      <Message ref={messageRef} />
     </Box>
   )
 }
@@ -142,6 +177,42 @@ const GitIconWrapper: FC<GitIconWrapperProps> = props => {
         {children}
       </Box>
     </Tooltip>
+  )
+}
+
+const Mask: FC = () => {
+  const close = () => {
+    window.ipcAPI.gitPipeline({ type: 'abort' }).catch(() => {
+      // catch err ?
+    })
+  }
+
+  return (
+    <Box
+      position="absolute"
+      top={0}
+      left={0}
+      backgroundColor="whiteAlpha.200"
+      width="100%"
+      height="100%"
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+    >
+      <Spinner />
+      <Box
+        onClick={close}
+        color="blackAlpha.600"
+        position="absolute"
+        right={0}
+        top={0}
+        marginTop={1}
+        marginRight={1}
+        _hover={{ color: 'black', cursor: 'pointer' }}
+      >
+        <BsXCircleFill />
+      </Box>
+    </Box>
   )
 }
 
