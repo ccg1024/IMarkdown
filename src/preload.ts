@@ -3,7 +3,13 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron'
 import ipcConfig from './config/ipc.config'
 import { VimOptionIPC } from './config/vim-option.config'
-import { UpdateFileData, ConfigFile, FileToken } from 'src/types'
+import {
+  UpdateFileData,
+  ConfigFile,
+  FileToken,
+  GitPipelineIn,
+  GitPipelineOut
+} from 'src/types'
 
 // eslint-disable-next-line
 type CallbackFunction = (event: IpcRendererEvent, ...args: any[]) => void
@@ -41,6 +47,9 @@ contextBridge.exposeInMainWorld('ipcAPI', {
   getPlatform: (): string => process.platform,
   getVersion: (): Promise<string> => {
     return ipcRenderer.invoke(ipcConfig.GET_VERSION)
+  },
+  gitPipeline: (input: GitPipelineIn): Promise<GitPipelineOut> => {
+    return ipcRenderer.invoke(ipcConfig.GIT_PIPELINE, input)
   },
 
   updateDocCache: (update: UpdateFileData) => {
