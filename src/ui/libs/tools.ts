@@ -49,7 +49,7 @@ export function formatGitOut(out: string) {
   const keys = ['stderr', 'stdout']
   let res = ''
   keys.forEach(key => {
-    res += `${key}: ${outObj[key]}`
+    res += `${outObj[key]}`
   })
 
   return res

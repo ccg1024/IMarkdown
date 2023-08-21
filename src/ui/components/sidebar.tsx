@@ -121,7 +121,7 @@ function RouteItem({ title, children }: RouteItemProps): JSX.Element {
         </Text>
         <Box
           aria-label="search bar"
-          display="flex"
+          display="none"
           height="40px"
           width="90%"
           border="1px solid black"

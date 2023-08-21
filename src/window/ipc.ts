@@ -57,6 +57,11 @@ export function mountIPC() {
       case 'abort':
         called = git.abortExec()
         break
+      case 'command':
+        called = await git.promiseExec(input.command, {
+          cwd: path.dirname(cwd)
+        })
+        break
     }
     return {
       type,

@@ -6,16 +6,19 @@ import {
   Text,
   Tooltip,
   Spinner,
+  useDisclosure,
   useColorModeValue
 } from '@chakra-ui/react'
 import {
   BsGit,
+  BsTerminal,
   BsXCircleFill,
   BsArrowRepeat,
   BsArrowUpCircle
 } from 'react-icons/bs'
 import { AnimatePresence, motion } from 'framer-motion'
 
+import GitModal from './git-modal'
 import { formatGitOut } from '../libs/tools'
 import Message, { MessageRefMethod } from './message'
 import { selectDirlist } from '../app/reducers/dirlistSlice'
@@ -40,6 +43,7 @@ const GitBar: FC<React.HTMLAttributes<HTMLDivElement>> = props => {
   const [showGit, setShowGit] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const messageRef = useRef<MessageRefMethod>(null)
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   const isGitWorkplace = branch !== 'no git branch'
 
@@ -72,8 +76,9 @@ const GitBar: FC<React.HTMLAttributes<HTMLDivElement>> = props => {
       .then(res => {
         messageRef.current.showMessage(formatGitOut(res.out))
       })
-      .catch(() => {
+      .catch(err => {
         // TODO: add a message alert
+        messageRef.current.showMessage('[ERROR]\n' + err)
       })
       .finally(() => {
         setIsLoading(false)
@@ -88,12 +93,17 @@ const GitBar: FC<React.HTMLAttributes<HTMLDivElement>> = props => {
       .then(res => {
         messageRef.current.showMessage(formatGitOut(res.out))
       })
-      .catch(() => {
+      .catch(err => {
         // TODO: add a message alert
+        messageRef.current.showMessage('[ERROR]\n' + err)
       })
       .finally(() => {
         setIsLoading(false)
       })
+  }
+  const openTerminal = () => {
+    setShowGit(false)
+    onOpen()
   }
 
   const gitOperation = isGitWorkplace && (
@@ -111,6 +121,9 @@ const GitBar: FC<React.HTMLAttributes<HTMLDivElement>> = props => {
           </GitIconWrapper>
           <GitIconWrapper tooltip="push" clickFn={gitPush}>
             <BsArrowUpCircle className="git_operation hover_cursor" />
+          </GitIconWrapper>
+          <GitIconWrapper tooltip="terminal" clickFn={openTerminal}>
+            <BsTerminal className="git_operation hover_cursor" />
           </GitIconWrapper>
         </motion.div>
       )}
@@ -143,6 +156,11 @@ const GitBar: FC<React.HTMLAttributes<HTMLDivElement>> = props => {
       </Flex>
       {isLoading && <Mask />}
       <Message ref={messageRef} />
+      <GitModal
+        isOpen={isOpen}
+        onClose={onClose}
+        cwd={isGitWorkplace ? dirlist[0].id : ''}
+      />
     </Box>
   )
 }
@@ -158,7 +176,7 @@ const GitIconWrapper: FC<GitIconWrapperProps> = props => {
   const { tooltip, openDelay, clickFn, children } = props
   const colors = {
     background: useColorModeValue(
-      'var(--chakra-colors-gray-200)',
+      'var(--chakra-colors-whiteAlpha-400)',
       'var(--chakra-colors-whiteAlpha-400)'
     )
   }
