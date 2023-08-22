@@ -30,7 +30,7 @@ const config: ForgeConfig = {
   plugins: [
     new WebpackPlugin({
       devContentSecurityPolicy:
-        "default-src 'self' 'unsafe-inline' 'unsafe-eval' data:;img-src atom:;",
+        "default-src 'self' 'unsafe-inline' 'unsafe-eval' data:;img-src 'self' data: base64 atom:;",
       mainConfig,
       renderer: {
         config: rendererConfig,
