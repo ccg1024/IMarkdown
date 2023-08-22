@@ -5497,6 +5497,14 @@
   dependencies:
     "flat-cache" "^3.0.4"
 
+"file-loader@^6.2.0":
+  "integrity" "sha512-qo3glqyTa61Ytg4u73GultjHGjdRyig3tG6lPtyX/jOEJvHif9uB0/OCI2Kif6ctF3caQTW2G5gym21oAsI4pw=="
+  "resolved" "https://registry.npmmirror.com/file-loader/-/file-loader-6.2.0.tgz"
+  "version" "6.2.0"
+  dependencies:
+    "loader-utils" "^2.0.0"
+    "schema-utils" "^3.0.0"
+
 "filename-reserved-regex@^2.0.0":
   "integrity" "sha512-lc1bnsSr4L4Bdif8Xb/qrtokGbq5zlsms/CYH8PP+WtCkGNF65DPiQY8vG3SakEdRn8Dlnm+gW/qWKKjS5sZzQ=="
   "resolved" "https://registry.npmmirror.com/filename-reserved-regex/-/filename-reserved-regex-2.0.0.tgz"
@@ -8910,7 +8918,7 @@
   dependencies:
     "loose-envify" "^1.1.0"
 
-"schema-utils@^3.1.1", "schema-utils@^3.1.2":
+"schema-utils@^3.0.0", "schema-utils@^3.1.1", "schema-utils@^3.1.2":
   "integrity" "sha512-pvjEHOgWc9OWA/f/DE3ohBWTD6EleVLf7iFUkoSwAxttdBhB9QUebQgxER2kWueOvRJXPHNnyrvvh9eZINB8Eg=="
   "resolved" "https://registry.npmmirror.com/schema-utils/-/schema-utils-3.1.2.tgz"
   "version" "3.1.2"

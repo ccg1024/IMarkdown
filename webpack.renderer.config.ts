@@ -13,6 +13,14 @@ rules.push({
   issuer: /\.[jt]sx?$/,
   use: ['@svgr/webpack']
 })
+rules.push({
+  test: /\.(png|jpe?g|gif)$/i,
+  use: [
+    {
+      loader: 'file-loader'
+    }
+  ]
+})
 
 export const rendererConfig: Configuration = {
   module: {

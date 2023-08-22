@@ -17,6 +17,7 @@ import {
   UnorderedList,
   Divider
 } from '@chakra-ui/react'
+import img404 from '../img/404img.jpg'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function getStartLine(node: any) {
@@ -121,6 +122,11 @@ export function RemarkImg(props: any): JSX.Element {
       m="auto"
       marginY="1em"
       data-line={props.node && getStartLine(props.node)}
+      onError={({ currentTarget }) => {
+        currentTarget.onerror = null
+        // currentTarget.src = img404
+        console.log(img404)
+      }}
     />
   )
 }
