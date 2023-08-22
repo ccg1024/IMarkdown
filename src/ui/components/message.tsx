@@ -1,4 +1,10 @@
-import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react'
+import React, {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState
+} from 'react'
 import { createPortal } from 'react-dom'
 import { Box, Text, useColorModeValue } from '@chakra-ui/react'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -37,9 +43,33 @@ const InternalMessage: React.ForwardRefRenderFunction<
   const timeRef = useRef<number>(null)
   const debounce = useRef<NodeJS.Timeout>(null)
   const oldMessage = useRef<string>(null)
+  const messageBody = useRef<HTMLDivElement>(null)
   const colors = {
     backgroundColor: useColorModeValue('gray.200', 'black')
   }
+
+  useEffect(() => {
+    const { current: container } = messageBody
+    function enterCallback() {
+      if (debounce.current) {
+        clearTimeout(debounce.current)
+      }
+    }
+    function leaveCallback() {
+      debounce.current = setTimeout(() => {
+        setIsVisible(false)
+      }, 3000)
+    }
+    if (container && isVisible) {
+      container.addEventListener('mouseenter', enterCallback)
+      container.addEventListener('mouseleave', leaveCallback)
+
+      return () => {
+        container.removeEventListener('mouseenter', enterCallback)
+        container.removeEventListener('mouseleave', leaveCallback)
+      }
+    }
+  }, [isVisible])
 
   useImperativeHandle(
     ref,
@@ -83,12 +113,19 @@ const InternalMessage: React.ForwardRefRenderFunction<
       <AnimatePresence mode="wait" initial={true}>
         {isVisible && (
           <motion.div
+            ref={messageBody}
             key={keyValue}
             initial={{ top: 40, opacity: 0 }}
             animate={{ top: 20, opacity: 1 }}
             exit={{ top: 0, opacity: 0 }}
             transition={{ duration: 0.5 }}
-            style={{ position: 'absolute', top: 0, right: 0, zIndex: 1000 }}
+            style={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              zIndex: 1000,
+              maxWidth: '760px'
+            }}
           >
             <Box
               borderRadius="md"
@@ -100,7 +137,9 @@ const InternalMessage: React.ForwardRefRenderFunction<
             >
               <Box display="flex" gap={2} alignItems="center">
                 <Celebrate style={{ width: '1em', height: '1em' }} />
-                <Text lineHeight={1}>{mess}</Text>
+                <Text lineHeight={1} whiteSpace="pre-wrap">
+                  {mess}
+                </Text>
               </Box>
               {children && <Box>{children}</Box>}
             </Box>

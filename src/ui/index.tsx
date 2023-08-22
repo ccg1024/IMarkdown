@@ -12,7 +12,8 @@ import '@fontsource/m-plus-rounded-1c'
 
 // mount a global object
 window.imarkdown = {
-  themeModel: 'light'
+  themeModel: 'light',
+  didModified: false
 }
 
 const root = ReactDOM.createRoot(document.getElementById('root'))

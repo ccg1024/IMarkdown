@@ -13,12 +13,14 @@ import {
   Flex,
   IconButton,
   Text,
+  Stack,
   useColorModeValue,
   useColorMode
 } from '@chakra-ui/react'
 import { BsList, BsMarkdown, BsFileRichtext, BsFolder } from 'react-icons/bs'
 import { NavLink } from 'react-router-dom'
 import { Global } from '@emotion/react'
+import GitBar from './git-bar'
 
 type CompoundedComponent = ForwardRefExoticComponent<
   React.RefAttributes<HTMLDivElement>
@@ -48,6 +50,8 @@ const InternalSideNav: ForwardRefRenderFunction<
       color={useColorModeValue('white', 'white')}
       width="220px"
       backdropBlur="md"
+      display="flex"
+      flexDirection="column"
     >
       <Global
         styles={{
@@ -65,6 +69,8 @@ const InternalSideNav: ForwardRefRenderFunction<
         paddingX={4}
         justifyContent="space-between"
         className="draggable"
+        flexShrink={0}
+        flexGrow={0}
       >
         <Box alignItems="center" display="flex">
           {!isMac && (
@@ -103,13 +109,19 @@ const InternalSideNav: ForwardRefRenderFunction<
         />
       </Flex>
 
-      {/*<NavItem path="main_window/recent_file">Recent Files</NavItem>*/}
-      <NavItem path="/" icon={<BsFileRichtext />}>
-        Recent Files
-      </NavItem>
-      <NavItem path="main_window/folder" icon={<BsFolder />}>
-        Folder
-      </NavItem>
+      <Stack flexShrink={0} flexGrow={1} justifyContent="space-between">
+        <Box flexShrink={0} flexGrow={0}>
+          {/*<NavItem path="main_window/recent_file">Recent Files</NavItem>*/}
+          <NavItem path="/" icon={<BsFileRichtext />}>
+            Recent Files
+          </NavItem>
+          <NavItem path="main_window/folder" icon={<BsFolder />}>
+            Folder
+          </NavItem>
+        </Box>
+
+        <GitBar style={{ flexGrow: 0, flexShrink: 0 }} />
+      </Stack>
     </Box>
   )
 }

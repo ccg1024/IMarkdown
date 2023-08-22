@@ -43,3 +43,14 @@ export function concatHeaderAndContent(
 export function copyProp<T, K extends keyof T>(dist: T, src: T, key: K) {
   dist[key] = src[key]
 }
+
+export function formatGitOut(out: string) {
+  const outObj = JSON.parse(out)
+  const keys = ['stderr', 'stdout']
+  let res = ''
+  keys.forEach(key => {
+    res += `${outObj[key]}`
+  })
+
+  return res
+}

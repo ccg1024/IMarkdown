@@ -1,0 +1,14 @@
+.git_operation_container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translateY(-100%);
+}
+.git_operation {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.hover_cursor:hover {
+  cursor: pointer;
+}

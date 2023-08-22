@@ -1,7 +1,7 @@
 ---
-title: README
-desc: some description of imarkdown
-date: 2023-5-28
+title: 'README'
+desc: 'some description of imarkdown'
+date: '2023-5-28'
 ---
 # imarkdown
 
@@ -17,4 +17,14 @@ the branch `friday` is the last javascript version. The current branch is all bu
 
 ## Macos
 
-![mac-screenshot](./img/macos.png)
+### light
+
+![mac-screenshot](./img/mac-light.png)
+
+### dark
+
+![mac-screenshot-dark](./img/mac-dark.png)
+
+## windows
+
+![win-screenshot](./img/win.png)
