@@ -24,7 +24,7 @@ import * as remarkTags from './remark-tags'
 import RemarkCode from './remark-code'
 import pubsubConfig from '../../config/pubsub.config'
 import { LiveScroll } from 'src/types'
-import { selectFileContent } from '../app/reducers/fileContentSlice'
+import { selectFileDoc } from '../app/reducers/currentFileSlice'
 import '../css/scroll-style.css'
 
 interface Props {
@@ -284,9 +284,8 @@ const Preview: React.FC<Props> = React.memo(props => {
 
 const PresentRehype: React.FC = React.memo(() => {
   const [content, setContent] = useState<React.ReactNode>()
-  // eslint-disable-next-line
   const [_, startTransition] = useTransition()
-  const doc = useSelector(selectFileContent)
+  const doc = useSelector(selectFileDoc)
 
   // update preview
   useEffect(() => {

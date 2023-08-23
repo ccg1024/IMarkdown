@@ -1,12 +1,12 @@
 import { FC, useCallback } from 'react'
 import { useSelector } from 'react-redux'
-import { selectCurrentFile } from '../app/reducers/currentFileSlice'
+import { selectFilepath } from '../app/reducers/currentFileSlice'
 import { selectRecentFiles } from '../app/reducers/recentFilesSlice'
 import { SideFileItemNew } from './side-file-item'
 
 const SideRecentFiles: FC = (): JSX.Element => {
   const recentFiles = useSelector(selectRecentFiles)
-  const currentFile = useSelector(selectCurrentFile)
+  const currentFile = useSelector(selectFilepath)
   const recentPath: string[] = Object.keys(recentFiles)
 
   const openRencentFile = useCallback((path: string) => {

@@ -52,7 +52,6 @@ const imarkdownDefaultExtensions = [
   bracketMatching(),
   closeBrackets(),
   rectangularSelection(),
-  // crosshairCursor(),
   highlightActiveLine(),
   highlightSelectionMatches(),
   keymap.of([
@@ -96,23 +95,6 @@ const generateState = (doc: string): EditorState => {
         if (update.docChanged) {
           PubSub.publish(pubsubConfig.UPDATE_EDITOR_CONTENT)
         }
-
-        // if (update.selectionSet) {
-        //   if (controller.cursorTimer) {
-        //     window.clearTimeout(controller.cursorTimer)
-        //   }
-
-        //   controller.cursorTimer = window.setTimeout(() => {
-        //     const cursor = update.state.selection.main.head
-        //     const line = update.state.doc.lineAt(cursor).number
-        //     const totalLine = update.state.doc.lines
-        //     const lineOfStatusLine: LineOfStatusLine = {
-        //       current: line,
-        //       total: totalLine
-        //     }
-        //     PubSub.publish(pubsubConfig.STATUS_LINE_INFO, lineOfStatusLine)
-        //   }, 100)
-        // }
       }),
 
       EditorView.domEventHandlers({
@@ -148,11 +130,6 @@ const generateState = (doc: string): EditorState => {
   })
 
   PubSub.publish(pubsubConfig.SYNC_SCROLL_TO_LIVE_PREVIEW, { line: -1 })
-  // PubSub.publish(pubsubConfig.STATUS_LINE_INFO, {
-  //   current: 1,
-  //   total: state.doc.lines
-  // })
-
   return state
 }
 

@@ -35,11 +35,12 @@ const InternalSidebar: ForwardRefRenderFunction<
   useImperativeHandle(
     ref,
     () => {
-      function toggle(ref: React.MutableRefObject<HTMLDivElement>) {
+      function toggle(ref: React.MutableRefObject<HTMLDivElement>, id: number) {
         if (ref.current) {
+          const display = id === 1 ? 'flex' : 'unset'
           const { current: container } = ref
           if (container.style.display === 'none') {
-            container.style.display = 'unset'
+            container.style.display = display
           } else {
             container.style.display = 'none'
           }
@@ -48,10 +49,10 @@ const InternalSidebar: ForwardRefRenderFunction<
 
       return {
         toggleNav() {
-          toggle(sideNavRef)
+          toggle(sideNavRef, 1)
         },
         toggleMid() {
-          toggle(midNavRef)
+          toggle(midNavRef, 2)
         }
       }
     },

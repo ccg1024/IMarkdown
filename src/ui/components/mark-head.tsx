@@ -10,16 +10,12 @@ import {
 import { useSelector, useDispatch } from 'react-redux'
 import { BsChevronRight } from 'react-icons/bs'
 
-import { selectCurrentFile } from '../app/reducers/currentFileSlice'
 import {
-  selectRecentFiles,
-  updateFileIsChange,
-  RecentFilesStateItem
-} from '../app/reducers/recentFilesSlice'
-import {
-  selectFileHeadInfo,
-  updateFileHeadInfo
-} from '../app/reducers/fileContentSlice'
+  selectFilepath,
+  selectFileHeadinfo,
+  updateFileHeadinfo
+} from '../app/reducers/currentFileSlice'
+import { updateFileIsChange } from '../app/reducers/recentFilesSlice'
 import { HeadInfo } from 'src/types'
 
 type MarkTagProps = {
@@ -56,9 +52,8 @@ function getArrayTag(tag: string | string[]): string[] {
 }
 
 const MarkHeadInfo: FC = (): JSX.Element => {
-  const currentFile: string = useSelector(selectCurrentFile)
-  const recentFiles: RecentFilesStateItem = useSelector(selectRecentFiles)
-  const headInfo = useSelector(selectFileHeadInfo)
+  const currentFile: string = useSelector(selectFilepath)
+  const headInfo = useSelector(selectFileHeadinfo)
 
   const reduxDispatch = useDispatch()
   const noteTitle = headInfo.title || ''
@@ -85,7 +80,7 @@ const MarkHeadInfo: FC = (): JSX.Element => {
   }
   const updateFun = (headInfo: HeadInfo<string>) => {
     if (currentFile) {
-      reduxDispatch(updateFileHeadInfo(headInfo))
+      reduxDispatch(updateFileHeadinfo(headInfo))
       makeChange()
     }
   }

@@ -1,15 +1,18 @@
 import PubSub from 'pubsub-js'
-import { useEffect, MutableRefObject, useRef } from 'react'
+import { useState, useLayoutEffect, useEffect, MutableRefObject } from 'react'
 import { EditorView } from '@codemirror/view'
 import { vim } from '@replit/codemirror-vim'
 import { useColorMode } from '@chakra-ui/react'
+import { useSelector } from 'react-redux'
 
 import pubsubConfig from 'src/config/pubsub.config'
-import { EditorConfig, LiveScroll } from 'src/types'
+import { LiveScroll } from 'src/types'
 import generateState, { themePlugin, vimPlugin } from '../libs/generate-state'
 import { imarkdownDark } from '../plugins/theme/imarkdown-dark'
 import { imarkdown } from '../plugins/theme/imarkdown'
 import { ImarkdownPlugin } from 'src/config/plugin-list.config'
+import { selectFilepath } from '../app/reducers/currentFileSlice'
+import { getDoc, getScrollPos } from '../app/store'
 
 const dynamicPlugin: ImarkdownPlugin = {
   vim: false
@@ -22,86 +25,60 @@ const dynamicPlugin: ImarkdownPlugin = {
  * @param containerRef The container ref which place the codemirror instance
  */
 export const useEditor = (containerRef: MutableRefObject<HTMLDivElement>) => {
-  const editorRef = useRef<EditorView>(null)
-  const fileRef = useRef<string>('')
+  const filepath = useSelector(selectFilepath)
+  const [editor, setEditor] = useState<EditorView>(null)
   const { colorMode } = useColorMode()
-  const pubsubCallback = (_type: string, editorConfig: EditorConfig) => {
-    // update scroll pos to main process
-    if (fileRef.current && editorRef.current) {
-      const scrollTop = editorRef.current.scrollDOM.scrollTop
-      const blockInfo = editorRef.current.elementAtHeight(scrollTop)
-      window.ipcAPI.updateScrollPos({
-        filepath: fileRef.current,
-        fileData: {
-          scrollPos: blockInfo.from
-        }
-      })
-    }
-    // re-assign
-    fileRef.current = editorConfig.file
-    const view = new EditorView({
-      state: generateState(editorConfig.doc),
-      parent: containerRef.current
-    })
 
-    // distroy old one
-    if (editorRef.current) {
-      editorRef.current.destroy()
-    }
+  window.imarkdown.themeModel = colorMode
 
-    if (dynamicPlugin.vim) {
-      view.dispatch({
-        effects: vimPlugin.reconfigure(vim())
+  // create new editor when file path change
+  useLayoutEffect(() => {
+    if (filepath) {
+      const view = new EditorView({
+        state: generateState(getDoc()),
+        parent: containerRef.current
       })
-    }
 
-    if (colorMode === 'dark') {
-      view.dispatch({
-        effects: themePlugin.reconfigure(imarkdownDark)
-      })
-    } else {
-      view.dispatch({
-        effects: themePlugin.reconfigure(imarkdown)
-      })
-    }
-
-    if (editorConfig.scrollPos) {
-      view.dispatch({
-        effects: EditorView.scrollIntoView(editorConfig.scrollPos, {
-          y: 'start'
+      if (dynamicPlugin.vim) {
+        view.dispatch({
+          effects: vimPlugin.reconfigure(vim())
         })
-      })
-    }
-  }
-  useEffect(() => {
-    const token = PubSub.subscribe(
-      pubsubConfig.UPDATE_EDITOR_STATE,
-      pubsubCallback
-    )
-    return () => {
-      PubSub.unsubscribe(token)
-    }
-  }, [colorMode])
+      }
 
-  useEffect(() => {
-    if (editorRef.current) {
+      const scrollPos = getScrollPos()
+      if (scrollPos) {
+        view.dispatch({
+          effects: EditorView.scrollIntoView(scrollPos, { y: 'start' })
+        })
+      }
+
+      setEditor(view)
+
+      return () => {
+        view.destroy()
+      }
+    }
+  }, [filepath])
+
+  useLayoutEffect(() => {
+    if (editor) {
       if (colorMode === 'dark') {
-        editorRef.current.dispatch({
+        editor.dispatch({
           effects: themePlugin.reconfigure(imarkdownDark)
         })
       } else {
-        editorRef.current.dispatch({
+        editor.dispatch({
           effects: themePlugin.reconfigure(imarkdown)
         })
       }
     }
-  }, [colorMode])
+  }, [colorMode, editor])
 
-  useSyncScrollFromPreview(editorRef)
+  useSyncScrollFromPreview(editor)
   useDynamicPluginConfig()
-  usePluginEvent(editorRef)
+  usePluginEvent(editor)
 
-  return { editorRef, fileRef }
+  return editor
 }
 
 /**
@@ -130,8 +107,7 @@ const useDynamicPluginConfig = () => {
  *
  * @param editorRef A ref which refer to codemirror instance
  */
-const usePluginEvent = (editorRef: MutableRefObject<EditorView>) => {
-  const { current: editor } = editorRef
+const usePluginEvent = (editor: EditorView) => {
   const headNavFn = (_type: string, headAnchor: number) => {
     if (editor && headAnchor) {
       const line = editor.state.doc.line(headAnchor)
@@ -146,7 +122,7 @@ const usePluginEvent = (editorRef: MutableRefObject<EditorView>) => {
     return () => {
       PubSub.unsubscribe(token)
     }
-  }, [])
+  }, [editor])
 }
 
 /**
@@ -154,20 +130,20 @@ const usePluginEvent = (editorRef: MutableRefObject<EditorView>) => {
  *
  * @param editorRef A ref which refer to codemirror instance
  */
-const useSyncScrollFromPreview = (editorRef: MutableRefObject<EditorView>) => {
+const useSyncScrollFromPreview = (editor: EditorView) => {
   const callback = (_type: string, scrollInfo: LiveScroll) => {
-    if (editorRef.current && !editorRef.current.hasFocus) {
-      const cm = editorRef.current
-      const blockInfo = cm.lineBlockAt(cm.state.doc.line(scrollInfo.line).from)
+    if (editor && !editor.hasFocus) {
+      const blockInfo = editor.lineBlockAt(
+        editor.state.doc.line(scrollInfo.line).from
+      )
 
-      if (!cm.inView) {
-        cm.dispatch({
+      if (!editor.inView) {
+        editor.dispatch({
           effects: EditorView.scrollIntoView(blockInfo.from, { y: 'start' })
         })
       } else {
         const scrollTop = blockInfo.top + blockInfo.height * scrollInfo.percent
-        // cm.scrollDOM.scrollTop = scrollTop
-        cm.scrollDOM.scrollTo({ top: scrollTop, behavior: 'smooth' })
+        editor.scrollDOM.scrollTo({ top: scrollTop, behavior: 'smooth' })
       }
     }
   }
@@ -179,5 +155,5 @@ const useSyncScrollFromPreview = (editorRef: MutableRefObject<EditorView>) => {
     return () => {
       PubSub.unsubscribe(token)
     }
-  }, [])
+  }, [editor])
 }
