@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from 'react'
+import React, { FC, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import {
   Box,
@@ -23,11 +23,7 @@ import { formatGitOut } from '../libs/tools'
 import Message, { MessageRefMethod } from './message'
 import { selectDirlist } from '../app/reducers/dirlistSlice'
 import '../css/git-bar.css'
-
-type GitCommadMsg = {
-  stderr: string
-  stdout: string
-}
+import { useGitBranch } from '../hooks/useGitBranch'
 
 const GitBar: FC<React.HTMLAttributes<HTMLDivElement>> = props => {
   const { ...rest } = props
@@ -39,29 +35,14 @@ const GitBar: FC<React.HTMLAttributes<HTMLDivElement>> = props => {
     ),
     color: useColorModeValue('var(--chakra-colors-gray-200)', 'white')
   }
-  const [branch, setBranch] = useState('no git branch')
   const [showGit, setShowGit] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const messageRef = useRef<MessageRefMethod>(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const isGitWorkplace = branch !== 'no git branch'
+  const branch = useGitBranch('no git branch', dirlist)
 
-  useEffect(() => {
-    if (dirlist && !!dirlist.length) {
-      window.ipcAPI
-        .gitPipeline({ type: 'head', cwd: dirlist[0].id })
-        .then(res => {
-          const { out } = res
-          const gitMsg = JSON.parse(out) as GitCommadMsg
-          setBranch(gitMsg.stdout.trim())
-        })
-        .catch(() => {
-          // TODO: add a message alert
-          setBranch('no git branch')
-        })
-    }
-  }, [dirlist])
+  const isGitWorkplace = branch !== 'no git branch'
 
   const toggleGit = () => {
     if (isGitWorkplace) {
