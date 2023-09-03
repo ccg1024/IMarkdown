@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import {
   Box,
   Flex,
@@ -10,6 +10,7 @@ import {
   RadioGroup,
   useColorModeValue
 } from '@chakra-ui/react'
+import { useActiveScroll } from '../hooks/useActiveScroll'
 
 type SideFileItemNewProps = {
   uuid: string
@@ -26,11 +27,7 @@ export const SideFileItemNew: React.FC<SideFileItemNewProps> = props => {
   const { uuid, name, time, desc, size, isChange, isActive, onClick, ...rest } =
     props
 
-  useEffect(() => {
-    if (isActive) {
-      document.getElementById(uuid).scrollIntoView({ block: 'nearest' })
-    }
-  }, [isActive, uuid])
+  useActiveScroll(uuid, isActive)
 
   return (
     <Box
