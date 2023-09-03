@@ -1,37 +1,15 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Code, useColorModeValue } from '@chakra-ui/react'
 
-import runmode, { getLanguage } from '../libs/runmode'
-
-type Tokens = {
-  text: string
-  style: string | null
-}[]
+import { useRunmode } from '../hooks/useRunmode'
 
 const RemarkCode: React.FC<
   React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>
 > = props => {
-  const [spans, setSpans] = useState<Tokens>([])
   const { className } = props
   const langName = (className || '').substring(9)
 
-  useEffect(() => {
-    getLanguage(langName).then(language => {
-      if (language) {
-        const body = props.children instanceof Array ? props.children[0] : null
-        const tokens: Tokens = []
-        runmode(
-          body as string,
-          language,
-          // eslint-disable-next-line
-          (text: string, style: string | null, _from: number, _to: number) => {
-            tokens.push({ text, style })
-          }
-        )
-        setSpans(tokens)
-      }
-    })
-  }, [props.children])
+  const spans = useRunmode(langName, props.children)
 
   if (spans.length > 0) {
     return (
@@ -43,19 +21,19 @@ const RemarkCode: React.FC<
         ))}
       </code>
     )
-  } else {
-    return (
-      <Code
-        color={useColorModeValue('#3D7AED', '#FF63C3')}
-        backgroundColor="unset"
-        fontWeight="bold"
-        fontFamily="inherit"
-        fontSize="1em"
-      >
-        {props.children}
-      </Code>
-    )
   }
+
+  return (
+    <Code
+      color={useColorModeValue('#3D7AED', '#FF63C3')}
+      backgroundColor="unset"
+      fontWeight="bold"
+      fontFamily="inherit"
+      fontSize="1em"
+    >
+      {props.children}
+    </Code>
+  )
 }
 
 export default RemarkCode
