@@ -1,6 +1,7 @@
-import { FC, MouseEventHandler, ReactNode, useEffect, useRef } from 'react'
+import { FC, MouseEventHandler, ReactNode, useRef } from 'react'
 import { Box, useColorModeValue } from '@chakra-ui/react'
 import { BsLayoutSplit, BsEye, BsPencil } from 'react-icons/bs'
+import { useHoverFade } from '../hooks/useHoverFade'
 
 interface Props {
   livePreviewCallback: MouseEventHandler
@@ -34,34 +35,8 @@ const IconBox: FC<IconBoxProps> = (props): JSX.Element => {
 
 const InterIcon: FC<Props> = props => {
   const interIconRef = useRef<HTMLDivElement>(null)
-  const timer = useRef<NodeJS.Timeout>(null)
 
-  useEffect(() => {
-    const { current: container } = interIconRef
-    function mouseEnter() {
-      if (timer && timer.current) {
-        clearTimeout(timer.current)
-        timer.current = null
-      }
-      container.style.opacity = '1'
-    }
-    function mouseLeave() {
-      timer.current = setTimeout(() => {
-        container.style.opacity = '0'
-      }, 1000)
-    }
-
-    function clear() {
-      container.removeEventListener('mouseenter', mouseEnter)
-      container.removeEventListener('mouseleave', mouseLeave)
-    }
-    if (container) {
-      container.addEventListener('mouseenter', mouseEnter)
-      container.addEventListener('mouseleave', mouseLeave)
-
-      return clear
-    }
-  }, [])
+  useHoverFade(interIconRef)
 
   return (
     <Box
