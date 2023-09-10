@@ -17,17 +17,17 @@ export default function createMenus(): MenuItemConstructorOptions[] {
   return [
     ...(isMac
       ? [
-          {
-            label: app.name,
-            submenu: [
-              { role: 'about' },
-              { type: 'separator' },
-              { role: 'services' },
-              { type: 'separator' },
-              { role: 'quit' }
-            ] as MenuItemConstructorOptions[]
-          }
-        ]
+        {
+          label: app.name,
+          submenu: [
+            { role: 'about' },
+            { type: 'separator' },
+            { role: 'services' },
+            { type: 'separator' },
+            { role: 'quit' }
+          ] as MenuItemConstructorOptions[]
+        }
+      ]
       : []),
     {
       label: 'File',
@@ -104,6 +104,10 @@ export default function createMenus(): MenuItemConstructorOptions[] {
           accelerator: isMac ? 'Cmd+Shift+f' : 'Ctrl+Shift+f'
         }
       ]
+    },
+    {
+      label: 'Edit',
+      submenu: [{ role: 'copy' }, { role: 'paste' }]
     },
     {
       label: 'Window',
