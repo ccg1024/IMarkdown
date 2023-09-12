@@ -25,7 +25,6 @@ import RemarkCode from './remark-code'
 import pubsubConfig from '../../config/pubsub.config'
 import { LiveScroll } from 'src/types'
 import { selectFileDoc } from '../app/reducers/currentFileSlice'
-import '../css/scroll-style.css'
 
 interface Props {
   isVisible: boolean

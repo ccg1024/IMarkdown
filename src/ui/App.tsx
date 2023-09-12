@@ -13,6 +13,8 @@ import Message, { MessageRefMethod } from './components/message'
 import { useDocChange } from './hooks/useDocChange'
 import { useConfig } from './hooks/useConfig'
 import { useIpc } from './hooks/useIpc'
+import { useMackScroll } from './hooks/useMacScroll'
+import './css/global.css'
 
 const App: FC = (): JSX.Element => {
   const editorRef = useRef<EditorRef>(null)
@@ -57,6 +59,7 @@ const App: FC = (): JSX.Element => {
 
   // config setting
   useConfig()
+  useMackScroll()
 
   return (
     <>
