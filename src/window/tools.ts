@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import readline from 'readline'
+import matter from 'gray-matter'
 import { mkdir, stat, readdir } from 'fs/promises'
 import type { MessageBoxSyncOptions } from 'electron'
 
@@ -184,4 +185,18 @@ export function existProp(obj: Record<string, unknown>, p: string) {
 // https://stackoverflow.com/questions/63118414/type-error-when-trying-to-assign-to-object-copy
 export function copyProp<T, K extends keyof T>(dist: T, src: T, key: K) {
   dist[key] = src[key]
+}
+
+export async function readfileSync(path: string) {
+  if (!path) return {}
+
+  const fileInfo = await getMarkFile(path)
+  const fileContent = fs.readFileSync(path, 'utf8')
+  const matterParser = matter(fileContent)
+
+  return {
+    fileInfo,
+    headInfo: matterParser.data,
+    content: matterParser.content
+  }
 }

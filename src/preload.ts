@@ -6,7 +6,7 @@ import { VimOptionIPC } from './config/vim-option.config'
 import {
   UpdateFileData,
   ConfigFile,
-  FileToken,
+  OpenFileType,
   GitPipelineIn,
   GitPipelineOut
 } from 'src/types'
@@ -41,7 +41,7 @@ contextBridge.exposeInMainWorld('ipcAPI', {
   vimOption: (option: VimOptionIPC) => {
     ipcRenderer.invoke(ipcConfig.VIM_OPTION, option)
   },
-  initRenderer: (): Promise<FileToken> => {
+  initRenderer: (): Promise<OpenFileType> => {
     return ipcRenderer.invoke(ipcConfig.INIT_RENDERER)
   },
   getPlatform: (): string => process.platform,

@@ -8,11 +8,12 @@ import {
   updateFileCache,
   touchWin,
   setCurrentFile,
-  hasCache
+  hasCache,
+  addFileCache
 } from 'src/index'
 import ipcConfig from 'src/config/ipc.config'
 import { fileOpenCallback } from './menu/menu-callback'
-import { existProp } from './tools'
+import { existProp, readfileSync } from './tools'
 
 import { UpdateFileData, SaveToken, ConfigFile, GitPipelineIn } from 'src/types'
 import { Git } from './git'
@@ -177,5 +178,28 @@ export function mountIPC() {
   }
   async function handleTouchFile() {
     // TODO: open imarkdown by click file
+    const args = process.argv
+    if (args.length < 2) return
+
+    const path = args[1]
+
+    if (path === '.') return
+
+    const data = await readfileSync(path)
+
+    const fileData = {
+      headInfo: data.headInfo,
+      content: data.content,
+      isChange: false,
+      scrollPos: undefined as number
+    }
+
+    addFileCache(path, { fileInfo: data.fileInfo, fileData })
+    setCurrentFile(path)
+
+    return {
+      fileInfo: data.fileInfo,
+      fileData
+    }
   }
 }

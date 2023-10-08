@@ -146,6 +146,11 @@ export const useOpenFileIpc = (
     }
 
     window.ipcAPI.listenFileOpen(handleFileOpen)
+    window.ipcAPI.initRenderer().then((res: OpenFileType) => {
+      if (res) {
+        handleFileOpen(null, res)
+      }
+    })
 
     return () => {
       window.ipcAPI.removeFileOpenListener()
